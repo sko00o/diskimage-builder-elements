@@ -30,7 +30,6 @@ fi
 unset ARCH
 
 # perftest
-sudo apt-get -y install autotools-dev automake
 git clone https://github.com/linux-rdma/perftest /tmp/perftest
 cd /tmp/perftest
 ./autogen.sh
