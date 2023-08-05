@@ -1,0 +1,9 @@
+{
+    "family": {
+        "debian": {
+            "automake":"autoconf",
+            "libtool":"libtool",
+            "pciutils-devel":"libpci-dev"
+        }
+    }
+}

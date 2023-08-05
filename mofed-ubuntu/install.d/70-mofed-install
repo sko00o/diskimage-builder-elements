@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -o errexit
+set -o nounset
+set -o pipefail
+
+echo "############################################################"
+echo "# Install Mellanox OFED for Ubuntu                         #"
+echo "############################################################"
+
+
+
+mkdir /tmp/ofed_install
+mount -o ro,loop /tmp/MLNX* /tmp/ofed_install
+unset ARCH
+CHROOT_KERNEL=$(dpkg -l | awk '/^.i +linux-(im)/&& $2~/[0-9]/{print substr($2,13)}')
+/tmp/ofed_install/mlnxofedinstall -k ${CHROOT_KERNEL} -s /usr/src/linux-headers-${CHROOT_KERNEL} --without-dkms --add-kernel-support --without-fw-update --force
+export ARCH=amd64
+umount /tmp/ofed_install

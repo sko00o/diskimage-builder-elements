@@ -1,0 +1,44 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -o errexit
+set -o nounset
+set -o pipefail
+
+echo "#############################################################"
+echo "# CUDA Installation                                         #"
+echo "#############################################################"
+
+# comparing chroot kernel with host kernel
+CHROOT_KERNEL=$(dpkg -l | awk '/^.i +linux-(im)/&& $2~/[0-9]/{print substr($2,13)}')
+HOST_KERNEL=$(uname -r)
+if [ "$CHROOT_KERNEL" != "$HOST_KERNEL" ]; then
+    echo "ERROR: kernel mismatch! CHROOT_KERNEL:$CHROOT_KERNEL HOST_KERNEL:$HOST_KERNEL"
+    exit 1
+fi
+
+# download and install cuda keyring file
+mkdir -p /tmp/cuda
+cd /tmp/cuda
+
+if [ -n "${DIB_CUDA_URL}" ]; then
+    wget -nv $DIB_CUDA_URL
+else
+    echo "ERROR: DIB_CUDA_URL is not set."
+fi
+
+# Install cuda
+unset ARCH
+sudo dpkg -i cuda-keyring*
+sudo apt-get -y update
+if [ -n "${DIB_CUDA_VERSION}" ]; then
+    sudo apt-get -y install cuda=${DIB_CUDA_VERSION}
+else
+    sudo apt-get -y install cuda
+fi
+
+# clean
+export ARCH=amd64
+rm -Rf /tmp/cuda
