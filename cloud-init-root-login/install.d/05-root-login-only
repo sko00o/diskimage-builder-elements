@@ -8,11 +8,12 @@ set -o nounset
 set -o pipefail
 
 echo "############################################################"
-echo "# enable root ssh login                                    #"
+echo "# root login only                                          #"
 echo "############################################################"
 
+cat >/etc/cloud/cloud.cfg.d/05-dib-root-login.cfg <<EOF
 # remove default user
-sed -i "/users:/,3d" /etc/cloud/cloud.cfg
-
+users: []
 # enable root login
-sed -i "s\disable_root: true\disable_root: false\g" /etc/cloud/cloud.cfg
+disable_root: false
+EOF
