@@ -15,4 +15,4 @@ echo "############################################################"
 sed -i "/users:/,3d" /etc/cloud/cloud.cfg
 
 # enable root login
-sed -i "s\preserve_hostname: false\preserve_hostname: true\g" /etc/cloud/cloud.cfg
+sed -i "s\disable_root: true\disable_root: false\g" /etc/cloud/cloud.cfg
