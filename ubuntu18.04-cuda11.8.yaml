@@ -1,12 +1,12 @@
 - imagename: ubuntu18.04-cuda11.8
   elements:
-  - vm
-  - dhcp-all-interfaces
-  - cloud-init-datasources
-  - mofed-ubuntu
-  - cuda-ubuntu
-  - gpudirect-bench-ubuntu
-  - ubuntu
+    - vm
+    - dhcp-all-interfaces
+    - cloud-init-datasources
+    - mofed-ubuntu
+    - cuda-ubuntu
+    - gpudirect-bench-ubuntu
+    - ubuntu
   debug-trace: 0
   no-tmpfs: true
   environment:
