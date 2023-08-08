@@ -8,5 +8,5 @@ set -o nounset
 set -o pipefail
 
 if [ ! -f $DIB_MOFED_FILE ]; then
-    wget "${DIB_MOFED_URL}" -O "$DIB_MOFED_FILE"
+    curl -o "$DIB_MOFED_FILE" "${DIB_MOFED_URL}"
 fi
