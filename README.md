@@ -13,7 +13,7 @@ python3 -m pip install diskimage-builder
 ## build image
 
 ```sh
-./build.sh ubuntu18.04-miniconda3.yaml
+./build.sh etc/ubuntu18.04-miniconda3.yaml
 ```
 
 Image file **ubuntu18.04-miniconda3.qcow2** will be grnerated.
