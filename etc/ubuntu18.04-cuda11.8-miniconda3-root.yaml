@@ -1,4 +1,4 @@
-- imagename: ubuntu18.04-cuda11.8-miniconda3
+- imagename: ubuntu18.04-cuda11.8-miniconda3-root
   elements:
     - vm
     - dhcp-all-interfaces
