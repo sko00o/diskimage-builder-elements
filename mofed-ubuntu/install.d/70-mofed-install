@@ -12,7 +12,7 @@ echo "# Install Mellanox OFED for Ubuntu                         #"
 echo "############################################################"
 
 mkdir /tmp/ofed_install
-mount -o ro,loop /tmp/MLNX* /tmp/ofed_install
+mount -o ro,loop /tmp/MLNX_OFED_LINUX.iso /tmp/ofed_install
 unset ARCH
 CHROOT_KERNEL=$(dpkg -l | awk '/^.i +linux-(im)/&& $2~/[0-9]/{print substr($2,13)}')
 /tmp/ofed_install/mlnxofedinstall -k ${CHROOT_KERNEL} -s /usr/src/linux-headers-${CHROOT_KERNEL} --without-dkms --add-kernel-support --without-fw-update --force

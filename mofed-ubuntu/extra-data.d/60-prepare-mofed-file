@@ -7,9 +7,6 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-MLNX_OFED_IMG="MLNX_OFED_LINUX-5.8-3.0.7.0-ubuntu18.04-x86_64.iso"
-export DIB_MOFED_FILE="/tmp/$MLNX_OFED_IMG"
 if [ ! -f $DIB_MOFED_FILE ]; then
-    wget https://content.mellanox.com/ofed/MLNX_OFED-5.8-3.0.7.0/MLNX_OFED_LINUX-5.8-3.0.7.0-ubuntu18.04-x86_64.iso \
-        -O "$DIB_MOFED_FILE"
+    wget "${DIB_MOFED_URL}" -O "$DIB_MOFED_FILE"
 fi

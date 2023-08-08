@@ -12,7 +12,7 @@ echo "# Copy Mellanox OFED ISO from HOST                         #"
 echo "############################################################"
 
 if [ -n "${DIB_MOFED_FILE}" ]; then
-    cp ${DIB_MOFED_FILE} ${TMP_MOUNT_PATH}/tmp/
+    cp ${DIB_MOFED_FILE} ${TMP_MOUNT_PATH}/tmp/MLNX_OFED_LINUX.iso
 else
     echo "ERROR: DIB_MOFED_FILE is not set."
 fi
