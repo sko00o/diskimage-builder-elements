@@ -23,3 +23,5 @@ export LD_LIBRARY_PATH=\$MINICONDA_ROOT/lib:\$LD_LIBRARY_PATH
 # Python paths
 export PYTHONHOME=\$MINICONDA_ROOT
 EOF
+
+ln -s $MINICONDA_ROOT/bin/conda /usr/local/bin/conda

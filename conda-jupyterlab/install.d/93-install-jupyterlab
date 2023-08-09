@@ -6,4 +6,8 @@ fi
 set -eu
 set -o pipefail
 
+echo "############################################################"
+echo "# install jupyter using conda                              #"
+echo "############################################################"
+
 conda install -y -c conda-forge jupyterlab
