@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -eu
+set -o pipefail
+
+if [ -x "$ANACONDA_INSTALLER_LOCAL" ]; then
+    bash $ANACONDA_INSTALLER_LOCAL -b -f -p $ANACONDA_ROOT || exit -1
+fi
+
+ln -s $ANACONDA_ROOT/bin/conda /usr/local/bin/conda
+conda init
+conda --version

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -eu
+set -o pipefail
+
+if [ -x "$MINICONDA_INSTALLER_LOCAL" ]; then
+    bash $MINICONDA_INSTALLER_LOCAL -b -f -p $MINICONDA_ROOT || exit -1
+fi
+
+ln -s $MINICONDA_ROOT/bin/conda /usr/local/bin/conda
+conda init
+conda --version

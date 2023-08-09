@@ -1,0 +1,14 @@
+- imagename: ubuntu18.04-miniconda3-root
+  elements:
+    - vm
+    - dhcp-all-interfaces
+    - cloud-init-datasources
+    - cloud-init-root-login
+    - miniconda
+    - ubuntu
+  debug-trace: 0
+  no-tmpfs: true
+  environment:
+    DIB_CLOUD_INIT_DATASOURCES: "OpenStack"
+    DIB_RELEASE: bionic # ubuntu18.04
+    DIB_MINICONDA_RELEASE: py311_23.5.2-0

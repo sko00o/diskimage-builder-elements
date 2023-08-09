@@ -8,11 +8,12 @@ set -o nounset
 set -o pipefail
 
 echo "############################################################"
-echo "# Copy Mellanox OFED ISO from HOST                         #"
+echo "# root login only                                          #"
 echo "############################################################"
 
-if [ -n "${DIB_MOFED_FILE}" ]; then
-    cp ${DIB_MOFED_FILE} ${TMP_MOUNT_PATH}/tmp/MLNX_OFED_LINUX.iso
-else
-    echo "ERROR: DIB_MOFED_FILE is not set."
-fi
+cat >/etc/cloud/cloud.cfg.d/05-dib-root-login.cfg <<EOF
+# remove default user
+users: []
+# enable root login
+disable_root: false
+EOF

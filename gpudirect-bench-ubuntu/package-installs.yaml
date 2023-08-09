@@ -1,3 +1,4 @@
+autotools-dev:
 automake:
 libtool:
 pciutils-devel:

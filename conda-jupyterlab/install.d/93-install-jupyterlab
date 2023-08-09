@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -eu
+set -o pipefail
+
+echo "############################################################"
+echo "# install jupyter using conda                              #"
+echo "############################################################"
+
+conda install -y -c conda-forge jupyterlab
+
+JP_PATH=$(conda run which jupyter)
+ln -s $JP_PATH /usr/local/bin/jupyter

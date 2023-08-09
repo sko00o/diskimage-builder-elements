@@ -1,0 +1,6 @@
+export MINICONDA_MIRROR_URL=${DIB_MINICONDA_MIRROR_URL:-"https://repo.anaconda.com/miniconda"}
+export MINICONDA_PYTHON_VER=${DIB_MINICONDA_PYTHON_VER:-"3"}
+export MINICONDA_RELEASE=${DIB_MINICONDA_RELEASE:-"latest"}
+export MINICONDA_INSTALLER_URL="${MINICONDA_MIRROR_URL}/Miniconda${MINICONDA_PYTHON_VER}-${MINICONDA_RELEASE}-Linux-x86_64.sh"
+export MINICONDA_INSTALLER_LOCAL="/tmp/miniconda-installer.sh"
+export MINICONDA_ROOT="/opt/miniconda"
