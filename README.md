@@ -6,8 +6,14 @@ Some elements for [diskimage-builder (DIB)](https://docs.openstack.org/diskimage
 
 ```sh
 sudo apt-get update
-sudo apt-get -y install kpartx debootstrap qemu-utils 
-sudo apt-get -y install python3 python3-pip
+sudo apt-get -y install kpartx debootstrap qemu-utils
+
+# install miniconda and python
+curl -o /tmp/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash /tmp/miniconda.sh -b -f -p /opt/miniconda
+/opt/miniconda/bin/conda init
+source ~/.bashrc
+
 python3 -m pip install diskimage-builder
 ```
 
