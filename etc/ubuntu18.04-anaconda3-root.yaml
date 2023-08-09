@@ -1,0 +1,14 @@
+- imagename: ubuntu18.04-anaconda3-root
+  elements:
+    - vm
+    - dhcp-all-interfaces
+    - cloud-init-datasources
+    - cloud-init-root-login
+    - anaconda
+    - ubuntu
+  debug-trace: 0
+  no-tmpfs: true
+  environment:
+    DIB_CLOUD_INIT_DATASOURCES: "OpenStack"
+    DIB_RELEASE: bionic # ubuntu18.04
+    DIB_ANACONDA_RELEASE: 2023.07-2

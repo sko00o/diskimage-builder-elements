@@ -1,6 +1,6 @@
-========
-anaconda
-========
+===========================================================
+Install anaconda
+===========================================================
 
 Install Anaconda - the leading open data science platform powered
 by Python. The open source version of Anaconda is a high performance
