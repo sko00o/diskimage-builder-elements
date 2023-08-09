@@ -10,18 +10,6 @@ if [ -x "$MINICONDA_INSTALLER_LOCAL" ]; then
     bash $MINICONDA_INSTALLER_LOCAL -b -f -p $MINICONDA_ROOT || exit -1
 fi
 
-# Update the system shell profile to accommodate the Miniconda installation
-cat >/etc/profile.d/miniconda.sh <<EOF
-# Miniconda installation root
-MINICONDA_ROOT=$MINICONDA_ROOT
-
-# Miniconda system paths
-export PATH=\$MINICONDA_ROOT/bin:\$PATH
-export MANPATH=\$MINICONDA_ROOT/share/man:\$MANPATH
-export LD_LIBRARY_PATH=\$MINICONDA_ROOT/lib:\$LD_LIBRARY_PATH
-
-# Python paths
-export PYTHONHOME=\$MINICONDA_ROOT
-EOF
-
 ln -s $MINICONDA_ROOT/bin/conda /usr/local/bin/conda
+conda init
+conda --version
