@@ -6,6 +6,7 @@
     - cloud-init-root-login
     - miniconda
     - conda-jupyterlab
+    - systemd-jupyterlab
     - ubuntu
   debug-trace: 0
   no-tmpfs: true
