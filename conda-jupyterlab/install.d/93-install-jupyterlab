@@ -11,3 +11,6 @@ echo "# install jupyter using conda                              #"
 echo "############################################################"
 
 conda install -y -c conda-forge jupyterlab
+
+JP_PATH=$(conda run which jupyter)
+ln -s $JP_PATH /usr/local/bin/jupyter
