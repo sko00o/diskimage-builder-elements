@@ -4,16 +4,35 @@ Some elements for [diskimage-builder (DIB)](https://docs.openstack.org/diskimage
 
 ## requirements
 
+<details>
+<summary> Install python3 if it's not exists. </summary>
+
+DO NOT USE CONDA ON BUILD HOST!
+Environment variables related to conda may lead to image build fail.
+
+I recommended install python3.10. You can build it from source on Ubuntu18.04.
+
+```sh
+sudo apt-get -y install build-essential wget \
+    libbz2-dev zlib1g-dev libncurses-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev
+
+wget https://www.python.org/ftp/python/3.10.12/Python-3.10.12.tar.xz
+tar -xf Python-3.10.12.tar.xz
+cd Python-3.10.12
+./configure --enable-optimizations
+make -j $(nproc)
+sudo make install
+
+## enter venv
+python3 -m venv venv
+source venv/bin/activate
+```
+</details>
+
+
 ```sh
 sudo apt-get update
 sudo apt-get -y install kpartx debootstrap qemu-utils
-
-# install miniconda and python
-curl -o /tmp/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash /tmp/miniconda.sh -b -f -p /opt/miniconda
-/opt/miniconda/bin/conda init
-source ~/.bashrc
-
 python3 -m pip install diskimage-builder
 ```
 
