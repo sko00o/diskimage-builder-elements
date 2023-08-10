@@ -1,0 +1,13 @@
+- imagename: ubuntu18.04-python-root
+  elements:
+    - vm
+    - ubuntu
+    - cloud-init-root-login
+    - pip-and-virtualenv
+  debug-trace: 0
+  no-tmpfs: true
+  environment:
+    DIB_CLOUD_INIT_DATASOURCES: "OpenStack"
+    DIB_RELEASE: bionic # ubuntu18.04
+    DIB_OFFLINE: "true"
+    DIB_INSTALLTYPE_pip_and_virtualenv: source
