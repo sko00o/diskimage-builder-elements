@@ -8,12 +8,12 @@ set -o pipefail
 
 name="workspace"
 ## Create new conda env based on Python3.10
-conda create -n $name python=3.10
+conda create -y -n $name python=3.10
 ## Enter env
 conda activate $name
 
 ## Install CUDA 11.8
-conda install -c conda-forge cudatoolkit=11.8.0
+conda install -y -c conda-forge cudatoolkit=11.8.0
 ## Install cuDNN 8.6
 python3 -m pip install nvidia-cudnn-cu11==8.6.0.163
 
