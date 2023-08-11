@@ -11,7 +11,10 @@ set -o pipefail
 # conda create -y -n $name python=3.10
 # ## Enter env
 # conda activate $name
-source $(conda info --base)/etc/profile.d/conda.sh
+CONDA_PREFIX=$(conda info --base)
+python3() {
+    $CONDA_PREFIX/bin/python3 "$@"
+}
 
 ## Install CUDA 11.8
 conda install -y -c conda-forge cudatoolkit=11.8.0
