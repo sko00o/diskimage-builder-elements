@@ -6,28 +6,23 @@ fi
 set -eu
 set -o pipefail
 
-# name="workspace"
-# ## Create new conda env based on Python3.10
-# conda create -y -n $name python=3.10
-# ## Enter env
-# conda activate $name
 CONDA_PREFIX=$(conda info --base)
 python3() {
     $CONDA_PREFIX/bin/python3 "$@"
 }
 
-## Install CUDA 11.8
-conda install -y -c conda-forge cudatoolkit=11.8.0
-## Install cuDNN 8.6
-python3 -m pip install nvidia-cudnn-cu11==8.6.0.163
+## Install CUDA
+conda install -y -c conda-forge cudatoolkit=${CUDATOOLKIT_VER}
+## Install cuDNN
+python3 -m pip install nvidia-cudnn-cu11==${CUDNN_CU11_VER}
 
 ## Setup cuDNN
 mkdir -p $CONDA_PREFIX/etc/conda/activate.d
 echo 'CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))' >>$CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
 echo 'export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH' >>$CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
 
-## Install TensorFlow 2.12
-python3 -m pip install tensorflow==2.12.*
+## Install TensorFlow
+python3 -m pip install tensorflow==${TENSORFLOW_VER}
 
 ## (optional) Install TensorRT
-python3 -m pip install tensorrt==8.6.1
+python3 -m pip install tensorrt==${TENSORRT_VER}
