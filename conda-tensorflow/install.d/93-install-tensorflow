@@ -6,11 +6,12 @@ fi
 set -eu
 set -o pipefail
 
-name="workspace"
-## Create new conda env based on Python3.10
-conda create -y -n $name python=3.10
-## Enter env
-conda activate $name
+# name="workspace"
+# ## Create new conda env based on Python3.10
+# conda create -y -n $name python=3.10
+# ## Enter env
+# conda activate $name
+source $(conda info --base)/etc/profile.d/conda.sh
 
 ## Install CUDA 11.8
 conda install -y -c conda-forge cudatoolkit=11.8.0
