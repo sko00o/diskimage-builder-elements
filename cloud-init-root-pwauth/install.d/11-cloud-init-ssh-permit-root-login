@@ -13,4 +13,5 @@ echo "############################################################"
 cat >/etc/cloud/cloud.cfg.d/06-dib-root-pwauth.cfg <<EOF
 runcmd:
   - sed -i 's/#PermitRootLogin .*/PermitRootLogin yes/' /etc/ssh/sshd_config
+  - service ssh reload
 EOF
