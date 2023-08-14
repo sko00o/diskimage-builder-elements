@@ -52,5 +52,11 @@ Image file **ubuntu18.04-miniconda3.qcow2** will be grnerated.
 sudo apt-get -y install build-essential
 python3 -m pip install python-openstackclient
 source ./service-openrc.sh
-openstack image create ubuntu18.04_miniconda3 --public --disk-format qcow2 --container-format bare --file ubuntu18.04-miniconda3.qcow2
+
+openstack image create \
+  --container-format bare \
+  --disk-format qcow2 \
+  --public \
+  --file ubuntu18.04-miniconda3.qcow2
+  ubuntu18.04_miniconda3
 ```
