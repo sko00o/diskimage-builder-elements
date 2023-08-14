@@ -2,7 +2,7 @@
   elements:
     - vm
     - ubuntu
-    - cloud-init-root-pwauth
+    - cloud-init-root-login
     - qemu-guest-agent
   debug-trace: 0
   no-tmpfs: true
