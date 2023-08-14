@@ -3,15 +3,16 @@
 if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
     set -x
 fi
-set -o errexit
-set -o nounset
+set -eu
 set -o pipefail
 
 echo "############################################################"
-echo "# enable ssh password login                                #"
+echo "# root login only                                          #"
 echo "############################################################"
 
-cat >/etc/cloud/cloud.cfg.d/05-dib-pwauth-login.cfg <<EOF
-# enable password login
-ssh_pwauth: true
+cat >/etc/cloud/cloud.cfg.d/05-dib-root-login.cfg <<EOF
+# remove default user
+users: []
+# enable root login
+disable_root: false
 EOF
