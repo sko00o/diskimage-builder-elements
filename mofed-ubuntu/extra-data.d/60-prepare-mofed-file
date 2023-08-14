@@ -8,5 +8,7 @@ set -o nounset
 set -o pipefail
 
 if [ ! -f $DIB_MOFED_FILE ]; then
-    curl -o "$DIB_MOFED_FILE" "${DIB_MOFED_URL}"
+    curl -sfL -o "$DIB_MOFED_FILE" "${DIB_MOFED_URL}"
+else
+    echo "$DIB_MOFED_FILE already exists."
 fi
