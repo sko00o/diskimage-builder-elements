@@ -12,9 +12,5 @@ echo "############################################################"
 
 cat >/etc/cloud/cloud.cfg.d/06-dib-root-pwauth.cfg <<EOF
 runcmd:
-  - echo 'Include /etc/ssh/sshd_config.d/*.conf' >> /etc/ssh/sshd_config
-write_files:
-  - path: /etc/ssh/sshd_config.d/permit_root_login.conf
-    content: |
-      PermitRootLogin yes
+  - sed -i 's/#PermitRootLogin .*/PermitRootLogin yes/' /etc/ssh/sshd_config
 EOF
