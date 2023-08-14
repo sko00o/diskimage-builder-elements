@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -eu
+set -o pipefail
+
+echo ">> Install node-exporter"
+
+## extract node_exporter and move to PATH
+tar -xvf /tmp/node-exporter.tar.gz -C /tmp
+cp /tmp/node_exporter*/node_exporter /usr/local/bin/
+
+## create an user for node_exporter
+useradd --no-create-home --shell /bin/false node_exporter
+chown node_exporter:node_exporter /usr/local/bin/node_exporter
