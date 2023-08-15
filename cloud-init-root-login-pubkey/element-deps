@@ -1,0 +1,2 @@
+cloud-init-enable-root-login
+cloud-init-remove-default-users

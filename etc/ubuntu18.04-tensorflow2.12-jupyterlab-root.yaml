@@ -1,10 +1,9 @@
-- imagename: ubuntu18.04-miniconda3-jupyterlab-root
+- imagename: ubuntu18.04-tensorflow2.12-jupyterlab-root
   elements:
     - vm
-    - dhcp-all-interfaces
-    - cloud-init-datasources
     - cloud-init-root-login
     - miniconda
+    - conda-tensorflow
     - jupyterlab
     - ubuntu
   debug-trace: 0
