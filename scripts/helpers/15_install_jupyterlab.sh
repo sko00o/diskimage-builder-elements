@@ -1,8 +1,8 @@
 #!/bin/bash
 
 JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-"4.0.4"}
+JUPYTERLAB_PORT=${JUPYTERLAB_PORT:-"8888"}
 JUPYTERLAB_CONFIG=${HOME}/.jupyter/jupyter_lab_config.py
-JUPYTERLAB_PORT=8888
 
 setup_jupyterlab_binary() {
     if command -v jupyter &>/dev/null; then
