@@ -14,7 +14,7 @@ install_pytorch_conda() {
 }
 
 install_pytorch_pip() {
-    extra=${PYTORCH_CUDA_VERSION//./}
+    extra="cu${PYTORCH_CUDA_VERSION//./}"
     python3 -m pip install \
         torch==${PYTORCH_VERSION}+${extra} \
         torchvision==${PYTORCH_TORCHVISION_VERSION}+${extra} \
