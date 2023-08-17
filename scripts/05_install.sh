@@ -11,3 +11,4 @@ install_node_exporter
 install_miniconda
 install_jupyterlab
 install_tensorflow
+install_pytorch
