@@ -16,13 +16,13 @@ setup_jupyterlab_binary() {
 setup_jupyterlab_systemd() {
     # Check if jupyter lab systemd service is active
     if systemctl is-active --quiet jupyter-lab; then
-        echo "Jupyter Lab systemd service is already active"
+        echo "jupyter-lab systemd service is already active"
         return
     fi
 
     # Check if jupyter lab systemd service exists
     if [ -f /etc/systemd/system/jupyter-lab.service ]; then
-        echo "jupyter lab systemd service already exists"
+        echo "jupyter-lab systemd service already exists"
     else
         JUPYTER=$(which jupyter)
         cat <<EOF | sudo tee /etc/systemd/system/jupyter-lab.service
@@ -51,7 +51,7 @@ EOF
 
 setup_jupyterlab_config() {
     if [ -f ${JUPYTERLAB_CONFIG} ]; then
-        echo "jupyter lab config already exists"
+        echo "jupyter-lab config already exists"
         return
     fi
 
@@ -77,5 +77,5 @@ install_jupyterlab() {
     setup_jupyterlab_binary
     setup_jupyterlab_config
     setup_jupyterlab_systemd
-    echo "jupyter lab installed and added to systemd service."
+    echo "jupyter-lab installed and added to systemd service."
 }
