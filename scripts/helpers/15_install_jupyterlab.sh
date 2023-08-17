@@ -11,8 +11,6 @@ setup_jupyterlab_binary() {
     fi
     install_miniconda
     python3 -m pip install jupyterlab==${JUPYTERLAB_VERSION}
-
-    sudo ln -s $(conda info --base)/bin/jupyter /usr/local/bin/jupyter
 }
 
 setup_jupyterlab_systemd() {
@@ -26,15 +24,15 @@ setup_jupyterlab_systemd() {
     if [ -f /etc/systemd/system/jupyter-lab.service ]; then
         echo "jupyter lab systemd service already exists"
     else
-
-        cat <<EOF  | sudo tee /etc/systemd/system/jupyter-lab.service
+        JUPYTER=$(which jupyter)
+        cat <<EOF | sudo tee /etc/systemd/system/jupyter-lab.service
 [Unit]
 Description=Jupyter Lab
 
 [Service]
 Type=simple
 PIDFile=/run/jupyter-lab.pid
-ExecStart=/usr/local/bin/jupyter lab --allow-root --config ${JUPYTERLAB_CONFIG}
+ExecStart=${JUPYTER} lab --allow-root --config ${JUPYTERLAB_CONFIG}
 User=${USER}
 WorkingDirectory=${HOME}
 Restart=always
