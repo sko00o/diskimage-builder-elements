@@ -34,12 +34,6 @@ install_keyring() {
     rm cuda-keyring_1.0-1_all.deb
 }
 
-install_nvidia_driver() {
-    major_version=${CUDA_DRIVER_VERSION%%.*}
-    sudo apt-get -y install --no-install-recommends \
-        nvidia-driver-${major_version}=${CUDA_DRIVER_VERSION}-0ubuntu1
-}
-
 install_cuda_driver() {
     major_version=${CUDA_DRIVER_VERSION%%.*}
     sudo apt-get -y install --no-install-recommends \
