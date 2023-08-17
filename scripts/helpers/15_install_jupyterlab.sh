@@ -75,6 +75,7 @@ EOF
 
 install_jupyterlab() {
     setup_jupyterlab_binary
+    setup_jupyterlab_config
     setup_jupyterlab_systemd
     echo "jupyter lab installed and added to systemd service."
 }
