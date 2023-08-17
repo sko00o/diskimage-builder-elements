@@ -2,12 +2,26 @@
 
 # https://docs.nvidia.com/datacenter/tesla/drivers/index.html#driver-install
 
-NVIDIA_DRIVER_VERSION=${NVIDIA_DRIVER_VERSION:-"535"}
+NVIDIA_DRIVER_VERSION=${NVIDIA_DRIVER_VERSION:-"530.30.02"}
 CUDA_VERSION=${CUDA_VERSION:-"11.8.0"}
 CUDNN_VERSION=${CUDNN_VERSION:-"8.6.0.163"}
 
+version_short() {
+    version=$1
+    major=${version%%.*}
+    minor=${version#"${major}."}
+    minor=${minor%%.*}
+    echo "${major}.${minor}"
+}
+
 # https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html#ubuntu-lts
 install_keyring() {
+    # Check if keyring already installed
+    if dpkg -s cuda-keyring &>/dev/null; then
+        echo "The cuda-keyring is already installed."
+        return
+    fi
+
     distribution=$(
         . /etc/os-release
         echo $ID$VERSION_ID | sed -e 's/\.//g'
@@ -20,21 +34,23 @@ install_keyring() {
 }
 
 install_nvidia_driver() {
+    major_version=${NVIDIA_DRIVER_VERSION%%.*}
     sudo apt-get -y install --no-install-recommends \
-        nvidia-driver-${NVIDIA_DRIVER_VERSION}
+        nvidia-driver-${major_version}=${NVIDIA_DRIVER_VERSION}-0ubuntu1
 }
 
 # Installs all CUDA Toolkit packages required to develop CUDA applications. Does not include the driver.
 install_cuda_toolkit() {
-    MINOR_VERSION=${CUDA_VERSION%.*}
+    cuda_version=$(version_short $CUDA_VERSION)
     sudo apt-get -y install \
-        cuda-toolkit-${MINOR_VERSION//-/.}=$CUDA_VERSION-1
+        cuda-toolkit-${cuda_version//./-}=$CUDA_VERSION-1
 }
 
 install_cudnn() {
+    cuda_version=$(version_short $CUDA_VERSION)
     sudo apt-get -y install \
-        libcudnn8=$CUDNN_VERSION-1+cuda${CUDA_VERSION} \
-        libcudnn8-dev=$CUDNN_VERSION-1+cuda${CUDA_VERSION}
+        libcudnn8=$CUDNN_VERSION-1+cuda${cuda_version} \
+        libcudnn8-dev=$CUDNN_VERSION-1+cuda${cuda_version}
 }
 
 # all in one
