@@ -60,4 +60,5 @@ install_cuda() {
     install_cuda_driver
     install_cuda_toolkit
     install_cudnn
+    echo "CUDA ${CUDA_VERSION} and cuDNN ${CUDNN_VERSION} installed"
 }

@@ -35,4 +35,5 @@ install_pytorch() {
     fi
 
     install_pytorch_conda
+    echo "pytorch ${PYTORCH_VERSION} installed"
 }

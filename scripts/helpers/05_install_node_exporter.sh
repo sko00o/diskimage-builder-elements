@@ -65,5 +65,5 @@ EOF
 install_node_exporter() {
     setup_node_exporter_binary
     setup_node_exporter_systemd
-    echo "node_exporter installed and added to systemd service."
+    echo "node_exporter ${NODE_EXPORTER_VERSION} installed and added to systemd service"
 }

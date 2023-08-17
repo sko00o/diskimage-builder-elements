@@ -8,6 +8,7 @@ index-url = http://mirrors.aliyun.com/pypi/simple/
 [install]
 trusted-host=mirrors.aliyun.com
 EOF
+  echo "pip mirror already set"
 }
 
 setup_conda_mirror() {
@@ -27,4 +28,5 @@ custom_channels:
   pytorch: http://mirrors.aliyun.com/anaconda/cloud
   simpleitk: http://mirrors.aliyun.com/anaconda/cloud
 EOF
+  echo "conda mirror already set"
 }

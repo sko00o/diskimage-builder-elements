@@ -24,4 +24,6 @@ install_nvidia_driver() {
 
     # cleanup
     rm -rf "${filename}"
+
+    echo "nvidia-driver ${NVIDIA_DRIVER_VERSION} for ${NVIDIA_DRIVER_TYPE} installed"
 }

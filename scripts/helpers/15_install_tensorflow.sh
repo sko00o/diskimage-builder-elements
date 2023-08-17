@@ -31,4 +31,6 @@ install_tensorflow() {
     if ! verify_tensorrt; then
         install_tensorrt_pip
     fi
+
+    echo "TensorFlow ${TENSORFLOW_VERSION} and TensorRT ${TENSORRT_VERSION} installed"
 }
