@@ -2,7 +2,9 @@
 set -exo pipefail
 
 cd "$(dirname "$0")"
-source ./helpers/*.sh
+for helper in ./helpers/*.sh; do
+    source "$helper"
+done
 
 install_cuda
 install_node_exporter
