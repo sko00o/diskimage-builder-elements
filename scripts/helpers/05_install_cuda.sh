@@ -1,10 +1,9 @@
 #!/bin/bash
-set -euxo pipefail
 
 # https://docs.nvidia.com/datacenter/tesla/drivers/index.html#driver-install
 
 NVIDIA_DRIVER_VERSION=${NVIDIA_DRIVER_VERSION:-"535"}
-CUDA_VERSION=${CUDA_VERSION:-"11.8"}
+CUDA_VERSION=${CUDA_VERSION:-"11.8.0"}
 CUDNN_VERSION=${CUDNN_VERSION:-"8.6.0.163"}
 
 # https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html#ubuntu-lts
@@ -27,8 +26,9 @@ install_nvidia_driver() {
 
 # Installs all CUDA Toolkit packages required to develop CUDA applications. Does not include the driver.
 install_cuda_toolkit() {
+    MINOR_VERSION=${CUDA_VERSION%.*}
     sudo apt-get -y install \
-        cuda-toolkit-${CUDA_VERSION//-/.}
+        cuda-toolkit-${MINOR_VERSION//-/.}=$CUDA_VERSION-1
 }
 
 install_cudnn() {
@@ -44,5 +44,3 @@ install_cuda() {
     install_cuda_toolkit
     install_cudnn
 }
-
-install_cuda

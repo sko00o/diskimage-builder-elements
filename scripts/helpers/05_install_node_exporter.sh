@@ -1,5 +1,4 @@
 #!/bin/bash
-set -euxo pipefail
 
 NODE_EXPORTER_VERSION=${NODE_EXPORTER_VERSION:-"1.6.1"}
 NODE_EXPORTER_URL=${NODE_EXPORTER_URL:-"https://github.com/prometheus/node_exporter/releases/download/v${NODE_EXPORTER_VERSION}/node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz"}
@@ -67,5 +66,3 @@ install_node_exporter() {
     setup_node_exporter_systemd
     echo "Node Exporter installed and added to systemd service."
 }
-
-install_node_exporter
