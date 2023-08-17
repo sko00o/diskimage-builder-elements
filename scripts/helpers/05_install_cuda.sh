@@ -2,7 +2,8 @@
 
 # https://docs.nvidia.com/datacenter/tesla/drivers/index.html#driver-install
 
-NVIDIA_DRIVER_VERSION=${NVIDIA_DRIVER_VERSION:-"530.30.02"}
+CUDA_REPO=${CUDA_REPO:-"https://developer.download.nvidia.com/compute/cuda/repos"}
+CUDA_DRIVER_VERSION=${CUDA_DRIVER_VERSION:-"530.30.02"}
 CUDA_VERSION=${CUDA_VERSION:-"11.8.0"}
 CUDNN_VERSION=${CUDNN_VERSION:-"8.6.0.163"}
 
@@ -26,7 +27,7 @@ install_keyring() {
         . /etc/os-release
         echo $ID$VERSION_ID | sed -e 's/\.//g'
     )
-    wget https://developer.download.nvidia.com/compute/cuda/repos/$distribution/x86_64/cuda-keyring_1.0-1_all.deb
+    wget ${CUDA_REPO}/$distribution/x86_64/cuda-keyring_1.0-1_all.deb
     sudo dpkg -i cuda-keyring_1.0-1_all.deb
     sudo apt-get -y update
     # Clean up
@@ -34,9 +35,15 @@ install_keyring() {
 }
 
 install_nvidia_driver() {
-    major_version=${NVIDIA_DRIVER_VERSION%%.*}
+    major_version=${CUDA_DRIVER_VERSION%%.*}
     sudo apt-get -y install --no-install-recommends \
-        nvidia-driver-${major_version}=${NVIDIA_DRIVER_VERSION}-0ubuntu1
+        nvidia-driver-${major_version}=${CUDA_DRIVER_VERSION}-0ubuntu1
+}
+
+install_cuda_driver() {
+    major_version=${CUDA_DRIVER_VERSION%%.*}
+    sudo apt-get -y install --no-install-recommends \
+        cuda-drivers-${major_version}=${CUDA_DRIVER_VERSION}-1
 }
 
 # Installs all CUDA Toolkit packages required to develop CUDA applications. Does not include the driver.
@@ -56,7 +63,7 @@ install_cudnn() {
 # all in one
 install_cuda() {
     install_keyring
-    install_nvidia_driver
+    install_cuda_driver
     install_cuda_toolkit
     install_cudnn
 }

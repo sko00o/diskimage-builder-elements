@@ -1,7 +1,7 @@
 #!/bin/bash
 
+NODE_EXPORTER_REPO=${NODE_EXPORTER_REPO:-"https://github.com/prometheus/node_exporter/releases/download"}
 NODE_EXPORTER_VERSION=${NODE_EXPORTER_VERSION:-"1.6.1"}
-NODE_EXPORTER_URL=${NODE_EXPORTER_URL:-"https://github.com/prometheus/node_exporter/releases/download/v${NODE_EXPORTER_VERSION}/node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz"}
 
 setup_node_exporter_binary() {
     # Check if Node Exporter binary exists
@@ -11,7 +11,7 @@ setup_node_exporter_binary() {
     fi
 
     # Download Node Exporter
-    wget ${NODE_EXPORTER_URL}
+    wget "${NODE_EXPORTER_REPO}/v${NODE_EXPORTER_VERSION}/node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz"
 
     # Extract Node Exporter
     tar -xzvf node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz
