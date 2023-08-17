@@ -1,7 +1,7 @@
 #!/bin/bash
 
 JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-"4.0.4"}
-JUPYTERLAB_CONFIG=/root/.jupyter/jupyter_lab_config.py
+JUPYTERLAB_CONFIG=${HOME}/.jupyter/jupyter_lab_config.py
 JUPYTERLAB_PORT=8888
 
 setup_jupyterlab_binary() {
@@ -11,7 +11,8 @@ setup_jupyterlab_binary() {
     fi
     install_miniconda
     python3 -m pip install jupyterlab==${JUPYTERLAB_VERSION}
-    ln -s $(conda info --base)/bin/jupyter /usr/local/bin/jupyter
+
+    sudo ln -s $(conda info --base)/bin/jupyter /usr/local/bin/jupyter
 }
 
 setup_jupyterlab_systemd() {
@@ -26,7 +27,7 @@ setup_jupyterlab_systemd() {
         echo "jupyter lab systemd service already exists"
     else
 
-        cat <<EOF >/etc/systemd/system/jupyter-lab.service
+        cat <<EOF  | sudo tee /etc/systemd/system/jupyter-lab.service
 [Unit]
 Description=Jupyter Lab
 
@@ -34,8 +35,8 @@ Description=Jupyter Lab
 Type=simple
 PIDFile=/run/jupyter-lab.pid
 ExecStart=/usr/local/bin/jupyter lab --allow-root --config ${JUPYTERLAB_CONFIG}
-User=root
-WorkingDirectory=/root/
+User=${USER}
+WorkingDirectory=${HOME}
 Restart=always
 RestartSec=10
 
@@ -62,7 +63,7 @@ c = get_config()
 c.ServerApp.ip = '0.0.0.0'
 c.ServerApp.port = ${JUPYTERLAB_PORT}
 c.LabApp.open_browser = False
-c.ServerApp.root_dir = '/root/'
+c.ServerApp.root_dir = '${HOME}'
 c.ServerApp.tornado_settings = {
     'headers': {
         'Content-Security-Policy': "frame-ancestors * 'self' "
