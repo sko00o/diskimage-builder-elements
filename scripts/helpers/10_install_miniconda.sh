@@ -10,7 +10,7 @@ install_miniconda() {
 
     # Download Miniconda installer
     filename="Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh"
-    wget "${MINICONDA_REPO}/${filename}"
+    wget -O ${filename} "${MINICONDA_REPO}/${filename}"
 
     # Install Miniconda
     bash ${filename} -b -p $HOME/miniconda

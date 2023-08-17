@@ -17,8 +17,7 @@ install_nvidia_driver() {
     ## Data Center Driver For Linux X64
     ##   https://us.download.nvidia.com/tesla/535.86.10/NVIDIA-Linux-x86_64-535.86.10.run
     filename="NVIDIA-Linux-x86_64-${NVIDIA_DRIVER_VERSION}.run"
-    download_url="$NVIDIA_DRIVER_REPO/${NVIDIA_DRIVER_TYPE}/${NVIDIA_DRIVER_VERSION}/${filename}"
-    curl -sfL -o "${filename}" "${download_url}"
+    wget -O ${filename} "$NVIDIA_DRIVER_REPO/${NVIDIA_DRIVER_TYPE}/${NVIDIA_DRIVER_VERSION}/${filename}"
 
     sudo sh "${filename}" --no-questions
 

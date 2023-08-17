@@ -27,11 +27,12 @@ install_keyring() {
         . /etc/os-release
         echo $ID$VERSION_ID | sed -e 's/\.//g'
     )
-    wget ${CUDA_REPO}/$distribution/x86_64/cuda-keyring_1.0-1_all.deb
-    sudo dpkg -i cuda-keyring_1.0-1_all.deb
+    filename="cuda-keyring_1.0-1_all.deb"
+    wget -O ${filename} "${CUDA_REPO}/$distribution/x86_64/cuda-keyring_1.0-1_all.deb"
+    sudo dpkg -i ${filename}
     sudo apt-get -y update
     # Clean up
-    rm cuda-keyring_1.0-1_all.deb
+    rm ${filename}
 }
 
 install_cuda_driver() {

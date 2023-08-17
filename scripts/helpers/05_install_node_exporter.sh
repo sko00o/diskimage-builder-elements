@@ -11,16 +11,17 @@ setup_node_exporter_binary() {
     fi
 
     # Download node_exporter
-    wget "${NODE_EXPORTER_REPO}/v${NODE_EXPORTER_VERSION}/node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz"
+    filename="node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz"
+    wget -O ${filename} "${NODE_EXPORTER_REPO}/v${NODE_EXPORTER_VERSION}/${filename}"
 
     # Extract node_exporter
-    tar -xzvf node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz
+    tar -xzvf ${filename}
 
     # Move node_exporter binary
     sudo mv node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64/node_exporter /usr/local/bin
 
     # Cleanup
-    rm -rf node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64
+    rm -rf ${filename} node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64
 }
 
 setup_node_exporter_systemd() {
