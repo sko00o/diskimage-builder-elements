@@ -67,3 +67,5 @@ install_node_exporter() {
     setup_node_exporter_systemd
     echo "Node Exporter installed and added to systemd service."
 }
+
+install_node_exporter

@@ -22,3 +22,5 @@ install_miniconda() {
     # Cleanup
     rm Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh
 }
+
+install_miniconda

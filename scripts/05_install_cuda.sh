@@ -44,3 +44,5 @@ install_cuda() {
     install_cuda_toolkit
     install_cudnn
 }
+
+install_cuda

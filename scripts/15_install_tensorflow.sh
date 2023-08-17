@@ -11,3 +11,5 @@ install_jupyterlab() {
     ## (optional) Install TensorRT
     python3 -m pip install tensorrt==${TENSORRT_VERSION}
 }
+
+install_jupyterlab

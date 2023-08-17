@@ -7,3 +7,5 @@ install_jupyterlab() {
     install_miniconda
     conda install -y -c conda-forge jupyterlab=${JUPYTERLAB_VERSION}
 }
+
+install_jupyterlab
