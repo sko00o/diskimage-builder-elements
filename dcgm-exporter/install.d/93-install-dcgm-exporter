@@ -1,0 +1,18 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+echo ">> Install dcgm-exporter"
+
+## extract dcgm-exporter and move to PATH
+tar -xvf /tmp/dcgm_exporter.tar.gz -C /tmp
+install -m 557 /tmp/cmd/dcgm-exporter/dcgm-exporter /usr/local/bin/dcgm-exporter
+install -m 557 -D /tmp/etc/default-counters.csv /etc/dcgm-exporter/default-counters.csv
+install -m 557 -D /tmp/etc/dcp-metrics-included.csv /etc/dcgm-exporter/dcp-metrics-included.csv
+
+## create an user for dcgm-exporter
+useradd --no-create-home --shell /bin/false dcgm-exporter
+chown dcgm-exporter:dcgm-exporter /usr/local/bin/dcgm-exporter

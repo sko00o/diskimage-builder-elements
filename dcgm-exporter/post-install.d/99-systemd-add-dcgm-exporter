@@ -1,0 +1,26 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+cat <<EOF >/etc/systemd/system/dcgm-exporter.service
+[Unit]
+Description=DCGM Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=dcgm-exporter
+Group=dcgm-exporter
+Type=simple
+ExecStart=/usr/local/bin/dcgm-exporter
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl enable dcgm-exporter.service
