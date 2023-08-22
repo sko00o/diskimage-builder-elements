@@ -20,7 +20,7 @@ build_dcgm_exporter() {
 
 pack_dcgm_exporter() {
     cd /tmp/
-    tar -czvf ${TMP_MOUNT_PATH}/tmp/dcgm_exporter.tar.gz \
+    tar -czvf ${TMP_MOUNT_PATH}/tmp/dcgm-exporter.tar.gz \
         dcgm-exporter/cmd/dcgm-exporter/dcgm-exporter \
         dcgm-exporter/etc/default-counters.csv \
         dcgm-exporter/etc/dcp-metrics-included.csv
