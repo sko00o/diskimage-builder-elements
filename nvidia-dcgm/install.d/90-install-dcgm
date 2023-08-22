@@ -6,9 +6,9 @@ fi
 set -euo pipefail
 
 if [ -n "${DCGM_VERSION}" ]; then
-    sudo apt-get install -y datacenter-gpu-manager=${DCGM_VERSION}
+    sudo apt-get -y install datacenter-gpu-manager="1:${DCGM_VERSION}"
 else
-    sudo apt-get install -y datacenter-gpu-manager
+    sudo apt-get -y install datacenter-gpu-manager
 fi
 
 sudo systemctl enable nvidia-dcgm
