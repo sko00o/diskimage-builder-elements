@@ -4,6 +4,7 @@
     - cloud-init-root-login
     - miniconda
     - conda-tensorflow
+    - conda-cuda
     - jupyterlab
     - ubuntu
   debug-trace: 0

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -eu
+set -o pipefail
+
+CONDA_PREFIX=$(conda info --base)
+python3() {
+    $CONDA_PREFIX/bin/python3 "$@"
+}
+
+## Install CUDA
+conda install -y -c conda-forge cudatoolkit=${CUDATOOLKIT_VER}
+## Install cuDNN
+python3 -m pip install nvidia-cudnn-cu11==${CUDNN_CU11_VER}
+
+## Setup cuDNN
+mkdir -p $CONDA_PREFIX/etc/conda/activate.d
+echo 'CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))' >>$CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
+echo 'export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$CUDNN_PATH/lib:$LD_LIBRARY_PATH' >>$CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
