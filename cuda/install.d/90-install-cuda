@@ -1,0 +1,41 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+version_short() {
+    echo $1 | awk -F'.' '{print $1 "." $2}'
+}
+
+install_cuda_driver() {
+    major_version=${CUDA_DRIVER_VERSION%%.*}
+    sudo apt-get -y install --no-install-recommends \
+        cuda-drivers-${major_version}=${CUDA_DRIVER_VERSION}-1
+}
+
+install_cuda_toolkit() {
+    cuda_version=$(version_short $CUDA_VERSION)
+    sudo apt-get -y install \
+        cuda-toolkit-${cuda_version//./-}=$CUDA_VERSION-1
+}
+
+install_cudnn() {
+    cuda_version=$(version_short $CUDA_VERSION)
+    sudo apt-get -y install \
+        libcudnn8=$CUDNN_VERSION-1+cuda${cuda_version} \
+        libcudnn8-dev=$CUDNN_VERSION-1+cuda${cuda_version}
+}
+
+# all in one
+install_all() {
+    install_cuda_driver
+    echo "CUDA driver ${CUDA_DRIVER_VERSION} installed"
+    install_cuda_toolkit
+    echo "CUDA toolkit ${CUDA_VERSION} installed"
+    install_cudnn
+    echo "cuDNN ${CUDNN_VERSION} installed"
+}
+
+install_all
