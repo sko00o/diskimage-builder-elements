@@ -19,8 +19,11 @@ build_dcgm_exporter() {
 }
 
 pack_dcgm_exporter() {
+    cd /tmp/
     tar -czvf ${TMP_MOUNT_PATH}/tmp/dcgm_exporter.tar.gz \
-        cmd/dcgm-exporter/dcgm-exporter ./etc/default-counters.csv ./etc/dcp-metrics-included.csv
+        dcgm-exporter/cmd/dcgm-exporter/dcgm-exporter \
+        dcgm-exporter/etc/default-counters.csv \
+        dcgm-exporter/etc/dcp-metrics-included.csv
 }
 
 # Check If Go is installed
@@ -28,5 +31,8 @@ if ! command -v go &>/dev/null; then
     install_go
 fi
 
-build_dcgm_exporter
+if [ ! -f "/tmp/dcgm-exporter/cmd/dcgm-exporter/dcgm-exporter" ]; then
+    build_dcgm_exporter
+fi
+
 pack_dcgm_exporter

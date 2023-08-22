@@ -9,9 +9,10 @@ echo ">> Install dcgm-exporter"
 
 ## extract dcgm-exporter and move to PATH
 tar -xvf /tmp/dcgm_exporter.tar.gz -C /tmp
-install -m 557 /tmp/cmd/dcgm-exporter/dcgm-exporter /usr/local/bin/dcgm-exporter
-install -m 557 -D /tmp/etc/default-counters.csv /etc/dcgm-exporter/default-counters.csv
-install -m 557 -D /tmp/etc/dcp-metrics-included.csv /etc/dcgm-exporter/dcp-metrics-included.csv
+base="/tmp/dcgm_exporter"
+install -m 557 ${base}/cmd/dcgm-exporter/dcgm-exporter /usr/local/bin/dcgm-exporter
+install -m 557 -D ${base}/etc/default-counters.csv /etc/dcgm-exporter/default-counters.csv
+install -m 557 -D ${base}/etc/dcp-metrics-included.csv /etc/dcgm-exporter/dcp-metrics-included.csv
 
 ## create an user for dcgm-exporter
 useradd --no-create-home --shell /bin/false dcgm-exporter
