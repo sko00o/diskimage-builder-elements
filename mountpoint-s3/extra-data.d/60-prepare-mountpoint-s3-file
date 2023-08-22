@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+echo ">> Download mountpoint-s3 if it not exists"
+
+if [ ! -f $MOUNTPOINT_S3_FILE ]; then
+    MOUNTPOINT_S3_URL="${MOUNTPOINT_S3_REPO}/${MOUNTPOINT_S3_VERSION}/x86_64/mount-s3-${MOUNTPOINT_S3_VERSION}-x86_64.deb"
+    curl -sfL -o "$MOUNTPOINT_S3_FILE" "${MOUNTPOINT_S3_URL}"
+else
+    echo "$MOUNTPOINT_S3_FILE already exists."
+fi
