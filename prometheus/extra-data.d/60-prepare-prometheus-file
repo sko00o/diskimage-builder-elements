@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+echo ">> Download prometheus if it not exists"
+
+if [ ! -f "$PROMETHEUS_FILE" ]; then
+    curl -sfL -o "$PROMETHEUS_FILE" "${PROMETHEUS_URL}"
+else
+    echo "$PROMETHEUS_FILE already exists."
+fi

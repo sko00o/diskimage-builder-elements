@@ -5,6 +5,7 @@
     - cloud-init-root-login
     - qemu-guest-agent
     - node-exporter
+    - prometheus
     - miniconda
     - jupyterlab
   debug-trace: 0
