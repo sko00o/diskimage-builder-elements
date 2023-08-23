@@ -9,11 +9,7 @@ CUDNN_VERSION=${CUDNN_VERSION:-"8.6.0.163"}
 CUDA_KEYRING_FILE=${CUDA_KEYRING_FILE:-"/tmp/cuda-keyring_1.0-1_all.deb"}
 
 version_short() {
-    version=$1
-    major=${version%%.*}
-    minor=${version#"${major}."}
-    minor=${minor%%.*}
-    echo "${major}.${minor}"
+    echo $1 | awk -F'.' '{print $1 "." $2}'
 }
 
 # https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html#ubuntu-lts
