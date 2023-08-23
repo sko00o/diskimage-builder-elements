@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+
+import argparse
+import yaml
+
+cfg_path = "/etc/prometheus/prometheus.yml"
+default_url = "http://prometheus.service.yoga:9094/api/v1/write"
+
+# Parse command-line arguments
+parser = argparse.ArgumentParser()
+parser.add_argument('--url', default=default_url, help='URL value')
+parser.add_argument('--instance', required=True, help='Instance value')
+args = parser.parse_args()
+
+remote_write = [
+    {
+        'url': args.url,
+        'write_relabel_configs': [
+            {
+                'target_label': 'instance',
+                'replacement': args.instance,
+            },
+        ],
+    },
+]
+
+# Load the Prometheus configuration file
+with open(cfg_path, 'r') as file:
+    config = yaml.safe_load(file)
+
+# Modify the configuration
+if 'remote_write' in config:
+    config['remote_write'] = remote_write
+
+# Save the modified configuration
+with open(cfg_path, 'w') as file:
+    yaml.dump(config, file)
+
+print(f"Updated Prometheus configuration: {cfg_path}")
