@@ -1,0 +1,16 @@
+- imagename: test-image-00
+  elements:
+    - vm
+    - ubuntu
+    - cloud-init-root-login
+    - scripts-install
+    - scripts-helper
+  debug-trace: 0
+  no-tmpfs: true
+  environment:
+    DIB_CLOUD_INIT_DATASOURCES: "OpenStack"
+    DIB_RELEASE: bionic # ubuntu18.04
+    DIB_OFFLINE: "true"
+
+# command to upload:
+# openstack image create --container-format bare --disk-format qcow2 --public --property hw_qemu_guest_agent=yes --property os_type=linux --property os_distro=ubuntu --property os_version='18.04' --property os_admin_user=root --file test-image-00.qcow2 test_image_00

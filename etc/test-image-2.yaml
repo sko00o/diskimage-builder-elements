@@ -1,4 +1,4 @@
-- imagename: test-image-2
+- imagename: test-image-02
   elements:
     - vm
     - ubuntu
@@ -10,6 +10,7 @@
     - prometheus
     - miniconda
     - jupyterlab
+    - scripts-helper
   debug-trace: 0
   no-tmpfs: true
   environment:
@@ -19,4 +20,4 @@
     DIB_MINICONDA_RELEASE: py311_23.5.2-0
 
 # command to upload:
-# openstack image create --container-format bare --disk-format qcow2 --public --property hw_qemu_guest_agent=yes --property os_type=linux --property os_distro=ubuntu --property os_version='18.04' --property os_admin_user=root --file test-image-1.qcow2 test_image_01
+# openstack image create --container-format bare --disk-format qcow2 --public --property hw_qemu_guest_agent=yes --property os_type=linux --property os_distro=ubuntu --property os_version='18.04' --property os_admin_user=root --file test-image-02.qcow2 test_image_02
