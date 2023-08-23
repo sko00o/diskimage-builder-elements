@@ -8,7 +8,8 @@ set -euo pipefail
 install_nvidia_driver() {
     major_version=${NVIDIA_DRIVER_VERSION%%.*}
     sudo apt-get -y install --no-install-recommends \
-        nvidia-driver-${major_version}=${NVIDIA_DRIVER_VERSION}-0ubuntu1
+        nvidia-driver-${major_version}=${NVIDIA_DRIVER_VERSION}-0ubuntu1 \
+        nvidia-modprobe=${NVIDIA_DRIVER_VERSION}-0ubuntu1
 }
 
 install_nvidia_driver
