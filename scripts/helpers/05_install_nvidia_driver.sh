@@ -15,12 +15,23 @@ NVIDIA_DRIVER_VERSION=${NVIDIA_DRIVER_VERSION:-"535.86.10"}
 
 NVIDIA_DRIVER_FILE=${NVIDIA_DRIVER_FILE:-"/tmp/NVIDIA-Linux-x86_64-${NVIDIA_DRIVER_VERSION}.run"}
 
-install_kernel_headers() {
-    sudo apt-get -y install linux-headers-$(uname -r)
+# reference: https://gist.github.com/wangruohui/df039f0dc434d6486f5d4d098aa52d07#install-nvidia-graphics-driver-via-apt-get
+install_nvidia_driver_deps() {
+    sudo apt-get -y install build-essential dkms
+    # sudo apt-get -y install linux-headers-$(uname -r)
+}
+
+setup_blacklist_nouveau() {
+    cat <<EOF | sudo tee /etc/modprobe.d/blacklist-nouveau.conf
+blacklist nouveau
+options nouveau modeset=0
+EOF
+    sudo update-initramfs -u
 }
 
 install_nvidia_driver() {
     install_kernel_headers
+    setup_blacklist_nouveau
 
     if [ ! -f "${NVIDIA_DRIVER_FILE}" ]; then
         ## For example:
