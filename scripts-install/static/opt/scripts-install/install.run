@@ -19,7 +19,10 @@ setup_pip_mirror
 setup_conda_mirror
 
 install_cuda
+install_dcgm
 install_node_exporter
+install_dcgm_exporter
+install_prometheus_agent
 install_miniconda
 install_jupyterlab
 install_tensorflow
@@ -27,4 +30,6 @@ install_pytorch
 
 cleanup_cuda
 cleanup_node_exporter
+cleanup_dcgm_exporter
+cleanup_prometheus_agent
 cleanup_miniconda
