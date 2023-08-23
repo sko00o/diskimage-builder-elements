@@ -6,7 +6,7 @@ fi
 set -euo pipefail
 
 SCRIPTDIR="$(dirname $0)/../scripts"
-TARGETDIR="${TMP_MOUNT_PATH}/tmp/scripts-helper"
+TARGETDIR="${TMP_MOUNT_PATH}/tmp/scripts-install"
 
 if [ ! -d "${TARGETDIR}" ]; then
     cp "${SCRIPTDIR}" "${TARGETDIR}"
