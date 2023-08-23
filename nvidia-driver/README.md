@@ -1,0 +1,3 @@
+# Nvidia Driver
+
+- DIB_NVIDIA_DRIVER_VERSION: 530.30.02
