@@ -25,7 +25,7 @@ scrape_configs:
       - targets: ["localhost:9400"]
 
 remote_write:
-- url: 'prometheus.service.yoga:9094/api/v1/write'
+  - url: "http://prometheus.service.yoga:9094/api/v1/write"
 EOF
 
 cat <<EOF >/etc/systemd/system/prometheus-agent.service
