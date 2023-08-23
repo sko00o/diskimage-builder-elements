@@ -6,6 +6,7 @@ CUDA_REPO=${CUDA_REPO:-"https://developer.download.nvidia.com/compute/cuda/repos
 CUDA_DRIVER_VERSION=${CUDA_DRIVER_VERSION:-"530.30.02"}
 CUDA_VERSION=${CUDA_VERSION:-"11.8.0"}
 CUDNN_VERSION=${CUDNN_VERSION:-"8.6.0.163"}
+CUDA_KEYRING_FILE=${CUDA_KEYRING_FILE:-"/tmp/cuda-keyring_1.0-1_all.deb"}
 
 version_short() {
     version=$1
@@ -27,12 +28,12 @@ install_keyring() {
         . /etc/os-release
         echo $ID$VERSION_ID | sed -e 's/\.//g'
     )
-    filename="cuda-keyring_1.0-1_all.deb"
-    wget -O ${filename} "${CUDA_REPO}/$distribution/x86_64/cuda-keyring_1.0-1_all.deb"
-    sudo dpkg -i ${filename}
+
+    if [ ! -f "${CUDA_KEYRING_FILE}" ]; then
+        wget -O "${CUDA_KEYRING_FILE}" "${CUDA_REPO}/$distribution/x86_64/cuda-keyring_1.0-1_all.deb"
+    fi
+    sudo dpkg -i "${CUDA_KEYRING_FILE}"
     sudo apt-get -y update
-    # Clean up
-    rm ${filename}
 }
 
 install_cuda_driver() {
@@ -62,4 +63,8 @@ install_cuda() {
     install_cuda_toolkit
     install_cudnn
     echo "CUDA ${CUDA_VERSION} and cuDNN ${CUDNN_VERSION} installed"
+}
+
+cleanup_cuda() {
+    rm -rf "${CUDA_KEYRING_FILE}"
 }

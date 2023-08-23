@@ -18,3 +18,7 @@ install_miniconda
 install_jupyterlab
 install_tensorflow
 install_pytorch
+
+cleanup_cuda
+cleanup_node_exporter
+cleanup_miniconda

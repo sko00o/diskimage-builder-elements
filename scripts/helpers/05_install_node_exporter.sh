@@ -2,6 +2,8 @@
 
 NODE_EXPORTER_REPO=${NODE_EXPORTER_REPO:-"https://github.com/prometheus/node_exporter/releases/download"}
 NODE_EXPORTER_VERSION=${NODE_EXPORTER_VERSION:-"1.6.1"}
+NODE_EXPORTER_FILE=${NODE_EXPORTER_FILE:-"/tmp/node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz"}
+NODE_EXPORTER_EXTRACTED_DIR=${NODE_EXPORTER_EXTRACTED_DIR:-"/tmp/node_exporter-${NODE_EXPORTER_VERSION}"}
 
 setup_node_exporter_binary() {
     # Check if node_exporter binary exists
@@ -10,18 +12,17 @@ setup_node_exporter_binary() {
         return
     fi
 
-    # Download node_exporter
-    filename="node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz"
-    wget -O ${filename} "${NODE_EXPORTER_REPO}/v${NODE_EXPORTER_VERSION}/${filename}"
+    if [ ! -f "${NODE_EXPORTER_FILE}" ]; then
+        # Download node_exporter
+        wget -O "${NODE_EXPORTER_FILE}" "${NODE_EXPORTER_REPO}/v${NODE_EXPORTER_VERSION}/node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz"
+    fi
 
     # Extract node_exporter
-    tar -xzvf ${filename}
+    mkdir -p "${NODE_EXPORTER_EXTRACTED_DIR}"
+    tar -xzvf "${NODE_EXPORTER_FILE}" -C "${NODE_EXPORTER_EXTRACTED_DIR}"
 
     # Move node_exporter binary
-    sudo mv node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64/node_exporter /usr/local/bin
-
-    # Cleanup
-    rm -rf ${filename} node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64
+    sudo mv ${NODE_EXPORTER_EXTRACTED_DIR}/node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64/node_exporter /usr/local/bin
 }
 
 setup_node_exporter_systemd() {
@@ -67,4 +68,8 @@ install_node_exporter() {
     setup_node_exporter_binary
     setup_node_exporter_systemd
     echo "node_exporter ${NODE_EXPORTER_VERSION} installed and added to systemd service"
+}
+
+cleanup_node_exporter() {
+    rm -rf "${NODE_EXPORTER_FILE}" "${NODE_EXPORTER_EXTRACTED_DIR}"
 }
