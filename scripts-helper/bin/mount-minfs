@@ -1,0 +1,19 @@
+#!/bin/bash
+set -euo pipefail
+
+S3_AK=$1
+S3_SK=$2
+S3_ENDPOINT=$3
+S3_BUCKET=$4
+MOUNT_PATH=${MOUNT_PATH:-"/root/public/"}
+
+# set minfs config
+cat <<EOF >/etc/minfs/config.json
+{"version":"1","accessKey":"$S3_AK","secretKey":"$S3_SK"}
+EOF
+
+# create dir for mount
+mkdir -p "${MOUNT_PATH}"
+
+# mount s3 bucket
+mount -t minfs -o ro,defaults,cache=/tmp/$S3_BUCKET "$S3_ENDPOINT/$S3_BUCKET" "${MOUNT_PATH}"
