@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+if [ -n "${DCGM_VERSION}" ]; then
+    sudo apt-get -y install datacenter-gpu-manager="1:${DCGM_VERSION}"
+else
+    sudo apt-get -y install datacenter-gpu-manager
+fi
+
+sudo systemctl enable nvidia-dcgm

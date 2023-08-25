@@ -1,0 +1,38 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+install_go() {
+    wget -O /tmp/go1.21.0.linux-amd64.tar.gz https://go.dev/dl/go1.21.0.linux-amd64.tar.gz
+    rm -rf /usr/local/go && tar -C /usr/local -xzf /tmp/go1.21.0.linux-amd64.tar.gz
+    ln -s /usr/local/go/bin/go /usr/local/bin/go
+}
+
+build_dcgm_exporter() {
+    sudo apt-get -y install build-essential
+    git clone -b "${DCGM_EXPORTER_VERSION}" https://github.com/NVIDIA/dcgm-exporter.git /tmp/dcgm-exporter
+    cd /tmp/dcgm-exporter
+    make binary
+}
+
+pack_dcgm_exporter() {
+    cd /tmp/
+    tar -czvf ${TMP_MOUNT_PATH}/tmp/dcgm-exporter.tar.gz \
+        dcgm-exporter/cmd/dcgm-exporter/dcgm-exporter \
+        dcgm-exporter/etc/default-counters.csv \
+        dcgm-exporter/etc/dcp-metrics-included.csv
+}
+
+# Check If Go is installed
+if ! command -v go &>/dev/null; then
+    install_go
+fi
+
+if [ ! -f "/tmp/dcgm-exporter/cmd/dcgm-exporter/dcgm-exporter" ]; then
+    build_dcgm_exporter
+fi
+
+pack_dcgm_exporter

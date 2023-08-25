@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+filename="/tmp/cuda-keyring_1.0-1_all.deb"
+wget -O "${filename}" "${CUDA_PUBKEY_URL}"
+sudo dpkg -i "${filename}"
+sudo apt-get -y update
+
+# Clean up
+rm "${filename}"

@@ -1,0 +1,27 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+check_kernel() {
+    # comparing chroot kernel with host kernel
+    CHROOT_KERNEL=$(dpkg -l | awk '/^.i +linux-(im)/&& $2~/[0-9]/{print substr($2,13)}')
+    HOST_KERNEL=$(uname -r)
+    if [ "$CHROOT_KERNEL" != "$HOST_KERNEL" ]; then
+        echo "ERROR: kernel mismatch! CHROOT_KERNEL:$CHROOT_KERNEL HOST_KERNEL:$HOST_KERNEL"
+        exit 1
+    fi
+}
+
+install_kernel() {
+    KERNEL_VERSION="$(ls /boot/vmlinuz*generic | sort -n | tail -n1 | cut -d'-' -f2-)"
+    sudo apt-get -y install linux-headers-$KERNEL_VERSION
+}
+
+if [ "${INSTALL_KERNEL:-false}" = "true" ]; then
+    install_kernel
+else
+    check_kernel
+fi

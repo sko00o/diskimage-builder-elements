@@ -1,0 +1,18 @@
+#!/bin/bash
+set -euo pipefail
+
+S3_AK=$1
+S3_SK=$2
+S3_ENDPOINT=$3
+S3_BUCKET=$4
+MOUNT_PATH=${MOUNT_PATH:-"/root/public/"}
+
+# set s3fs config
+echo "$S3_AK:$S3_SK" >/etc/passwd-s3fs
+chmod 600 /etc/passwd-s3fs
+
+# create dir for mount
+mkdir -p "${MOUNT_PATH}"
+
+# mount s3 bucket
+mount -t fuse.s3fs -o ro,defaults,use_path_request_style,url="$S3_ENDPOINT" "${S3_BUCKET}" "${MOUNT_PATH}"

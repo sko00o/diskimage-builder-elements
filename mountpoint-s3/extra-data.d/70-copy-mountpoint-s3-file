@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+echo ">> Copy mountpoint-s3 file from HOST"
+
+if [ -n "${MOUNTPOINT_S3_FILE}" ]; then
+    cp ${MOUNTPOINT_S3_FILE} ${TMP_MOUNT_PATH}/tmp/mount-s3.deb
+else
+    echo "ERROR: MOUNTPOINT_S3_FILE is not set."
+fi

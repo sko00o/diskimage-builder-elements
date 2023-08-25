@@ -1,0 +1,11 @@
+#!/bin/bash
+
+export CUDA_REPO=${DIB_CUDA_REPO:-"https://developer.download.nvidia.com/compute/cuda/repos"}
+
+distribution=$(
+    . /etc/os-release
+    echo $ID$VERSION_ID | sed -e 's/\.//g'
+)
+
+export CUDA_REPO_URL="${DIB_CUDA_REPO_URL:-"${CUDA_REPO}/${distribution}/x86_64"}"
+export CUDA_PUBKEY_URL="${DIB_CUDA_PUBKEY_URL:-"${CUDA_REPO_URL}/cuda-keyring_1.0-1_all.deb"}"

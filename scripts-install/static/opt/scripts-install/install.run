@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -exo pipefail
+
+# Update package lists
+sudo apt-get update
+
+# Install necessary dependencies
+sudo apt-get install -y build-essential apt-transport-https ca-certificates curl software-properties-common
+
+CUDA_REPO="https://mirrors.aliyun.com/nvidia-cuda"
+MINICONDA_REPO="https://mirrors.aliyun.com/anaconda/miniconda"
+
+cd "$(dirname "$0")"
+for helper in ./helpers/*.sh; do
+    source "$helper"
+done
+
+setup_pip_mirror
+setup_conda_mirror
+
+install_cuda
+install_dcgm
+install_node_exporter
+install_dcgm_exporter
+install_prometheus_agent
+install_miniconda
+install_jupyterlab
+install_tensorflow
+install_pytorch
+
+cleanup_cuda
+cleanup_node_exporter
+cleanup_dcgm_exporter
+cleanup_prometheus_agent
+cleanup_miniconda

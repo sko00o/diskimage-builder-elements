@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+echo ">> Install prometheus"
+
+## extract prometheus and move to PATH
+tar -xvf /tmp/prometheus.tar.gz -C /tmp
+cp /tmp/prometheus*/prometheus /usr/local/bin/
+
+## create an user for prometheus
+# useradd --no-create-home --shell /bin/false prometheus
+# chown prometheus:prometheus /usr/local/bin/prometheus
