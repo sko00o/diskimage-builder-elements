@@ -4,7 +4,6 @@
     - ubuntu
     - cloud-init-root-login
     - scripts-install
-    - scripts-helper
   debug-trace: 0
   no-tmpfs: true
   environment:
