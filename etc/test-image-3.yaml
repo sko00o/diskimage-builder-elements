@@ -6,7 +6,6 @@
     - qemu-guest-agent
     - node-exporter
     - dcgm-exporter
-    - nvidia-driver
     - prometheus
     - miniconda
     - jupyterlab
