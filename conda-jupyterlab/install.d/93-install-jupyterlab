@@ -11,9 +11,9 @@ echo "# install jupyter using conda                              #"
 echo "############################################################"
 
 if [ -n "${DIB_JUPYTERLAB_VER}" ]; then
-    conda install -y -c conda-forge jupyterlab=${DIB_JUPYTERLAB_VER}
+    $(conda info --base)/bin/python3 -m pip install jupyterlab=${DIB_JUPYTERLAB_VER}
 else
-    conda install -y -c conda-forge jupyterlab
+    $(conda info --base)/bin/python3 -m pip install jupyterlab
 fi
 
 JP_PATH=$(conda run which jupyter)
