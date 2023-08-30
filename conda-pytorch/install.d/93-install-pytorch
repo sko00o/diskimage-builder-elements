@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -eu
+set -o pipefail
+
+CONDA_PREFIX=$(conda info --base)
+python3() {
+    $CONDA_PREFIX/bin/python3 "$@"
+}
+
+install_pytorch_pip() {
+    extra="cu${PYTORCH_CUDA_VERSION//./}"
+    python3 -m pip install \
+        torch==${PYTORCH_VERSION}+${extra} \
+        torchvision==${PYTORCH_TORCHVISION_VERSION}+${extra} \
+        torchaudio==${PYTORCH_TORCHAUDIO_VERSION} \
+        --index-url https://download.pytorch.org/whl/${extra}
+}
+
+install_pytorch_pip
