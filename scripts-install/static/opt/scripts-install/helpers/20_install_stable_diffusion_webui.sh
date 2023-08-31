@@ -22,21 +22,19 @@ launch_sd_webui() {
 pre_install_sd_webui() {
     sudo apt-get -y install git cmake wget
     sudo apt-get -y install libtcmalloc-minimal4
-    git clone -b "${SD_WEBUI_TAG}" "${SD_WEBUI_REPO}" "${SD_WEBUI_DIR}"
+    # if dir not found, clone
+    if [ ! -d "${SD_WEBUI_DIR}" ]; then
+        git clone -b "${SD_WEBUI_TAG}" "${SD_WEBUI_REPO}" "${SD_WEBUI_DIR}"
+    fi
 }
 
 install_sd_webui() {
     pre_install_sd_webui
     cd "${SD_WEBUI_DIR}"
 
-    # if python3 venv not found, install python3-venv
-    if ! command -v python3-venv &>/dev/null; then
-        sudo apt-get -y install python3-venv
-    fi
-
-    # if pip command not found, install pip
-    if ! command -v pip &>/dev/null; then
-        sudo apt-get -y install python3-pip
+    # if python3 not found, install python3
+    if ! command -v python3 &>/dev/null; then
+        sudo apt-get -y install python3
     fi
 
     python3 -m venv venv
