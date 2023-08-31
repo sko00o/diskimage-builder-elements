@@ -54,8 +54,7 @@ install_sd_webui() {
 
     install_miniconda
     conda create -y -n sd_webui python=3.10
-    conda activate sd_webui
-    python3.10 -m venv venv
+    $(conda info --base)/envs/sd_webui/bin/python3.10 -m venv venv
 
     # PyTorch
     # pip install \
