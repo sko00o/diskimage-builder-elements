@@ -4,9 +4,28 @@ SD_WEBUI_TAG=${SD_WEBUI_TAG:-"v1.5.2"}
 SD_WEBUI_REPO=${SD_WEBUI_REPO:-"https://github.com/AUTOMATIC1111/stable-diffusion-webui.git"}
 SD_WEBUI_DIR=${SD_WEBUI_DIR:-"${HOME}/stable-diffusion-webui"}
 
-SD_WEBUI_CKPT=${SD_WEBUI_CKPT:-"${SD_WEBUI_DIR}/models/Stable-diffusion/v1-5-pruned-emaonly.safetensors"}
+SD_WEBUI_DATA_DIR=${SD_WEBUI_DATA_DIR:-"${SD_WEBUI_DIR}"}
+SD_WEBUI_CKPT=${SD_WEBUI_CKPT:-"${SD_WEBUI_DATA_DIR}/models/Stable-diffusion/v1-5-pruned-emaonly.safetensors"}
 SD_WEBUI_CKPT_URL=${SD_WEBUI_CKPT_URL:-"https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors"}
 SD_WEBUI_PORT=${SD_WEBUI_PORT:-"10000"}
+SD_WEBUI_EXT_DIR=${SD_WEBUI_EXT_DIR:-"${SD_WEBUI_DATA_DIR}/extensions"}
+
+download_sd_model() {
+    if [ ! -f "${SD_WEBUI_CKPT}" ]; then
+        mkdir -p "$(dirname "${SD_WEBUI_CKPT}")"
+        wget -O "${SD_WEBUI_CKPT}" "${SD_WEBUI_CKPT_URL}"
+    fi
+}
+
+download_sd_extensions() {
+    mkdir -p "${SD_WEBUI_EXT_DIR}"
+    if [ ! -d "${SD_WEBUI_EXT_DIR}/adetailer" ]; then
+        git clone https://github.com/Bing-su/adetailer.git "${SD_WEBUI_EXT_DIR}/adetailer"
+    fi
+    if [ ! -d "${SD_WEBUI_EXT_DIR}/sd-webui-controlnet" ]; then
+        git clone https://github.com/Mikubill/sd-webui-controlnet "${SD_WEBUI_EXT_DIR}/sd-webui-controlnet"
+    fi
+}
 
 launch_sd_webui() {
     cd "${SD_WEBUI_DIR}"
@@ -16,7 +35,8 @@ launch_sd_webui() {
         --xformers \
         --enable-insecure-extension-access \
         --gradio-queue \
-        --ckpt ${SD_WEBUI_CKPT}
+        --data-dir ${SD_WEBUI_DATA_DIR} \
+        --no-download-sd-model
 }
 
 pre_install_sd_webui() {
@@ -32,27 +52,21 @@ install_sd_webui() {
     pre_install_sd_webui
     cd "${SD_WEBUI_DIR}"
 
-    # if python3 not found, install python3
-    if ! command -v python3 &>/dev/null; then
-        sudo apt-get -y install python3
-    fi
+    install_miniconda
+    conda create -y -n sd_webui python=3.10
+    conda activate sd_webui
+    python3.10 -m venv venv
 
-    python3 -m venv venv
-    source venv/bin/activate
     # PyTorch
-    pip install \
-        torch==2.0.1+cu118 \
-        torchvision==0.15.2+cu118 \
-        torchaudio==2.0.2 \
-        --index-url https://download.pytorch.org/whl/cu118
+    # pip install \
+    #     torch==2.0.1+cu118 \
+    #     torchvision==0.15.2+cu118 \
+    #     torchaudio==2.0.2 \
+    #     --index-url https://download.pytorch.org/whl/cu118
     # GFPGAN
-    pip install \
-        git+https://github.com/TencentARC/GFPGAN.git --prefer-binary
+    #pip install git+https://github.com/TencentARC/GFPGAN.git --prefer-binary
     # CodeFormer
-    git clone https://github.com/sczhou/CodeFormer.git repositories/CodeFormer
-
-    # download a sd model if you don't have
-    wget -c -O "${SD_WEBUI_CKPT}" "${SD_WEBUI_CKPT_URL}"
+    #git clone https://github.com/sczhou/CodeFormer.git repositories/CodeFormer
 
     # launch and wait, It will take long time on first boot
     launch_sd_webui
