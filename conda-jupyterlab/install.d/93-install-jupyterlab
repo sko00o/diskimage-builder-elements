@@ -11,7 +11,7 @@ echo "# install jupyter using conda                              #"
 echo "############################################################"
 
 if [ -n "${DIB_JUPYTERLAB_VER}" ]; then
-    $(conda info --base)/bin/python3 -m pip install jupyterlab=${DIB_JUPYTERLAB_VER}
+    $(conda info --base)/bin/python3 -m pip install jupyterlab==${DIB_JUPYTERLAB_VER}
 else
     $(conda info --base)/bin/python3 -m pip install jupyterlab
 fi
