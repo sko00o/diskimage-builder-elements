@@ -10,6 +10,9 @@ SD_WEBUI_CKPT_URL=${SD_WEBUI_CKPT_URL:-"https://huggingface.co/runwayml/stable-d
 SD_WEBUI_PORT=${SD_WEBUI_PORT:-"10000"}
 SD_WEBUI_EXT_DIR=${SD_WEBUI_EXT_DIR:-"${SD_WEBUI_DATA_DIR}/extensions"}
 
+ADETAILER_TAG=${ADETAILER_TAG:-"v23.8.1"}
+CONTROLNET_COMMIT=${CONTROLNET_COMMIT:-"c3b32f2"}
+
 download_sd_model() {
     if [ ! -f "${SD_WEBUI_CKPT}" ]; then
         mkdir -p "$(dirname "${SD_WEBUI_CKPT}")"
@@ -20,14 +23,19 @@ download_sd_model() {
 download_sd_extensions() {
     mkdir -p "${SD_WEBUI_EXT_DIR}"
     if [ ! -d "${SD_WEBUI_EXT_DIR}/adetailer" ]; then
-        git clone https://github.com/Bing-su/adetailer.git "${SD_WEBUI_EXT_DIR}/adetailer"
+        git clone -b "${ADETAILER_TAG}" https://github.com/Bing-su/adetailer.git "${SD_WEBUI_EXT_DIR}/adetailer"
     fi
     if [ ! -d "${SD_WEBUI_EXT_DIR}/sd-webui-controlnet" ]; then
         git clone https://github.com/Mikubill/sd-webui-controlnet "${SD_WEBUI_EXT_DIR}/sd-webui-controlnet"
+        cd "${SD_WEBUI_EXT_DIR}/sd-webui-controlnet" && git reset --hard "${CONTROLNET_COMMIT}"
     fi
 }
 
 launch_sd_webui() {
+    for d in {embeddings,extensions,models}; do
+        mkdir -p "${SD_WEBUI_DATA_DIR}/${d}"
+    done
+
     cd "${SD_WEBUI_DIR}"
     ./webui.sh -f \
         --listen \
