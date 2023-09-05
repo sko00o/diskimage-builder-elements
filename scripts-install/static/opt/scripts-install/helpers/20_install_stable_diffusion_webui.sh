@@ -48,7 +48,7 @@ install_sd_requirements() {
     done
 
     # terminate after installation
-    launch_sd_webui --exit
+    launch_sd_webui --exit --skip-torch-cuda-test
 }
 
 pre_install_sd_webui() {
