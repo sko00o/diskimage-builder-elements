@@ -7,3 +7,4 @@ set -eu
 set -o pipefail
 
 conda clean -a -y
+$(conda info --base)/bin/pip cache purge
