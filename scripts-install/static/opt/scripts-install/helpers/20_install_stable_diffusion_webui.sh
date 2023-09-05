@@ -31,19 +31,24 @@ download_sd_extensions() {
 }
 
 launch_sd_webui() {
+    cd "${SD_WEBUI_DIR}" && ./webui.sh -f \
+        --listen \
+        --port ${SD_WEBUI_PORT} \
+        --data-dir ${SD_WEBUI_DATA_DIR} \
+        --enable-insecure-extension-access \
+        --gradio-queue \
+        --no-download-sd-model \
+        --xformers \
+        $@
+}
+
+install_sd_requirements() {
     for d in {embeddings,extensions,models}; do
         mkdir -p "${SD_WEBUI_DATA_DIR}/${d}"
     done
 
-    cd "${SD_WEBUI_DIR}"
-    ./webui.sh -f \
-        --listen \
-        --port ${SD_WEBUI_PORT} \
-        --xformers \
-        --enable-insecure-extension-access \
-        --gradio-queue \
-        --data-dir ${SD_WEBUI_DATA_DIR} \
-        --no-download-sd-model
+    # terminate after installation
+    launch_sd_webui --exit
 }
 
 pre_install_sd_webui() {
@@ -63,6 +68,5 @@ install_sd_webui() {
     conda create -y -n sd_webui python=3.10
     $(conda info --base)/envs/sd_webui/bin/python3.10 -m venv venv
 
-    # launch and wait, It will take long time on first boot
-    launch_sd_webui
+    install_sd_requirements
 }
