@@ -1,14 +1,18 @@
-- imagename: test-image-01
+- imagename: test-image-gpu-full
   elements:
     - vm
     - ubuntu
     - cloud-init-root-login
     - qemu-guest-agent
     - node-exporter
+    - dcgm-exporter
     - prometheus
     - miniconda
     - jupyterlab
     - minfs
+    - cuda
+    - conda-tensorflow
+    - conda-pytorch
   debug-trace: 0
   no-tmpfs: true
   environment:
@@ -18,4 +22,4 @@
     DIB_MINICONDA_RELEASE: py311_23.5.2-0
 
 # command to upload:
-# openstack image create --container-format bare --disk-format qcow2 --public --property hw_qemu_guest_agent=yes --property os_type=linux --property os_distro=ubuntu --property os_version='18.04' --property os_admin_user=root --file test-image-01.qcow2 test_image_01
+# openstack image create --container-format bare --disk-format qcow2 --public --property hw_qemu_guest_agent=yes --property os_type=linux --property os_distro=ubuntu --property os_version='18.04' --property os_admin_user=root --file test-image-gpu-full.qcow2 test-image-gpu-full

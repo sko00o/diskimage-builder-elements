@@ -1,18 +1,16 @@
-- imagename: test-image-04
+- imagename: test-image-gpu-mini-01
   elements:
     - vm
     - ubuntu
     - cloud-init-root-login
     - qemu-guest-agent
     - node-exporter
-    - dcgm-exporter
     - prometheus
     - miniconda
     - jupyterlab
     - minfs
-    - cuda
-    - conda-tensorflow
-    - conda-pytorch
+    - dcgm-exporter
+    - nvidia-driver
   debug-trace: 0
   no-tmpfs: true
   environment:
@@ -24,4 +22,4 @@
     DIB_MINFS_URL_BASE: https://github.com/huangnauh/minfs/releases/download
 
 # command to upload:
-# openstack image create --container-format bare --disk-format qcow2 --public --property hw_qemu_guest_agent=yes --property os_type=linux --property os_distro=ubuntu --property os_version='22.04' --property os_admin_user=root --file test-image-04.qcow2 test_image_04
+# openstack image create --container-format bare --disk-format qcow2 --public --property hw_qemu_guest_agent=yes --property os_type=linux --property os_distro=ubuntu --property os_version='18.04' --property os_admin_user=root --file test-image-gpu-mini-01.qcow2 test-image-gpu-mini-01
