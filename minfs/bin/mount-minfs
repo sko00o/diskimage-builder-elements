@@ -8,9 +8,8 @@ S3_BUCKET=$4
 MOUNT_PATH=${MOUNT_PATH:-"/root/public/"}
 
 # set minfs config
-cat <<EOF >/etc/minfs/config.json
-{"version":"1","accessKey":"$S3_AK","secretKey":"$S3_SK"}
-EOF
+export MINFS_ACCESS_KEY=$S3_AK
+export MINFS_SECRET_KEY=$S3_SK
 
 # create dir for mount
 mkdir -p "${MOUNT_PATH}"
