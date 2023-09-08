@@ -1,0 +1,27 @@
+- imagename: test-image-gpu-full-01
+  elements:
+    - vm
+    - ubuntu
+    - cloud-init-root-login
+    - qemu-guest-agent
+    - node-exporter
+    - prometheus
+    - miniconda
+    - jupyterlab
+    - minfs
+    - dcgm-exporter
+    - cuda
+    - conda-tensorflow
+    - conda-pytorch
+  debug-trace: 0
+  no-tmpfs: true
+  environment:
+    DIB_RELEASE: jammy # Ubuntu Server 22.04 LTS
+    DIB_CLOUD_INIT_DATASOURCES: "OpenStack"
+    DIB_OFFLINE: "true"
+    DIB_MINICONDA_RELEASE: py311_23.5.2-0
+    DIB_MINFS_VERSION: 1.0.3
+    DIB_MINFS_URL_BASE: https://github.com/huangnauh/minfs/releases/download
+
+# command to upload:
+# openstack image create --container-format bare --disk-format qcow2 --public --property hw_qemu_guest_agent=yes --property os_type=linux --property os_distro=ubuntu --property os_version='22.04' --property os_admin_user=root --file test-image-gpu-full-01.qcow2 test-image-gpu-full-01
