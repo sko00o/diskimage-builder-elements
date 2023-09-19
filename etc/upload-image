@@ -1,0 +1,66 @@
+#!/bin/bash
+
+upload() {
+    openstack image create \
+        --container-format bare \
+        --disk-format qcow2 \
+        --progress \
+        --public $@
+}
+
+image-gpu-mini() {
+    upload \
+        --property hw_qemu_guest_agent=yes \
+        --property os_type=linux \
+        --property os_distro=ubuntu \
+        --property os_version='22.04' \
+        --property os_admin_user=root \
+        --file ${FUNCNAME[0]}.qcow2 ${FUNCNAME[0]}
+
+    cat <<EOF
+ubuntu 22.04, 
+nvidia_driver 530.30.02, 
+miniconda py311_23.5.2-0, 
+jupyterlab 4.0.4,
+EOF
+}
+
+image-gpu-pytorch() {
+    upload \
+        --property hw_qemu_guest_agent=yes \
+        --property os_type=linux \
+        --property os_distro=ubuntu \
+        --property os_version='22.04' \
+        --property os_admin_user=root \
+        --file ${FUNCNAME[0]}.qcow2 ${FUNCNAME[0]}
+
+    cat <<EOF
+ubuntu 22.04, 
+nvidia_driver 530.30.02, 
+miniconda py311_23.5.2-0, 
+jupyterlab 4.0.4, 
+
+cuda 11.8.0, cudnn 8.6.0.163, 
+pytorch 2.0.1, torchvision 0.15.2, torchaudio 2.0.2,
+EOF
+}
+
+image-gpu-tensorflow() {
+    upload \
+        --property hw_qemu_guest_agent=yes \
+        --property os_type=linux \
+        --property os_distro=ubuntu \
+        --property os_version='22.04' \
+        --property os_admin_user=root \
+        --file ${FUNCNAME[0]}.qcow2 ${FUNCNAME[0]}
+
+    cat <<EOF
+ubuntu 22.04, 
+nvidia_driver 530.30.02, 
+miniconda py311_23.5.2-0, 
+jupyterlab 4.0.4, 
+
+cuda 11.8.0, cudnn 8.6.0.163, 
+tensorflow 2.12.1, tensorrt 8.6.1, 
+EOF
+}

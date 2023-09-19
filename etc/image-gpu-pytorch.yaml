@@ -1,5 +1,6 @@
-- imagename: test-image-gpu-full-01
+- imagename: image-gpu-pytorch
   elements:
+    # base
     - vm
     - ubuntu
     - cloud-init-root-login
@@ -9,9 +10,10 @@
     - miniconda
     - jupyterlab
     - minfs
+    - scripts-install
+    # gpu
     - dcgm-exporter
     - cuda
-    - conda-tensorflow
     - conda-pytorch
   debug-trace: 0
   no-tmpfs: true
