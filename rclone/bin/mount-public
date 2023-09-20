@@ -1,0 +1,13 @@
+#!/bin/bash
+set -euo pipefail
+
+export RCLONE_S3_ACCESS_KEY_ID=$1
+export RCLONE_S3_SECRET_ACCESS_KEY=$2
+export RCLONE_S3_ENDPOINT=$3
+S3_BUCKET=$4
+MOUNT_PATH=${MOUNT_PATH:-"/root/public/"}
+
+# create dir for mount
+mkdir -p "${MOUNT_PATH}"
+
+rclone mount "public-data:${S3_BUCKET}" "${MOUNT_PATH}" --daemon

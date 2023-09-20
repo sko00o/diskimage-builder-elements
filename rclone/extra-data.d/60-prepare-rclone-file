@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+echo ">> Download rclone if it not exists"
+
+if [ ! -f $RCLONE_FILE ]; then
+    curl -sfL -o "$RCLONE_FILE" "${RCLONE_URL}"
+else
+    echo "$RCLONE_FILE already exists."
+fi
