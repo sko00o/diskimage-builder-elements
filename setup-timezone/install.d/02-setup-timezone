@@ -7,4 +7,4 @@ set -eu
 set -o pipefail
 
 # Set timezone
-echo "$TIMEZONE" > /etc/timezone
+sudo timedatectl set-timezone "$TIMEZONE"
