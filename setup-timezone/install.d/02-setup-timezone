@@ -7,4 +7,7 @@ set -eu
 set -o pipefail
 
 # Set timezone
-sudo timedatectl set-timezone "$TIMEZONE"
+if [ -n "${TIMEZONE}" ]; then
+    sudo ln -s /usr/share/zoneinfo/$TIMEZONE /etc/localtime
+    echo "$TIMEZONE" | sudo tee /etc/timezone
+fi
