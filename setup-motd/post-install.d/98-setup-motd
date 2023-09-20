@@ -6,4 +6,5 @@ fi
 set -eu
 set -o pipefail
 
-figlet -f slant $MOTD_MSG > /etc/motd
+figlet -f slant "$MOTD_BIG_MSG" > /etc/motd
+echo -n "$MOTD_MSG" >> /etc/motd
