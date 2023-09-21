@@ -8,14 +8,19 @@ upload() {
         --public $@
 }
 
-image-mini() {
+common() {
+    name=$1
     upload \
         --property hw_qemu_guest_agent=yes \
         --property os_type=linux \
         --property os_distro=ubuntu \
         --property os_version='22.04' \
         --property os_admin_user=root \
-        --file ${FUNCNAME[0]}.qcow2 ${FUNCNAME[0]}
+        --file ${name}.qcow2 ${name}
+}
+
+image-mini() {
+    upload ${FUNCNAME[0]}
 
     cat <<EOF
 ubuntu 22.04, 
@@ -24,13 +29,7 @@ EOF
 }
 
 image-gpu-mini() {
-    upload \
-        --property hw_qemu_guest_agent=yes \
-        --property os_type=linux \
-        --property os_distro=ubuntu \
-        --property os_version='22.04' \
-        --property os_admin_user=root \
-        --file ${FUNCNAME[0]}.qcow2 ${FUNCNAME[0]}
+    upload ${FUNCNAME[0]}
 
     cat <<EOF
 ubuntu 22.04, 
@@ -41,13 +40,7 @@ EOF
 }
 
 image-gpu-pytorch() {
-    upload \
-        --property hw_qemu_guest_agent=yes \
-        --property os_type=linux \
-        --property os_distro=ubuntu \
-        --property os_version='22.04' \
-        --property os_admin_user=root \
-        --file ${FUNCNAME[0]}.qcow2 ${FUNCNAME[0]}
+    upload ${FUNCNAME[0]}
 
     cat <<EOF
 ubuntu 22.04, 
@@ -61,13 +54,7 @@ EOF
 }
 
 image-gpu-tensorflow() {
-    upload \
-        --property hw_qemu_guest_agent=yes \
-        --property os_type=linux \
-        --property os_distro=ubuntu \
-        --property os_version='22.04' \
-        --property os_admin_user=root \
-        --file ${FUNCNAME[0]}.qcow2 ${FUNCNAME[0]}
+    upload ${FUNCNAME[0]}
 
     cat <<EOF
 ubuntu 22.04, 
