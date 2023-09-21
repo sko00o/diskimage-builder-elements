@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+echo ">> Install sd-webui"
+
+# pre-install sd_webui
+TAR_FILE=/tmp/$(basename ${SD_WEBUI_FILE})
+SD_WEBUI_DIR=/root/stable-diffusion-webui
+SD_WEBUI_DATA_DIR=/root/sd_webui_data
+tar -xvf "${TAR_FILE}" -C /root/
+mv "/root/stable-diffusion-webui-${DIB_SD_WEBUI_VER}" "${SD_WEBUI_DIR}"
+
+
+for f in /opt/scripts-install/helpers/*; do
+    source $f
+done
+
+install_sd_webui
