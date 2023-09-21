@@ -10,4 +10,5 @@ MOUNT_PATH=${MOUNT_PATH:-"/root/public/"}
 # create dir for mount
 mkdir -p "${MOUNT_PATH}"
 
-rclone mount "public-data:${S3_BUCKET}" "${MOUNT_PATH}" --daemon
+# mount -t rclone -o read_only,config=/root/.config/rclone/rclone.conf "public-data:${S3_BUCKET}" "${MOUNT_PATH}"
+rclone mount "public-data:${S3_BUCKET}" "${MOUNT_PATH}" --read-only --daemon
