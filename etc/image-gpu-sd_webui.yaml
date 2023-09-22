@@ -20,7 +20,7 @@
     - dcgm-exporter
     - nvidia-driver
     # app
-    - sd-webui
+    - sd-webui-public-data
   debug-trace: 0
   no-tmpfs: true
   environment:

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+echo ">> Copy sd_webui source file from HOST"
+
+if [ -n "${SD_WEBUI_FILE}" ]; then
+    cp "${SD_WEBUI_FILE}" "${TMP_MOUNT_PATH}/tmp/$(basename ${SD_WEBUI_FILE})"
+else
+    echo "ERROR: SD_WEBUI_FILE is not set."
+fi
