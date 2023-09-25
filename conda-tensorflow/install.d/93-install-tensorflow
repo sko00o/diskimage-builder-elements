@@ -11,7 +11,7 @@ python3() {
     $CONDA_PREFIX/bin/python3 "$@"
 }
 
-conda install -c conda-forge cudatoolkit=${CUDATOOLKIT_VER}
+conda install -y -c conda-forge cudatoolkit=${CUDATOOLKIT_VER}
 
 ## Install TensorFlow
 python3 -m pip install nvidia-cudnn-cu11==${CUDNN_CU11_VER} tensorflow==${TENSORFLOW_VER}
