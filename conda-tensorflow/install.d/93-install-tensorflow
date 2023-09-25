@@ -11,8 +11,14 @@ python3() {
     $CONDA_PREFIX/bin/python3 "$@"
 }
 
+conda install -c conda-forge cudatoolkit=${CUDATOOLKIT_VER}
+
 ## Install TensorFlow
-python3 -m pip install tensorflow==${TENSORFLOW_VER}
+python3 -m pip install nvidia-cudnn-cu11==${CUDNN_CU11_VER} tensorflow==${TENSORFLOW_VER}
+
+mkdir -p mkdir -p $CONDA_PREFIX/etc/conda/activate.d
+echo 'CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
+echo 'export LD_LIBRARY_PATH=$CUDNN_PATH/lib:$CONDA_PREFIX/lib/:$LD_LIBRARY_PATH' >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
 
 ## (optional) Install TensorRT
 python3 -m pip install tensorrt==${TENSORRT_VER}

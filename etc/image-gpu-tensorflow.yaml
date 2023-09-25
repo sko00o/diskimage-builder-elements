@@ -18,7 +18,7 @@
     - prometheus
     # gpu
     - dcgm-exporter
-    - cuda
+    - nvidia-driver
     # AI Framework
     - conda-tensorflow
   debug-trace: 0
