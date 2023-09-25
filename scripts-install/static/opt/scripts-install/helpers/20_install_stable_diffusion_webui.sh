@@ -70,3 +70,12 @@ install_sd_webui() {
 
     install_sd_requirements
 }
+
+install_sd_webui_from_public_data() {
+    cd /root/
+    # sd_webui v1.5.2 and all dependencies already compressed
+    tar -xvf public/sd_webui/sd_webui.tar.xz
+    cp -r public/sd_webui/data/models sd_webui_data/
+    cp -r public/sd_webui/data/embeddings sd_webui_data/
+    ./start_sd_webui.sh
+}

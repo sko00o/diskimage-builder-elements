@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+echo ">> Install sd-webui"
+
+TAR_FILE=/tmp/$(basename ${SD_WEBUI_FILE})
+
+cd /root/
+tar -xvf ${TAR_FILE}
+./start_sd_webui.sh --exit --skip-torch-cuda-test

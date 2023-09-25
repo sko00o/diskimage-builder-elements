@@ -86,6 +86,9 @@ scrape_configs:
   - job_name: "dcgm-exporter"
     static_configs:
       - targets: ["localhost:9400"]
+  - job_name: "nvidia_gpu_exporter"
+    static_configs:
+      - targets: ["localhost:9835"]
 remote_write:
   - url: "http://prometheus.service.yoga:9094/api/v1/write"
 EOF

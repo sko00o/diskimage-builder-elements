@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+echo ">> Download sd_webui source if it not exists"
+
+if [ ! -f $SD_WEBUI_FILE ]; then
+    curl -sfL -o "$SD_WEBUI_FILE" "${SD_WEBUI_URL}"
+else
+    echo "$SD_WEBUI_FILE already exists."
+fi
