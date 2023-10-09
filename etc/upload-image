@@ -8,61 +8,16 @@ upload() {
         --public $@
 }
 
-common() {
-    name=$1
+image-ubuntu() {
+    name="$1"
+    os_version="${2:-22.04}"
     upload \
         --property hw_qemu_guest_agent=yes \
+        --property os_admin_user=root \
         --property os_type=linux \
         --property os_distro=ubuntu \
-        --property os_version='22.04' \
-        --property os_admin_user=root \
-        --file ${name}.qcow2 ${name}
-}
-
-image-mini() {
-    upload ${FUNCNAME[0]}
-
-    cat <<EOF
-ubuntu 22.04, 
-miniconda py311_23.5.2-0, 
-EOF
-}
-
-image-gpu-mini() {
-    upload ${FUNCNAME[0]}
-
-    cat <<EOF
-ubuntu 22.04, 
-nvidia_driver 530.30.02, 
-miniconda py311_23.5.2-0, 
-jupyterlab 4.0.4,
-EOF
-}
-
-image-gpu-pytorch() {
-    upload ${FUNCNAME[0]}
-
-    cat <<EOF
-ubuntu 22.04, 
-nvidia_driver 530.30.02, 
-miniconda py311_23.5.2-0, 
-jupyterlab 4.0.4, 
-
-cuda 11.8.0, cudnn 8.6.0.163, 
-pytorch 2.0.1, torchvision 0.15.2, torchaudio 2.0.2,
-EOF
-}
-
-image-gpu-tensorflow() {
-    upload ${FUNCNAME[0]}
-
-    cat <<EOF
-ubuntu 22.04, 
-nvidia_driver 530.30.02, 
-miniconda py311_23.5.2-0, 
-jupyterlab 4.0.4, 
-
-cuda 11.8.0, cudnn 8.6.0.163, 
-tensorflow 2.12.1, tensorrt 8.6.1, 
-EOF
+        --property os_version="${os_version}" \
+        --id "$(cat ${name}.id.txt)" \
+        --file "${name}.qcow2" \
+        "${name}"
 }
