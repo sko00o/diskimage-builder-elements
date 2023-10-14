@@ -32,7 +32,7 @@ ExecStartPre=-/usr/bin/mkdir -p /root/public
 ExecStart= \
   /usr/bin/rclone mount \
     --config=/root/.config/rclone/rclone.conf \
-    --umask 022 \
+    --read-only \
     --allow-other \
     public-data:%i /root/public
 ExecStop=/bin/fusermount -u /root/public
