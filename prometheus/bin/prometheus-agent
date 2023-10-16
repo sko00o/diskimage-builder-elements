@@ -1,0 +1,5 @@
+#!/bin/bash
+set -euo pipefail
+
+update-prometheus-agent-config $@
+systemctl restart prometheus-agent.service
