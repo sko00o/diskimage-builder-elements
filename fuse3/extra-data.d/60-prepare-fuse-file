@@ -8,7 +8,7 @@ set -euo pipefail
 echo ">> Download fuse if it not exists"
 
 if [ ! -f $FUSE_FILE ]; then
-    curl -sfL -o "$FUSE_FILE" "${FUSE_URL}"
+    wget -O "${FUSE_FILE}" "${FUSE_URL}"
 else
-    echo "$FUSE_FILE already exists."
+    echo "${FUSE_FILE} already exists."
 fi
