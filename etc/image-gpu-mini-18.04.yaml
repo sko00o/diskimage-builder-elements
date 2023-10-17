@@ -24,7 +24,7 @@
   no-tmpfs: true
   environment:
     DIB_RELEASE: bionic # Ubuntu Server 18.04 LTS
-    DIB_APT_INSTALL_FUSE: 0
+    DIB_APT_INSTALL_FUSE: "0"
     DIB_CLOUD_INIT_DATASOURCES: "OpenStack"
     DIB_OFFLINE: "true"
     DIB_MINICONDA_RELEASE: py311_23.5.2-0
