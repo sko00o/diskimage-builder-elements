@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+echo ">> Copy fuse file from HOST"
+
+if [ -n "${FUSE_FILE}" ]; then
+    cp ${FUSE_FILE} ${TMP_MOUNT_PATH}/tmp/$(basename ${FUSE_FILE})
+else
+    echo "ERROR: FUSE_FILE is not set."
+fi

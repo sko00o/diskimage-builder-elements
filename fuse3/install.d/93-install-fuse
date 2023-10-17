@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+echo ">> Install fuse build tools"
+pip3 install meson
+pip3 install ninja
+
+echo ">> Install fuse"
+tar -xzf "$FUSE_FILE" -C /tmp
+cd /tmp/fuse-${FUSE_VERSION}
+mkdir build; cd build
+meson setup ..
+ninja
+sudo python3 -m pytest test/
+sudo ninja install
