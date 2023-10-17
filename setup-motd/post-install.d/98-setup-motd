@@ -8,11 +8,3 @@ set -o pipefail
 
 figlet -f slant "$MOTD_BIG_MSG" >/etc/motd
 echo -n "$MOTD_MSG" >>/etc/motd
-
-# customize neofetch info, remove 'Host' line
-if [ -f /etc/neofetch/config.conf ]; then
-    sed -i 's/info "Host" model/# info "Host" model/' /etc/neofetch/config.conf
-fi
-if [ -f /root/.config/neofetch/config.conf ]; then
-    sed -i 's/info "Host" model/# info "Host" model/' /root/.config/neofetch/config.conf
-fi
