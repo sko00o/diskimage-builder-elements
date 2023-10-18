@@ -28,7 +28,7 @@ Wants=network-online.target
 Type=notify
 User=root
 Group=root
-ExecStartPre=-/usr/bin/mkdir -p /root/public
+ExecStartPre=-/bin/mkdir -p /root/public
 ExecStart= \
   /usr/bin/rclone mount \
     --config=/root/.config/rclone/rclone.conf \
