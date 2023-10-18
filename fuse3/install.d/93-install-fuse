@@ -9,7 +9,7 @@ echo ">> Install fuse build tools"
 apt-get -y install meson
 
 echo ">> Install fuse"
-tar -xzf "$FUSE_FILE" -C /tmp
+tar -xvf "$FUSE_FILE" -C /tmp
 cd /tmp/libfuse-fuse-${FUSE_VERSION}
 mkdir build; cd build
 meson setup ..
