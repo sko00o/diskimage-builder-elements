@@ -1,0 +1,2 @@
+fuse3:
+  when: DIB_APT_INSTALL_FUSE != 0
