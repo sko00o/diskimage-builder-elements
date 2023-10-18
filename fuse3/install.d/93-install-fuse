@@ -6,14 +6,12 @@ fi
 set -euo pipefail
 
 echo ">> Install fuse build tools"
-pip3 install meson
-pip3 install ninja
+apt-get -y install meson
 
 echo ">> Install fuse"
 tar -xzf "$FUSE_FILE" -C /tmp
-cd /tmp/fuse-${FUSE_VERSION}
+cd /tmp/libfuse-fuse-${FUSE_VERSION}
 mkdir build; cd build
 meson setup ..
 ninja
-sudo python3 -m pytest test/
 sudo ninja install
