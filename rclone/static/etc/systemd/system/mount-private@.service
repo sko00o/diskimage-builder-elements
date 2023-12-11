@@ -1,0 +1,20 @@
+[Unit]
+Description=rclone: Remote FUSE filesystem for private data
+Documentation=man:rclone(1)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+User=root
+Group=root
+ExecStartPre=-/bin/mkdir -p /root/private
+ExecStart= \
+  /usr/bin/rclone mount \
+    --config=/root/.config/rclone/rclone.conf \
+    --allow-other \
+    cfg-%i:%i /root/private
+ExecStop=/bin/fusermount -u /root/private
+
+[Install]
+WantedBy=default.target

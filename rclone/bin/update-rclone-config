@@ -10,21 +10,26 @@ if __name__ == "__main__":
     parser.add_argument("s3_ak", help="S3 access key")
     parser.add_argument("s3_sk", help="S3 secret key")
     parser.add_argument("s3_endpoint", help="S3 endpoint")
+    # add optional argument s3_bucket
+    parser.add_argument("--s3_bucket", default=None, help="S3 bucket")
     args = parser.parse_args()
 
     config = configparser.ConfigParser()
     with open(cfg_path, 'r') as file:
         config.read_file(file)
 
-    if "public-data" in config:
-        config["public-data"] = {
-            "type": "s3",
-            "env_auth": "false",
-            "provider": "Other",
-            "access_key_id": args.s3_ak,
-            "secret_access_key": args.s3_sk,
-            "endpoint": args.s3_endpoint,
-        }
-        with open(cfg_path, 'w') as file:
-            config.write(file)
-        print(f"Updated rclone configuration: {cfg_path}")
+    cfg_name = "public-data"
+    if args.s3_bucket is not None:
+        cfg_name = "cfg-" + args.s3_bucket
+
+    config[cfg_name] = {
+        "type": "s3",
+        "env_auth": "false",
+        "provider": "Other",
+        "access_key_id": args.s3_ak,
+        "secret_access_key": args.s3_sk,
+        "endpoint": args.s3_endpoint,
+    }
+    with open(cfg_path, 'w') as file:
+        config.write(file)
+    print(f"Updated rclone configuration: {cfg_path} [{cfg_name}]")
