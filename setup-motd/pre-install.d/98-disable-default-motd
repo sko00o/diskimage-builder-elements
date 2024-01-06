@@ -9,3 +9,6 @@ set -o pipefail
 
 # Disable default motd
 chmod -x /etc/update-motd.d/*
+
+# Remove motd-new.service
+rm /lib/systemd/system/motd-news.service
