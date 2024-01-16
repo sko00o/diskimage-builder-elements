@@ -1,0 +1,43 @@
+#!/bin/bash
+
+device="/dev/sdb"
+partition="/dev/sdb1"
+mount_point="/data"
+systemd_file="/etc/systemd/system/data.mount"
+
+# keep trying until success
+while true; do
+  # check if partition exists
+  if lsblk -rno NAME "$partition" >/dev/null 2>&1; then
+    echo "partition $partition exist"
+  else
+    echo "partition $partition not exist, will format $device"
+    # create partition and format to ext4
+    echo -e "n\np\n1\n\n\nw" | fdisk "$device"
+    mkfs.ext4 "$partition"
+  fi
+
+  # mount partition
+  mkdir -p "$mount_point" && mount "$partition" "$mount_point"
+  # check if mount success
+  if mountpoint -q "$mount_point"; then
+    echo "mount $partition to $mount_point success"
+    break
+  else
+    echo "mount $partition to $mount_point failed, will retry"
+    sleep 1
+  fi
+done
+
+cat <<EOF >"$systemd_file"
+[Unit]
+Description=Mount disk $partition to $mount_point
+[Mount]
+What=$partition
+Where=$mount_point
+Type=ext4
+Options=defaults
+[Install]
+WantedBy=multi-user.target
+EOF
+systemctl enable data.mount

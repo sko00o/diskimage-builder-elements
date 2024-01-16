@@ -1,0 +1,77 @@
+#!/bin/bash
+
+backup_source="/data"
+backup_destination="private-data:/backup"
+
+# Function to perform backup
+perform_backup() {
+    # list all directories in backup destination
+    local backup_names=$(rclone lsd "$backup_destination" | awk '{print $5}')
+
+    # add an option in beginning to create a new backup directory
+    backup_names=("+NEW" "${backup_names[@]}")
+
+    # using arrow keys to select a directory or type a new one
+    local backup_root_dir=$(dialog --menu "选择一个备份" 20 60 14 "${backup_names[@]}" 3>&1 1>&2 2>&3 3>&-)
+    if [ "$backup_root_dir" == "+NEW" ]; then
+        echo "输入备份名称:"
+        read backup_root_dir
+        backup_dir="$backup_destination/$backup_root_dir"
+        rclone mkdir "$backup_dir"
+    else
+        backup_dir="$backup_destination/$backup_root_dir"
+    fi
+
+    rclone sync --inplace --transfers=32 --checkers=32 -L -P \
+        "$backup_source/" "$backup_dir/"
+
+    echo "备份完成"
+}
+
+# Function to perform restore
+perform_restore() {
+    echo "从哪个备份恢复:"
+    # list all directories in backup destination
+    local backup_names=$(rclone lsd "$backup_destination" | awk '{print $5}')
+
+    # and using arrow keys to select a directory
+    local backup_root_dir=$(dialog --menu "选择一个备份" 20 60 14 "${backup_names[@]}" 3>&1 1>&2 2>&3 3>&-)
+
+    local backup_dir="$backup_destination/$backup_root_dir"
+
+    # Check if the backup directory exists
+    if [ ! -d "$backup_dir" ]; then
+        echo "备份目录不存在"
+        exit 1
+    fi
+
+    # Confirm before restoring
+    read -p "确定从 $backup_root_dir 恢复吗? (y/n): " choice
+    if [ "$choice" != "y" ]; then
+        echo "已终止"
+        exit 0
+    fi
+
+    rclone sync --inplace --transfers=32 --checkers=32 -L -P \
+        "$backup_dir/" "$backup_source/"
+
+    echo "恢复完成"
+}
+
+echo "选择一个操作:"
+echo "1. 备份"
+echo "2. 恢复"
+read option
+
+case $option in
+1)
+    perform_backup
+    ;;
+2)
+    perform_restore
+    ;;
+*)
+    echo "无效操作"
+    exit 1
+    ;;
+esac

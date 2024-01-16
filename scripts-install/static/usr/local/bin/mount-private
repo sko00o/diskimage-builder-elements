@@ -1,0 +1,15 @@
+#!/bin/bash
+
+AK=$1
+SK=$2
+ENDPOINT=$3
+BUCKET=$4
+
+# check connection to s3 endpoint
+if ! curl -s "$ENDPOINT" >/dev/null; then
+  echo "mount failed: can not connect to $ENDPOINT"
+  exit 1
+fi
+
+source /opt/scripts-install/helpers/50_setup_s3_bucket.sh
+private_bucket_clout_init "$AK" "$SK" "$ENDPOINT" "$BUCKET"
