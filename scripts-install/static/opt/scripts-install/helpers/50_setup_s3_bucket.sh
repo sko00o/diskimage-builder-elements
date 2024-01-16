@@ -24,6 +24,10 @@ config[cfg_name] = {
     "secret_access_key": "$s3_sk",
     "endpoint": "$s3_endpoint",
 }
+config["private-data"] = {
+    "type": "alias",
+    "remote": cfg_name+":$s3_bucket",
+}
 with open(cfg_path, 'w') as file:
     config.write(file)
 print(f"Updated rclone configuration: {cfg_path} [{cfg_name}]")
@@ -31,14 +35,11 @@ EOF
 }
 
 private_bucket_setup_systemd() {
-    # check systemd service file exists
-    local rclone_service_file="/etc/systemd/system/mount-private@.service"
-    if [[ -f "$rclone_service_file" ]]; then
-        echo "$rclone_service_file exists."
-    fi
+    local rclone_service_file="/etc/systemd/system/mount-private.service"
+    local mount_path="/root/private"
 
     # create systemd service file
-    cat <<EOF | sudo tee "$rclone_service_file"
+    cat <<EOF > "$rclone_service_file"
 [Unit]
 Description=rclone: Remote FUSE filesystem for private data
 Documentation=man:rclone(1)
@@ -49,13 +50,17 @@ Wants=network-online.target
 Type=notify
 User=root
 Group=root
-ExecStartPre=-/bin/mkdir -p /root/private
+ExecStartPre=-/bin/bash -c '/bin/mkdir -p "$mount_path" && \
+  ! /bin/mountpoint -q "$mount_path" || \
+  /bin/umount --force "$mount_path"'
 ExecStart= \
   /usr/bin/rclone mount \
     --config=/root/.config/rclone/rclone.conf \
     --allow-other \
-    cfg-%i:%i /root/private
-ExecStop=/bin/fusermount -u /root/private
+    --s3-directory-markers \
+    --devname="private" \
+    private-data: "$mount_path"
+ExecStop=/bin/fusermount -u "$mount_path"
 
 [Install]
 WantedBy=default.target
@@ -66,5 +71,5 @@ private_bucket_clout_init() {
     private_bucket_setup_systemd
     systemctl daemon-reload
     private_bucket_set_config "$1" "$2" "$3" "$4"
-    systemctl enable --now mount-private@${4}.service
+    systemctl enable --now mount-private.service
 }
