@@ -12,7 +12,7 @@ prompts = {
         'type_new_name': "Type a new name",
         'select_backup': "Select a backup:",
         'enter_backup_name': "Enter backup name: ",
-        'confirm_overwrite': "Are you sure you want to overwrite {name}? This will delete all its current contents. (y/n): ",
+        'confirm_overwrite': "Are you sure you want to overwrite {name}? This operation cannot be undone. (y/n): ",
         'terminated': "Terminated",
         'backup_completed': "Backup completed",
         'select_restore': "Select a backup to restore from:",
@@ -35,7 +35,7 @@ prompts = {
         'type_new_name': '输入一个新名称',
         'select_backup': "选择一个备份:",
         'enter_backup_name': "输入备份名称: ",
-        'confirm_overwrite': "你确定要覆盖 {name} 吗？这将删除所有当前内容。 (y/n): ",
+        'confirm_overwrite': "你确定要覆盖 {name} 吗？这个操作不能撤销。 (y/n): ",
         'terminated': "已终止",
         'backup_completed': "备份完成",
         'select_restore': "选择一个备份来恢复:",
@@ -103,9 +103,8 @@ class Toolbox:
         if choice.lower() != "y":
             print(self.prompts['terminated'])
             exit(0)
-        os.system(f'rclone purge "{backup_dir}"')
 
-        os.system(f'rclone sync --inplace --transfers=32 --checkers=32 -L -P "{self.backup_source}/" "{backup_dir}/"')
+        os.system(f'rclone sync --inplace --transfers=32 --checkers=32 -L -P -M "{self.backup_source}/" "{backup_dir}/"')
         print(self.prompts['backup_completed'])
 
     def perform_restore(self):
@@ -123,13 +122,12 @@ class Toolbox:
 
         backup_root_dir = backup_names[backup_choice]
         backup_dir = f"{self.backup_destination}/{backup_root_dir}"
-
         choice = input(self.prompts['confirm_restore'].format(name=backup_root_dir))
         if choice.lower() != "y":
             print(self.prompts['terminated'])
             exit(0)
 
-        os.system(f'rclone sync --inplace --transfers=32 --checkers=32 -L -P "{backup_dir}/" "{self.backup_source}/"')
+        os.system(f'rclone sync --inplace --transfers=32 --checkers=32 -L -P -M "{backup_dir}/" "{self.backup_source}/"')
         print(self.prompts['restore_completed'])
 
     def manage_backup(self):
@@ -171,11 +169,11 @@ class Toolbox:
 
 def main():
     # Ask the user to select a language
-    print("Select a language / 选择一种语言:")
-    print("1. English")
-    print("2. 中文")
+    print("选择一种语言 / Select a language:")
+    print("1. 中文")
+    print("2. English")
     language_choice = int(input())
-    language = 'en' if language_choice == 1 else 'zh'
+    language = 'zh' if language_choice == 1 else 'en'
     toolbox = Toolbox(language, backup_source, backup_destination)
     toolbox.run()
 
