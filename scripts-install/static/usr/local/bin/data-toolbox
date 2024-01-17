@@ -1,77 +1,175 @@
-#!/bin/bash
+#!/usr/bin/env python3
 
-backup_source="/data"
-backup_destination="private-data:/backup"
+import os
+import subprocess
 
-# Function to perform backup
-perform_backup() {
-    # list all directories in backup destination
-    local backup_names=$(rclone lsd "$backup_destination" | awk '{print $5}')
+backup_source = "/data"
+backup_destination = "private-data:/backup"
 
-    # add an option in beginning to create a new backup directory
-    backup_names=("+NEW" "${backup_names[@]}")
-
-    # using arrow keys to select a directory or type a new one
-    local backup_root_dir=$(dialog --menu "选择一个备份" 20 60 14 "${backup_names[@]}" 3>&1 1>&2 2>&3 3>&-)
-    if [ "$backup_root_dir" == "+NEW" ]; then
-        echo "输入备份名称:"
-        read backup_root_dir
-        backup_dir="$backup_destination/$backup_root_dir"
-        rclone mkdir "$backup_dir"
-    else
-        backup_dir="$backup_destination/$backup_root_dir"
-    fi
-
-    rclone sync --inplace --transfers=32 --checkers=32 -L -P \
-        "$backup_source/" "$backup_dir/"
-
-    echo "备份完成"
+# Define prompts in both languages
+prompts = {
+    'en': {
+        'type_new_name': "Type a new name",
+        'select_backup': "Select a backup:",
+        'enter_backup_name': "Enter backup name: ",
+        'confirm_overwrite': "Are you sure you want to overwrite {name}? This will delete all its current contents. (y/n): ",
+        'terminated': "Terminated",
+        'backup_completed': "Backup completed",
+        'select_restore': "Select a backup to restore from:",
+        'confirm_restore': "Are you sure you want to restore from {name}? (y/n): ",
+        'restore_completed': "Restore completed",
+        'select_manage': "Select a backup to manage:",
+        'select_operation': "Select an operation:",
+        'backup': "Backup",
+        'restore': "Restore",
+        'manage_backup': "Manage Backup",
+        'rename': "Rename",
+        'delete': "Delete",
+        'enter_new_name': "Enter new name: ",
+        'backup_renamed': "Backup renamed successfully",
+        'confirm_delete': "Are you sure you want to delete {name}? This operation cannot be undone. (y/n): ",
+        'backup_deleted': "Backup deleted successfully",
+        'invalid_operation': "Invalid operation",
+    },
+    'zh': {
+        'type_new_name': '输入一个新名称',
+        'select_backup': "选择一个备份:",
+        'enter_backup_name': "输入备份名称: ",
+        'confirm_overwrite': "你确定要覆盖 {name} 吗？这将删除所有当前内容。 (y/n): ",
+        'terminated': "已终止",
+        'backup_completed': "备份完成",
+        'select_restore': "选择一个备份来恢复:",
+        'confirm_restore': "你确定要从 {name} 恢复吗？ (y/n): ",
+        'restore_completed': "恢复完成",
+        'select_manage': "选择一个备份来管理:",
+        'select_operation': "选择一个操作:",
+        'backup': "备份",
+        'restore': "恢复",
+        'manage_backup': "管理备份",
+        'rename': "重命名",
+        'delete': "删除",
+        'enter_new_name': "输入新名称: ",
+        'backup_renamed': "备份成功重命名",
+        'confirm_delete': "你确定要删除 {name} 吗？这个操作不能撤销。 (y/n): ",
+        'backup_deleted': "备份成功删除",
+        'invalid_operation': "无效的操作",
+    }
 }
 
-# Function to perform restore
-perform_restore() {
-    echo "从哪个备份恢复:"
-    # list all directories in backup destination
-    local backup_names=$(rclone lsd "$backup_destination" | awk '{print $5}')
+language = 'en'
 
-    # and using arrow keys to select a directory
-    local backup_root_dir=$(dialog --menu "选择一个备份" 20 60 14 "${backup_names[@]}" 3>&1 1>&2 2>&3 3>&-)
+def perform_backup():
+    backup_names = subprocess.getoutput(f'rclone lsd "{backup_destination}"').split("\n")
+    backup_names = [name.split()[-1] for name in backup_names]
+    backup_names.insert(0, prompts[language]['type_new_name'])
 
-    local backup_dir="$backup_destination/$backup_root_dir"
+    print(prompts[language]['select_backup'])
+    for i, name in enumerate(backup_names):
+        print(f"{i}. {name}")
 
-    # Check if the backup directory exists
-    if [ ! -d "$backup_dir" ]; then
-        echo "备份目录不存在"
-        exit 1
-    fi
+    backup_choice = int(input())
+    if backup_choice >= len(backup_names):
+        print("Invalid backup")
+        exit(1)
 
-    # Confirm before restoring
-    read -p "确定从 $backup_root_dir 恢复吗? (y/n): " choice
-    if [ "$choice" != "y" ]; then
-        echo "已终止"
-        exit 0
-    fi
+    if backup_choice == 0:
+        backup_root_dir = input(prompts[language]['enter_backup_name'])
+    else:
+        backup_root_dir = backup_names[backup_choice]
+    backup_dir = f"{backup_destination}/{backup_root_dir}"
+    choice = input(prompts[language]['confirm_overwrite'].format(name=backup_root_dir))
+    if choice.lower() != "y":
+        print(prompts[language]['terminated'])
+        exit(0)
+    os.system(f'rclone purge "{backup_dir}"')
 
-    rclone sync --inplace --transfers=32 --checkers=32 -L -P \
-        "$backup_dir/" "$backup_source/"
+    os.system(f'rclone sync --inplace --transfers=32 --checkers=32 -L -P "{backup_source}/" "{backup_dir}/"')
+    print(prompts[language]['backup_completed'])
 
-    echo "恢复完成"
-}
+def perform_restore():
+    backup_names = subprocess.getoutput(f'rclone lsd "{backup_destination}"').split("\n")
+    backup_names = [name.split()[-1] for name in backup_names]
 
-echo "选择一个操作:"
-echo "1. 备份"
-echo "2. 恢复"
-read option
+    print(prompts[language]['select_restore'])
+    for i, name in enumerate(backup_names):
+        print(f"{i}. {name}")
 
-case $option in
-1)
-    perform_backup
-    ;;
-2)
-    perform_restore
-    ;;
-*)
-    echo "无效操作"
-    exit 1
-    ;;
-esac
+    backup_choice = int(input())
+    if backup_choice >= len(backup_names):
+        print(prompts[language]['invalid_operation'])
+        exit(1)
+
+    backup_root_dir = backup_names[backup_choice]
+    backup_dir = f"{backup_destination}/{backup_root_dir}"
+
+    choice = input(prompts[language]['confirm_restore'].format(name=backup_root_dir))
+    if choice.lower() != "y":
+        print(prompts[language]['terminated'])
+        exit(0)
+
+    os.system(f'rclone sync --inplace --transfers=32 --checkers=32 -L -P "{backup_dir}/" "{backup_source}/"')
+    print(prompts[language]['restore_completed'])
+
+def manage_backup():
+    backup_names = subprocess.getoutput(f'rclone lsd "{backup_destination}"').split("\n")
+    backup_names = [name.split()[-1] for name in backup_names]
+
+    print(prompts[language]['select_manage'])
+    for i, name in enumerate(backup_names):
+        print(f"{i}. {name}")
+
+    backup_choice = int(input())
+    if backup_choice >= len(backup_names):
+        print(prompts[language]['invalid_operation'])
+        exit(1)
+
+    backup_root_dir = backup_names[backup_choice]
+    backup_dir = f"{backup_destination}/{backup_root_dir}"
+
+    print(prompts[language]['select_operation'])
+    print("1. " + prompts[language]['rename'])
+    print("2. " + prompts[language]['delete'])
+    operation = input()
+
+    if operation == "1":
+        new_name = input(prompts[language]['enter_new_name'])
+        new_dir = f"{backup_destination}/{new_name}"
+        os.system(f'rclone moveto "{backup_dir}" "{new_dir}"')
+        print(prompts[language]['backup_renamed'])
+    elif operation == "2":
+        choice = input(prompts[language]['confirm_delete'].format(name=backup_root_dir))
+        if choice.lower() != "y":
+            print(prompts[language]['terminated'])
+            exit(0)
+        os.system(f'rclone purge "{backup_dir}"')
+        print(prompts[language]['backup_deleted'])
+    else:
+        print(prompts[language]['invalid_operation'])
+        exit(1)
+
+def main():
+    # Ask the user to select a language
+    print("Select a language / 选择一种语言:")
+    print("1. English")
+    print("2. 中文")
+    language_choice = int(input())
+    language = 'en' if language_choice == 1 else 'zh'
+
+    print(prompts[language]['select_operation'])
+    print("1. " + prompts[language]['backup'])
+    print("2. " + prompts[language]['restore'])
+    print("3. " + prompts[language]['manage_backup'])
+    option = input()
+
+    if option == "1":
+        perform_backup()
+    elif option == "2":
+        perform_restore()
+    elif option == "3":
+        manage_backup()
+    else:
+        print(prompts[language]['invalid_operation'])
+        exit(1)
+
+if __name__ == '__main__':
+    main()
