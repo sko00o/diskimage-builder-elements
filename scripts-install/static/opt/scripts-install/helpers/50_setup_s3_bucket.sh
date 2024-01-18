@@ -8,7 +8,7 @@ private_bucket_set_config() {
     local rclone_config_file="${5:-"/root/.config/rclone/rclone.conf"}"
     
     # call python heredoc to set ini config
-    /bin/python3 <<EOF
+    python3 <<EOF
 import argparse
 import configparser
 cfg_path = "$rclone_config_file"
