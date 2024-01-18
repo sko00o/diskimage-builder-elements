@@ -1,23 +1,3 @@
-#!/bin/bash
-
-if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
-  set -x
-fi
-set -euo pipefail
-
-# Set up rclone config
-mkdir -p /root/.config/rclone
-cat <<EOF >/root/.config/rclone/rclone.conf
-[public-data]
-type = s3
-provider = Other
-env_auth = false
-access_key_id = 
-secret_access_key = 
-endpoint = 
-EOF
-
-cat <<EOF >/etc/systemd/system/mount-public@.service
 [Unit]
 Description=rclone: Remote FUSE filesystem for public data
 Documentation=man:rclone(1)
@@ -34,11 +14,9 @@ ExecStart= \
     --config=/root/.config/rclone/rclone.conf \
     --read-only \
     --allow-other \
+    --devname="%i" \
     public-data:%i /root/public
 ExecStop=/bin/fusermount -u /root/public
 
 [Install]
 WantedBy=default.target
-EOF
-
-systemctl daemon-reload

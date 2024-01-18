@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+turbo_cfg="/etc/network-turbo.conf"
+
+proxy_set() {
+    http_proxy=$([ ! -f "$turbo_cfg" ] || cat "$turbo_cfg" | grep http_proxy | awk -F '=' '{print $2}')
+    if [ -z "$http_proxy" ]; then
+        echo "输入代理地址 (例如： http://proxy.example.com:8080):"
+        read -r http_proxy
+        echo "http_proxy=$http_proxy" >"$turbo_cfg"
+    fi
+
+    export http_proxy="$http_proxy"
+    export https_proxy="$http_proxy"
+    export no_proxy="10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,127.0.0.1,::1,localhost"
+}
+
+proxy_unset() {
+    unset http_proxy
+    unset https_proxy
+    unset no_proxy
+}
+
+if [ "$1" = "reset" ]; then
+    rm -f "$turbo_cfg"
+    echo "已重置加速配置"
+    exit 0
+fi

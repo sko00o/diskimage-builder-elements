@@ -1,0 +1,24 @@
+#!/bin/bash
+set -euo pipefail
+
+AK=$1
+SK=$2
+ENDPOINT=$3
+BUCKET=$4
+
+# check connection to s3 endpoint
+if ! curl -s "$ENDPOINT" >/dev/null; then
+  echo "mount failed: can not connect to $ENDPOINT"
+  exit 1
+fi
+
+# clean up any mount-private@bucket-xxxx.service
+for service in $(systemctl list-units --full --no-legend --no-pager --type=service --all --plain | grep mount-private@ | awk '{print $1}'); do
+  echo "cleaning up $service"
+  systemctl stop "$service"
+  systemctl disable "$service"
+  rm -f "/etc/systemd/system/$service"
+done
+
+source /opt/scripts-install/helpers/50_setup_s3_bucket.sh
+private_bucket_clout_init "$AK" "$SK" "$ENDPOINT" "$BUCKET"
