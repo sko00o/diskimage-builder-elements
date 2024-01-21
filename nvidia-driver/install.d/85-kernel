@@ -20,8 +20,14 @@ install_kernel() {
     sudo apt-get -y install linux-headers-$KERNEL_VERSION
 }
 
+freeze_kernel() {
+    # prevent kernel from being upgraded
+    sudo apt-mark hold linux-image-generic linux-headers-generic
+}
+
 if [ "${INSTALL_KERNEL:-false}" = "true" ]; then
     install_kernel
+    freeze_kernel
 else
     check_kernel
 fi

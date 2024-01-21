@@ -1,0 +1,16 @@
+#cloud-config
+disable_root: false
+ssh_pwauth: true
+users:
+  - name: root
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    lock_passwd: false
+    shell: /bin/bash
+packages:
+  - python3-pip
+  - kpartx 
+  - debootstrap 
+  - qemu-utils
+runcmd:
+  - pip3 install diskimage-builder
+  

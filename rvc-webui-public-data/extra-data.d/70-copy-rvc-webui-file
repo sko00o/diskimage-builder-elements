@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+echo ">> Copy rvc_webui source file from HOST"
+
+if [ -n "${RVC_WEBUI_FILE}" ]; then
+    cp "${RVC_WEBUI_FILE}" "${TMP_MOUNT_PATH}/tmp/$(basename ${RVC_WEBUI_FILE})"
+else
+    echo "ERROR: RVC_WEBUI_FILE is not set."
+fi
