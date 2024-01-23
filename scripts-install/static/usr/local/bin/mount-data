@@ -3,7 +3,7 @@ set -euo pipefail
 
 device="/dev/sdb"
 partition="/dev/sdb1"
-mount_point="/data"
+mount_point="/root/data"
 systemd_file="/etc/systemd/system/data.mount"
 
 # keep trying until success
