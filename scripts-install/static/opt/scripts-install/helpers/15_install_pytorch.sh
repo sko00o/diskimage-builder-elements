@@ -4,7 +4,7 @@ PYTORCH_VERSION=${PYTORCH_VERSION:-"2.0.1"}
 PYTORCH_TORCHVISION_VERSION=${PYTORCH_TORCHVISION_VERSION:-"0.15.2"}
 PYTORCH_TORCHAUDIO_VERSION=${PYTORCH_TORCHAUDIO_VERSION:-"2.0.2"}
 PYTORCH_CUDA_VERSION=${PYTORCH_CUDA_VERSION:-"11.8"}
-PYTORCH_LINKS=${PYTORCH_LINKS:-"/root/public/whl/"}
+PYTORCH_LINKS=${PYTORCH_LINKS:-"$PIP_LINKS"}
 
 install_pytorch_conda() {
     conda install -y -c pytorch -c nvidia \
@@ -15,21 +15,17 @@ install_pytorch_conda() {
 }
 
 install_pytorch_pip() {
-    extra="cu${PYTORCH_CUDA_VERSION//./}"
+    local extra="cu${PYTORCH_CUDA_VERSION//./}"
+    local option="--index-url https://download.pytorch.org/whl/${extra}"
+    if [[ -n "${PYTORCH_LINKS}" ]]; then
+        echo "PyTorch install from local whl files: ${PYTORCH_LINKS}"
+        option="--no-index --find-links ${PYTORCH_LINKS}"
+    fi
     python3 -m pip install \
         torch==${PYTORCH_VERSION}+${extra} \
         torchvision==${PYTORCH_TORCHVISION_VERSION}+${extra} \
         torchaudio==${PYTORCH_TORCHAUDIO_VERSION} \
-        --index-url https://download.pytorch.org/whl/${extra}
-}
-
-install_pytorch_pip_offline() {
-    extra="cu${PYTORCH_CUDA_VERSION//./}"
-    python3 -m pip install \
-        torch==${PYTORCH_VERSION}+${extra} \
-        torchvision==${PYTORCH_TORCHVISION_VERSION}+${extra} \
-        torchaudio==${PYTORCH_TORCHAUDIO_VERSION} \
-        --no-index --find-links "${PYTORCH_LINKS}"
+        ${option}
 }
 
 verify_pytorch() {
@@ -44,16 +40,6 @@ install_pytorch() {
         return
     fi
 
-    # Try offline installation first
-    if [[ -n "${PYTORCH_LINKS}" ]]; then
-        echo "Installing pytorch ${PYTORCH_VERSION} from ${PYTORCH_LINKS}"
-        if install_pytorch_pip_offline; then
-            echo "pytorch ${PYTORCH_VERSION} installed"
-            return
-        fi
-    fi
-
-    echo "Installing pytorch ${PYTORCH_VERSION} from pip"
     install_pytorch_pip
     echo "pytorch ${PYTORCH_VERSION} installed"
 }

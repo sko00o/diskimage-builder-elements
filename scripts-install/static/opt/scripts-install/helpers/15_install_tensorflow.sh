@@ -1,14 +1,26 @@
 #!/bin/bash
 
 TENSORFLOW_VERSION=${TENSORFLOW_VERSION:-"2.12.*"}
+TENSORFLOW_LINKS=${TENSORFLOW_LINKS:-"$PIP_LINKS"}
 TENSORRT_VERSION=${TENSORRT_VERSION:-"8.6.1"}
+TENSORRT_LINKS=${TENSORRT_LINKS:-"$PIP_LINKS"}
 
 install_tensorflow_pip() {
-    python3 -m pip install tensorflow==${TENSORFLOW_VERSION}
+    local option=""
+    if [[ -n "${TENSORFLOW_LINKS}" ]]; then
+        echo "TensorFlow install from local whl files: ${TENSORFLOW_LINKS}"
+        option="--no-index --find-links ${TENSORFLOW_LINKS}"
+    fi
+    python3 -m pip install tensorflow==${TENSORFLOW_VERSION} ${option}
 }
 
 install_tensorrt_pip() {
-    python3 -m pip install tensorrt==${TENSORRT_VERSION}
+    local option=""
+    if [[ -n "${TENSORRT_LINKS}" ]]; then
+        echo "TensorRT install from local whl files: ${TENSORRT_LINKS}"
+        option="--no-index --find-links ${TENSORRT_LINKS}"
+    fi
+    python3 -m pip install tensorrt==${TENSORRT_VERSION} ${option}
 }
 
 verify_tensorflow() {
