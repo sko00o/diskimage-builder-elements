@@ -1,0 +1,6 @@
+ca-certificates:
+  phase: pre-install.d
+curl:
+  phase: pre-install.d
+gnupg:
+  phase: pre-install.d
