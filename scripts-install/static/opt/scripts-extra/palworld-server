@@ -1,0 +1,189 @@
+#!/bin/bash
+
+PALWORLD_SERVER_NAME="HOLDCLOUD Palworld"
+PALWORLD_DATA_DIR=/root/data/palworld
+PALWORLD_SETTING=${PALWORLD_DATA_DIR}/Pal/Saved/Config/LinuxServer/PalWorldSettings.ini
+HELPER=/opt/scripts-install/helpers
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+
+logs() {
+    cd ${PALWORLD_DATA_DIR}
+    docker compose logs -f palworld
+}
+
+admin() {
+    cd ${PALWORLD_DATA_DIR}
+    docker compose exec -it palworld rcon-cli
+}
+
+backup() {
+    # will create a backup in ${PALWORLD_DATA_DIR}/backups/
+    cd ${PALWORLD_DATA_DIR}
+    docker compose exec palworld backup
+}
+
+restart() {
+    cd ${PALWORLD_DATA_DIR}
+    docker compose restart
+}
+
+setup_systemd_backup() {
+    # check if already setup
+    if systemctl is-active --quiet palworld-server-backup.timer; then
+        echo "systemd backup already setup"
+        return
+    fi
+
+    # setup systemd backup
+    cat <<EOF >/etc/systemd/system/palworld-server-backup.service
+[Unit]
+Description=Backup Palworld Server
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash ${DIR}/palworld-server backup
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    # run every 4 hours
+    cat <<EOF >/etc/systemd/system/palworld-server-backup.timer
+[Unit]
+Description=Run backup every 4 hours
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=4h
+
+[Install]
+WantedBy=timers.target
+EOF
+
+    systemctl daemon-reload
+    systemctl enable palworld-server-backup.timer
+    systemctl start palworld-server-backup.timer
+}
+
+setup_settings() {
+    # check if already setup
+    if [ -f ${PALWORLD_SETTING} ]; then
+        echo "palworld settings already setup"
+        return
+    fi
+
+    OptionSettings=(
+        "Difficulty=None"
+        "DayTimeSpeedRate=0.700000"
+        "NightTimeSpeedRate=1.200000"
+        "ExpRate=1.500000"
+        "PalCaptureRate=1.500000"
+        "PalSpawnNumRate=1.000000"
+        "PalDamageRateAttack=1.000000"
+        "PalDamageRateDefense=1.000000"
+        "PlayerDamageRateAttack=1.000000"
+        "PlayerDamageRateDefense=1.000000"
+        "PlayerStomachDecreaceRate=1.000000"
+        "PlayerStaminaDecreaceRate=1.000000"
+        "PlayerAutoHPRegeneRate=1.000000"
+        "PlayerAutoHpRegeneRateInSleep=1.000000"
+        "PalStomachDecreaceRate=1.000000"
+        "PalStaminaDecreaceRate=1.000000"
+        "PalAutoHPRegeneRate=1.000000"
+        "PalAutoHpRegeneRateInSleep=1.000000"
+        "BuildObjectDamageRate=1.000000"
+        "BuildObjectDeteriorationDamageRate=1.000000"
+        "CollectionDropRate=3.000000"
+        "CollectionObjectHpRate=1.000000"
+        "CollectionObjectRespawnSpeedRate=1.000000"
+        "EnemyDropItemRate=2.000000"
+        "DeathPenalty=None"
+        "bEnablePlayerToPlayerDamage=False"
+        "bEnableFriendlyFire=False"
+        "bEnableInvaderEnemy=True"
+        "bActiveUNKO=False"
+        "bEnableAimAssistPad=True"
+        "bEnableAimAssistKeyboard=False"
+        "DropItemMaxNum=3000"
+        "DropItemMaxNum_UNKO=100"
+        "BaseCampMaxNum=128"
+        "BaseCampWorkerMaxNum=15"
+        "DropItemAliveMaxHours=1.000000"
+        "bAutoResetGuildNoOnlinePlayers=False"
+        "AutoResetGuildTimeNoOnlinePlayers=72.000000"
+        "GuildPlayerMaxNum=20"
+        "PalEggDefaultHatchingTime=2.000000"
+        "WorkSpeedRate=2.000000"
+        "bIsMultiplay=False"
+        "bIsPvP=False"
+        "bCanPickupOtherGuildDeathPenaltyDrop=False"
+        "bEnableNonLoginPenalty=True"
+        "bEnableFastTravel=True"
+        "bIsStartLocationSelectByMap=True"
+        "bExistPlayerAfterLogout=False"
+        "bEnableDefenseOtherGuildPlayer=False"
+        "CoopPlayerMaxNum=4"
+        "ServerPlayerMaxNum=32"
+        "ServerName=\"Default Palworld Server\""
+        "ServerDescription=\"\""
+        "AdminPassword=\"\""
+        "ServerPassword=\"\""
+        "PublicPort=8211"
+        "PublicIP=\"\""
+        "RCONEnabled=False"
+        "RCONPort=25575"
+        "Region=\"\""
+        "bUseAuth=True"
+        "BanListURL=\"https://api.palworldgame.com/api/banlist.txt\""
+    )
+    result=""
+    for line in "${OptionSettings[@]}"; do
+        result+="$line,"
+    done
+    result=${result%?}
+
+    # setup palworld settings
+    mkdir -p $(dirname ${PALWORLD_SETTING})
+    cat <<EOF >${PALWORLD_SETTING}
+[/Script/Pal.PalGameWorldSettings]
+OptionSettings=($result)
+EOF
+}
+
+bootstrap() {
+    PALWORLD_PUBLIC_PORT=$1
+    PALWORLD_SERVER_PASSWORD=$2
+
+    for f in ${HELPER}/*; do . $f; done
+    setup_settings
+    start_palworld_server
+    setup_systemd_backup
+}
+
+# options
+case "$1" in
+bootstrap)
+    bootstrap $2 $3
+    ;;
+logs)
+    logs
+    ;;
+admin)
+    admin
+    ;;
+backup)
+    backup
+    ;;
+*)
+    echo "使用方法: $0 {命令}"
+    echo "可用的命令有:"
+    echo "  bootstrap: 初始化设置"
+    echo "  logs: 查看日志"
+    echo "  admin: 管理员命令"
+    echo "  backup: 备份数据"
+    echo ""
+    echo "示例: $0 bootstrap"
+    ;;
+esac
