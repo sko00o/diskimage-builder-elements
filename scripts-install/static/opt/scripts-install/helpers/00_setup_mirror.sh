@@ -32,11 +32,11 @@ EOF
 }
 
 setup_docker_mirror() {
-  mkdir -p /etc/docker
+  sudo mkdir -p /etc/docker
   if [ -f /etc/docker/daemon.json ]; then
-    cp /etc/docker/daemon.json /etc/docker/daemon.json.bak
+    sudo cp /etc/docker/daemon.json /etc/docker/daemon.json.bak
   fi
-  cat >/etc/docker/daemon.json <<EOF
+  sudo cat >/etc/docker/daemon.json <<EOF
 {
   "registry-mirrors": [
     "https://mirror.iscas.ac.cn",
@@ -47,9 +47,9 @@ setup_docker_mirror() {
   ]
 }
 EOF
-  if systemctl status docker >/dev/null 2>&1; then
-    systemctl daemon-reload
-    systemctl restart docker
+  if sudo systemctl status docker >/dev/null 2>&1; then
+    sudo systemctl daemon-reload
+    sudo systemctl restart docker
   fi
   echo "docker mirror already set"
 }
