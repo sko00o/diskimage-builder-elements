@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # https://tech.palworldgame.com/dedicated-server-guide#linux
+# https://github.com/thijsvanloef/palworld-server-docker
 
 PALWORLD_DATA_DIR=${PALWORLD_DATA_DIR:-"/root/data/palworld"}
 PALWORLD_ADMIN_PASSWORD=${PALWORLD_ADMIN_PASSWORD:-"secret-admin-password"}
@@ -9,7 +10,6 @@ PALWORLD_PORT=${PALWORLD_PORT:-"8211"}
 PALWORLD_PUBLIC_PORT=${PALWORLD_PUBLIC_PORT:-""}
 PALWORLD_SERVER_PASSWORD=${PALWORLD_SERVER_PASSWORD:-"secret-server-password"}
 PALWORLD_PLAYER=${PALWORLD_PLAYER:-"16"}
-
 
 setup_palworld_docker_compose() {
     if [ -f ${PALWORLD_DATA_DIR}/docker-compose.yml ]; then
@@ -31,17 +31,28 @@ services:
          - PUID=1000
          - PGID=1000
          - PORT=8211
+         - TZ=Asia/Shanghai
          - PLAYERS=${PALWORLD_PLAYER}
          - MULTITHREADING=true
          - RCON_ENABLED=true
          - RCON_PORT=25575
-         - ADMIN_PASSWORD="${PALWORLD_ADMIN_PASSWORD}}"
-         - COMMUNITY=true
+         - ADMIN_PASSWORD="${PALWORLD_ADMIN_PASSWORD}"
          - SERVER_PASSWORD="${PALWORLD_SERVER_PASSWORD}"
+         - COMMUNITY=true
          - SERVER_NAME="${PALWORLD_SERVER_NAME}"
          - PUBLIC_PORT="${PALWORLD_PUBLIC_PORT}"
+         # Special Server Settings
+         - DAYTIME_SPEEDRATE=0.7
+         - NIGHTTIME_SPEEDRATE=1.2
+         - EXP_RATE=1.5
+         - PAL_CAPTURE_RATE=1.5
+         - COLLECTION_DROP_RATE=3
+         - ENEMY_DROP_ITEM_RATE=2
+         - DEATH_PENALTY=None
+         - PAL_EGG_DEFAULT_HATCHING_TIME=2
+         - WORK_SPEED_RATE=2
       volumes:
-         - ${PALWORLD_DATA_DIR}:/palworld/
+         - ./:/palworld/
 EOF
 }
 
