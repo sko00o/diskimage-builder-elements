@@ -24,7 +24,7 @@ setup_docker_repo() {
 
 install_docker_ce() {
     # Install Docker CE
-    VERSION_STRING="5:${DIB_DOCKER_VERSION}-1~ubuntu.$(lsb_release -rs)~$(lsb_release -cs)"
+    VERSION_STRING="5:${DOCKER_VERSION}-1~ubuntu.$(lsb_release -rs)~$(lsb_release -cs)"
 
     sudo apt-get install -y docker-ce=$VERSION_STRING \
         docker-ce-cli=$VERSION_STRING \
