@@ -1,8 +1,9 @@
 #!/bin/bash
 set -e
 
+MOUNT_POINT="/root/data"
 PALWORLD_SERVER_NAME="HOLDCLOUD_Palworld"
-PALWORLD_DATA_DIR=/root/data/palworld
+PALWORLD_DATA_DIR=${MOUNT_POINT}/palworld
 PALWORLD_SETTING=${PALWORLD_DATA_DIR}/Pal/Saved/Config/LinuxServer/PalWorldSettings.ini
 HELPER=/opt/scripts-install/helpers
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
@@ -45,9 +46,19 @@ restore() {
     # will restore from ${PALWORLD_DATA_DIR}/backups/
     cd ${PALWORLD_DATA_DIR}
     docker compose stop palworld
-    tar -xf "${backup}" -C "${PALWORLD_DATA_DIR}/Pal/"
+    tar -xf "${PALWORLD_DATA_DIR}/backups/${backup}" -C "${PALWORLD_DATA_DIR}/Pal/"
     docker compose start palworld
     echo "存档 ${backup} 已恢复"
+}
+
+set_new_password() {
+    read -p "输入新的服务器密码: " PALWORLD_SERVER_PASSWORD
+
+    # update SERVER_PASSWORD in docker-compose.yml
+    sed -i "s/SERVER_PASSWORD=.*/SERVER_PASSWORD=${PALWORLD_SERVER_PASSWORD}/g" ${PALWORLD_DATA_DIR}/docker-compose.yml
+    cd ${PALWORLD_DATA_DIR}
+    docker compose up -d
+    echo "服务器密码已更新，新的密码是 ${PALWORLD_SERVER_PASSWORD}" 
 }
 
 restart() {
@@ -150,6 +161,9 @@ backup)
 restore)
     restore
     ;;
+passwd)
+    set_new_password
+    ;;
 *)
     echo "使用方法: $0 {命令}"
     echo "可用的命令有:"
@@ -161,6 +175,7 @@ restore)
     echo "  restart: 重启服务"
     echo "  backup: 备份存档"
     echo "  restore: 恢复存档"
+    echo "  passwd: 设置服务器密码"
     echo ""
     echo "示例: $0 logs"
     ;;
