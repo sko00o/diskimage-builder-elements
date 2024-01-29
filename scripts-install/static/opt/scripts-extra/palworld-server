@@ -106,8 +106,8 @@ EOF
 }
 
 bootstrap() {
-    PALWORLD_PUBLIC_PORT=$1
-    PALWORLD_SERVER_PASSWORD=$2
+    PALWORLD_SERVER_PASSWORD=$1
+    PALWORLD_PUBLIC_PORT=${2:-8211}
 
     for f in ${HELPER}/*; do . $f; done
     start_palworld_server
@@ -117,6 +117,11 @@ bootstrap() {
 # options
 case "$1" in
 bootstrap)
+    if [ $# -lt 2 ]; then
+        echo "使用方法: $0 {命令} {服务器密码} [{公网端口}]"
+        echo "示例: $0 bootstrap 123456 8211"
+        exit 1
+    fi
     bootstrap $2 $3
     ;;
 logs)
@@ -148,6 +153,6 @@ restore)
     echo "  backup: 备份存档"
     echo "  restore: 恢复存档"
     echo ""
-    echo "示例: $0 bootstrap"
+    echo "示例: $0 logs"
     ;;
 esac
