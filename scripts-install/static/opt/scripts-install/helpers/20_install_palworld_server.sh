@@ -40,7 +40,7 @@ services:
          - SERVER_PASSWORD="${PALWORLD_SERVER_PASSWORD}"
          - COMMUNITY=true
          - SERVER_NAME="${PALWORLD_SERVER_NAME}"
-         - PUBLIC_PORT="${PALWORLD_PUBLIC_PORT}"
+         - PUBLIC_PORT=${PALWORLD_PUBLIC_PORT}
          # Special Server Settings
          - DAYTIME_SPEEDRATE=0.7
          - NIGHTTIME_SPEEDRATE=1.2

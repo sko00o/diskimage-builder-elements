@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-PALWORLD_SERVER_NAME="HOLDCLOUD Palworld"
+PALWORLD_SERVER_NAME="HOLDCLOUD_Palworld"
 PALWORLD_DATA_DIR=/root/data/palworld
 PALWORLD_SETTING=${PALWORLD_DATA_DIR}/Pal/Saved/Config/LinuxServer/PalWorldSettings.ini
 HELPER=/opt/scripts-install/helpers
