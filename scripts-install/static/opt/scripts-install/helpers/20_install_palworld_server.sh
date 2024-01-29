@@ -41,6 +41,7 @@ services:
          - COMMUNITY=true
          - SERVER_NAME="${PALWORLD_SERVER_NAME}"
          - PUBLIC_PORT=${PALWORLD_PUBLIC_PORT}
+         - UPDATE_ON_BOOT=true
          # Special Server Settings
          - DAYTIME_SPEEDRATE=0.7
          - NIGHTTIME_SPEEDRATE=1.2

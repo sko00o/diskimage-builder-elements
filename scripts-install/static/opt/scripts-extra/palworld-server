@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e
 
-MOUNT_POINT="/root/data"
 PALWORLD_SERVER_NAME="HOLDCLOUD_Palworld"
-PALWORLD_DATA_DIR=${MOUNT_POINT}/palworld
+PALWORLD_ROOT=${PALWORLD_ROOT:-"/root/data"}
+PALWORLD_DATA_DIR=${PALWORLD_ROOT}/palworld
 PALWORLD_SETTING=${PALWORLD_DATA_DIR}/Pal/Saved/Config/LinuxServer/PalWorldSettings.ini
 HELPER=/opt/scripts-install/helpers
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
@@ -58,7 +58,7 @@ set_new_password() {
     sed -i "s/SERVER_PASSWORD=.*/SERVER_PASSWORD=${PALWORLD_SERVER_PASSWORD}/g" ${PALWORLD_DATA_DIR}/docker-compose.yml
     cd ${PALWORLD_DATA_DIR}
     docker compose up -d
-    echo "服务器密码已更新，新的密码是 ${PALWORLD_SERVER_PASSWORD}" 
+    echo "服务器密码已更新，新的密码是 ${PALWORLD_SERVER_PASSWORD}"
 }
 
 restart() {
