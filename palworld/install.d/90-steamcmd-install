@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -o errexit
+set -o nounset
+set -o pipefail
+
+# Ref: https://github.com/steamcmd/docker/blob/master/dockerfiles/ubuntu-20/Dockerfile
+echo steam steam/question select "I AGREE" | debconf-set-selections &&
+    echo steam steam/license note '' | debconf-set-selections
+export DEBIAN_FRONTEND=noninteractive
+sudo dpkg --add-architecture i386
+sudo apt-get update -y
+sudo apt-get install -y --no-install-recommends ca-certificates locales steamcmd

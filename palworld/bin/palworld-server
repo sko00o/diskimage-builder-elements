@@ -1,0 +1,120 @@
+#!/bin/bash
+set -e
+
+if [ -f /etc/palworld-server.env ]; then
+    source /etc/palworld-server.env
+fi
+
+logs() {
+    tail -f $(ls -t ${INSTALL_BASE}/logs/ | head -n 1)
+}
+
+admin() {
+    rcon-cli -c ${INSTALL_BASE}/.config/rcon/rcon.yaml
+}
+
+start() {
+    ${INSTALL_BASE}/pwserver start
+}
+
+stop() {
+    ${INSTALL_BASE}/pwserver stop
+}
+
+restart() {
+    ${INSTALL_BASE}/pwserver restart
+}
+
+backup() {
+    ${INSTALL_BASE}/pwserver backup
+}
+
+restore() {
+    backups=($(ls -1 ${BACKUP_DIR}))
+    for i in "${!backups[@]}"; do
+        printf "%s\t%s\n" "$i" "${backups[$i]}"
+    done
+
+    # get backup by number
+    read -p "选择需要恢复的存档编号: " backup_number
+    backup=${backups[$backup_number]}
+
+    # prompt for confirmation
+    read -p "确认恢复存档 ${backup} ? [y/N] " confirm
+    if [[ ! $confirm =~ ^[Yy]$ ]]; then
+        echo "取消恢复存档"
+        exit 1
+    fi
+
+    stop
+    tar -xvf "${BACKUP_DIR}/${backup}" -C "${INSTALL_BASE}/"
+    start
+    echo "存档 ${backup} 已恢复"
+}
+
+new_password() {
+    LGSM_CFG_FILE=${INSTALL_BASE}/lgsm/config-lgsm/pwserver/pwserver.cfg
+    sed -i "s/^serverpassword=.*/serverpassword=$1/" ${LGSM_CFG_FILE}
+}
+
+set_new_password() {
+    read -p "输入新的服务器密码: " PALWORLD_SERVER_PASSWORD
+    new_password ${PALWORLD_SERVER_PASSWORD}
+    restart
+    echo "服务器密码已更新，新的密码是 ${PALWORLD_SERVER_PASSWORD}"
+}
+
+bootstrap() {
+    new_password $1
+    restart
+}
+
+case "$1" in
+bootstrap)
+    if [ $# -lt 2 ]; then
+        echo "使用方法: $0 {命令} {服务器密码}"
+        echo "示例: $0 bootstrap 1234"
+        exit 1
+    fi
+    bootstrap $2
+    ;;
+logs)
+    logs
+    ;;
+admin)
+    admin
+    ;;
+start)
+    start
+    ;;
+stop)
+    stop
+    ;;
+restart)
+    restart
+    ;;
+backup)
+    backup
+    ;;
+restore)
+    restore
+    ;;
+passwd)
+    set_new_password
+    ;;
+*)
+    echo "使用方法: $0 {命令}"
+    echo "可用的命令有:"
+    echo "  bootstrap: 初始化"
+    echo "  logs: 查看日志"
+    echo "  admin: 管理员命令"
+    echo "  start: 启动服务"
+    echo "  stop: 停止服务"
+    echo "  restart: 重启服务"
+    echo "  backup: 备份存档"
+    echo "  restore: 恢复存档"
+    echo "  passwd: 设置服务器密码"
+    echo ""
+    echo "示例: $0 logs"
+    ;;
+esac
