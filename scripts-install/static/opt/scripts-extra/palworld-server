@@ -65,6 +65,11 @@ start() {
     docker compose start
 }
 
+restart() {
+    cd ${PALWORLD_DATA_DIR}
+    docker compose restart
+}
+
 setup_systemd_backup() {
     # check if already setup
     if systemctl is-active --quiet palworld-server-backup.timer; then
@@ -136,6 +141,9 @@ start)
 stop)
     stop
     ;;
+restart)
+    restart
+    ;;
 backup)
     backup
     ;;
@@ -150,6 +158,7 @@ restore)
     echo "  admin: 管理员命令"
     echo "  start: 启动服务"
     echo "  stop: 停止服务"
+    echo "  restart: 重启服务"
     echo "  backup: 备份存档"
     echo "  restore: 恢复存档"
     echo ""
