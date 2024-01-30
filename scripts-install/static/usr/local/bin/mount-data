@@ -4,7 +4,8 @@
 device="/dev/sdb"
 partition="/dev/sdb1"
 mount_point="/root/data"
-systemd_file="/etc/systemd/system/data.mount"
+unit_file="root-data.mount"
+systemd_file="/etc/systemd/system/${unit_file}"
 
 # keep trying until success
 while true; do
@@ -24,7 +25,7 @@ while true; do
   if mountpoint -q "$mount_point"; then
     echo "mount $partition to $mount_point success"
     break
-  else
+  else``
     echo "mount $partition to $mount_point failed, will retry"
     sleep 1
   fi
@@ -41,4 +42,4 @@ Options=defaults
 [Install]
 WantedBy=multi-user.target
 EOF
-systemctl enable data.mount
+systemctl enable ${unit_file}
