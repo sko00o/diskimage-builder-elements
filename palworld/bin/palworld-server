@@ -6,7 +6,7 @@ if [ -f /etc/palworld-server.env ]; then
 fi
 
 logs() {
-    tail -f $(ls -t ${INSTALL_BASE}/logs/ | head -n 1)
+    tail -f $(ls -t ${INSTALL_BASE}/logs/console | head -n 1)
 }
 
 admin() {

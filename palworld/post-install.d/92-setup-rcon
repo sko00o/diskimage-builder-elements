@@ -8,7 +8,7 @@ set -o nounset
 set -o pipefail
 
 # Configure RCON settings
-mkdir ${INSTALL_BASE}/.config/rcon
+mkdir -p ${INSTALL_BASE}/.config/rcon
 cat <<EOF >${INSTALL_BASE}/.config/rcon/rcon.yaml
 default:
   address: "127.0.0.1:${RCON_PORT}"
