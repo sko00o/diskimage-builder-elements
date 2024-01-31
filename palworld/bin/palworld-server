@@ -6,30 +6,31 @@ if [ -f /etc/palworld-server.env ]; then
 fi
 
 logs() {
-    tail -f $(ls -t ${INSTALL_BASE}/logs/console | head -n 1)
+    log_file=${INSTALL_BASE}/log/console/$(ls -t ${INSTALL_BASE}/log/console | head -n 1)
+    tail -f ${log_file}
 }
 
 admin() {
     rcon-cli -c ${INSTALL_BASE}/.config/rcon/rcon.yaml
 }
 
-start() {
+pw_start() {
     ${INSTALL_BASE}/pwserver start
 }
 
-stop() {
+pw_stop() {
     ${INSTALL_BASE}/pwserver stop
 }
 
-restart() {
+pw_restart() {
     ${INSTALL_BASE}/pwserver restart
 }
 
-backup() {
+pw_backup() {
     ${INSTALL_BASE}/pwserver backup
 }
 
-restore() {
+pw_restore() {
     backups=($(ls -1 ${BACKUP_DIR}))
     for i in "${!backups[@]}"; do
         printf "%s\t%s\n" "$i" "${backups[$i]}"
@@ -85,16 +86,16 @@ admin)
     admin
     ;;
 start)
-    start
+    pw_start
     ;;
 stop)
-    stop
+    pw_stop
     ;;
 restart)
-    restart
+    pw_restart
     ;;
 backup)
-    backup
+    pw_backup
     ;;
 restore)
     restore

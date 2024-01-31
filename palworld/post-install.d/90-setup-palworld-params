@@ -12,9 +12,7 @@ cat <<EOF >>${LGSM_CFG_FILE}
 servername="HOLDCLOUD_Palserver"
 serverpassword=0000
 adminpassword=${RCON_PASSWORD}
-#maxbackupdays="10"
 maxbackups="10"
-backupdir="${BACKUP_DIR}"
 EOF
 
 cat <<\EOF >>${LGSM_CFG_FILE}

@@ -10,5 +10,4 @@ set -o pipefail
 cat <<EOF >/etc/palworld-server.env
 INSTALL_USER=${INSTALL_USER}
 INSTALL_BASE=${INSTALL_BASE}
-BACKUP_DIR=${BACKUP_DIR}
 EOF
