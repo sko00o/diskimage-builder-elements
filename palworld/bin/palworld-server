@@ -16,24 +16,28 @@ admin() {
     rcon-cli -c ${INSTALL_BASE}/.config/rcon/rcon.yaml
 }
 
+pw_command() {
+    su - ${INSTALL_USER} -c "export https_proxy=${https_proxy}; cd ${INSTALL_BASE} && ./pwserver $@"
+}
+
 pw_start() {
-    su - ${INSTALL_USER} -c "cd ${INSTALL_BASE} && ./pwserver start"
+    pw_command start
 }
 
 pw_stop() {
-    su - ${INSTALL_USER} -c "cd ${INSTALL_BASE} && ./pwserver stop"
+    pw_command stop
 }
 
 pw_restart() {
-    su - ${INSTALL_USER} -c "cd ${INSTALL_BASE} && ./pwserver restart"
+    pw_command restart
 }
 
 pw_update() {
-    su - ${INSTALL_USER} -c "cd ${INSTALL_BASE} && ./pwserver update"
+    pw_command update
 }
 
 pw_backup() {
-    su - ${INSTALL_USER} -c "cd ${INSTALL_BASE} && ./pwserver backup"
+    pw_command backup
 
     # move backup to data backup dir
     mkdir -p ${DATA_BACKUP_BASE}
