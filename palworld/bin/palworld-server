@@ -28,6 +28,10 @@ pw_restart() {
     su - ${INSTALL_USER} -c "cd ${INSTALL_BASE} && ./pwserver restart"
 }
 
+pw_update() {
+    su - ${INSTALL_USER} -c "cd ${INSTALL_BASE} && ./pwserver update"
+}
+
 pw_backup() {
     su - ${INSTALL_USER} -c "cd ${INSTALL_BASE} && ./pwserver backup"
 
@@ -106,6 +110,9 @@ stop)
 restart)
     pw_restart
     ;;
+update)
+    pw_update
+    ;;
 backup)
     pw_backup
     ;;
@@ -124,6 +131,7 @@ passwd)
     echo "  start: 启动服务"
     echo "  stop: 停止服务"
     echo "  restart: 重启服务"
+    echo "  update: 更新服务"
     echo "  backup: 备份存档"
     echo "  restore: 恢复存档"
     echo "  passwd: 设置服务器密码"
