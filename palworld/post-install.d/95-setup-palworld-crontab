@@ -9,8 +9,8 @@ set -o pipefail
 
 CRONTAB_FILE=/etc/cron.d/palworld
 cat <<EOF >${CRONTAB_FILE}
-# check update on 02:00 every day
+# update on 02:00 every day
 0 2 * * * ${INSTALL_BASE}/pwserver update > /dev/null 2>&1
-# backup every 12 hours
-0 */12 * * * ${INSTALL_BASE}/pwserver backup > /dev/null 2>&1
+# backup on 03:00 every day
+0 3 * * * ${INSTALL_BASE}/pwserver backup > /dev/null 2>&1
 EOF

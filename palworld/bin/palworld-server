@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+DATA_BACKUP_BASE=/root/data/palworld-backup
+
 if [ -f /etc/palworld-server.env ]; then
     source /etc/palworld-server.env
 fi
@@ -15,23 +17,32 @@ admin() {
 }
 
 pw_start() {
-    ${INSTALL_BASE}/pwserver start
+    su - ${INSTALL_USER} -c "cd ${INSTALL_BASE} && ./pwserver start"
 }
 
 pw_stop() {
-    ${INSTALL_BASE}/pwserver stop
+    su - ${INSTALL_USER} -c "cd ${INSTALL_BASE} && ./pwserver stop"
 }
 
 pw_restart() {
-    ${INSTALL_BASE}/pwserver restart
+    su - ${INSTALL_USER} -c "cd ${INSTALL_BASE} && ./pwserver restart"
 }
 
 pw_backup() {
-    ${INSTALL_BASE}/pwserver backup
+    su - ${INSTALL_USER} -c "cd ${INSTALL_BASE} && ./pwserver backup"
+
+    # move backup to data backup dir
+    mkdir -p ${DATA_BACKUP_BASE}
+    backup=$(ls -t ${BACKUP_BASE} | head -n 1)
+    mv "${BACKUP_BASE}/${backup}" "${DATA_BACKUP_BASE}/${backup}"
+    echo "存档 ${backup} 已备份"
+
+    # delete backups more than 10 days old
+    find ${DATA_BACKUP_BASE} -mtime +10 -type f -delete
 }
 
 pw_restore() {
-    backups=($(ls -1 ${BACKUP_DIR}))
+    backups=($(ls -1 ${DATA_BACKUP_BASE}))
     for i in "${!backups[@]}"; do
         printf "%s\t%s\n" "$i" "${backups[$i]}"
     done
@@ -47,9 +58,10 @@ pw_restore() {
         exit 1
     fi
 
-    stop
-    tar -xvf "${BACKUP_DIR}/${backup}" -C "${INSTALL_BASE}/"
-    start
+    pw_stop
+    tar -xvf "${DATA_BACKUP_BASE}/${backup}" -C "${INSTALL_BASE}/"
+    chown -R ${INSTALL_USER}:${INSTALL_USER} ${INSTALL_BASE}
+    pw_start
     echo "存档 ${backup} 已恢复"
 }
 
@@ -61,13 +73,13 @@ new_password() {
 set_new_password() {
     read -p "输入新的服务器密码: " PALWORLD_SERVER_PASSWORD
     new_password ${PALWORLD_SERVER_PASSWORD}
-    restart
+    pw_restart
     echo "服务器密码已更新，新的密码是 ${PALWORLD_SERVER_PASSWORD}"
 }
 
 bootstrap() {
     new_password $1
-    restart
+    pw_restart
 }
 
 case "$1" in
