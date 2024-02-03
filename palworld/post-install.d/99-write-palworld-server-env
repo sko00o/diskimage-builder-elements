@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -o errexit
+set -o nounset
+set -o pipefail
+
+cat <<EOF >/etc/palworld-server.env
+INSTALL_USER=${INSTALL_USER}
+INSTALL_BASE=${INSTALL_BASE}
+BACKUP_BASE=${BACKUP_BASE}
+EOF

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -o errexit
+set -o nounset
+set -o pipefail
+
+SYSTEMD_UNIT_FILE=/etc/systemd/system/palworld.service
+cat <<EOF >${SYSTEMD_UNIT_FILE}
+[Unit]
+Description=Palworld Server
+After=network-online.target
+Wants=network-online.target,root-data.mount
+
+[Service]
+Type=forking
+User=${INSTALL_USER}
+WorkingDirectory=${INSTALL_BASE}
+#Assume that the service is running after main process exits with code 0
+RemainAfterExit=yes
+ExecStart=${INSTALL_BASE}/pwserver start
+ExecStop=${INSTALL_BASE}/pwserver stop
+Restart=no
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable palworld.service

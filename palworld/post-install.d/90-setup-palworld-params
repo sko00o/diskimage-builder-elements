@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+	set -x
+fi
+set -o errexit
+set -o nounset
+set -o pipefail
+
+LGSM_CFG_FILE=${INSTALL_BASE}/lgsm/config-lgsm/pwserver/pwserver.cfg
+cat <<EOF >>${LGSM_CFG_FILE}
+servername="HOLDCLOUD_Palserver"
+serverpassword=0000
+adminpassword=${RCON_PASSWORD}
+maxbackups="10"
+EOF
+
+cat <<\EOF >>${LGSM_CFG_FILE}
+startparameters="EpicApp=PalServer -servername='${servername}' -serverpassword='${serverpassword}' -adminpassword='${adminpassword}' -useperfthreads -NoAsyncLoadingThread -UseMultithreadForDS"
+EOF
+
+

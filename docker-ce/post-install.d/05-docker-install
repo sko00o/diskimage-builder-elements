@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -o errexit
+set -o nounset
+set -o pipefail
+
+# Install Docker CE
+VERSION_STRING="5:${DIB_DOCKER_VERSION}-1~ubuntu.$(lsb_release -rs)~$(lsb_release -cs)"
+
+sudo apt-get install -y docker-ce=$VERSION_STRING \
+    docker-ce-cli=$VERSION_STRING \
+    containerd.io \
+    docker-buildx-plugin \
+    docker-compose-plugin

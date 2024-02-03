@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -o errexit
+set -o nounset
+set -o pipefail
+
+sudo apt-get install -y curl wget file tar bzip2 gzip unzip bsdmainutils python3 util-linux binutils bc jq tmux netcat lib32gcc-s1 lib32stdc++6 libsdl2-2.0-0:i386
+
+# using linuxGSM to install palworld
+adduser --disabled-password --gecos "" ${INSTALL_USER}
+
+# Ref: https://linuxgsm.com/servers/pwserver/
+su - ${INSTALL_USER} <<EOF
+export https_proxy=$https_proxy
+curl -Lo linuxgsm.sh https://linuxgsm.sh && chmod +x linuxgsm.sh && bash linuxgsm.sh pwserver
+yes | ./pwserver install
+./pwserver start
+EOF

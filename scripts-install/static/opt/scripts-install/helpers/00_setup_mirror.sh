@@ -30,3 +30,26 @@ custom_channels:
 EOF
   echo "conda mirror already set"
 }
+
+setup_docker_mirror() {
+  sudo mkdir -p /etc/docker
+  if [ -f /etc/docker/daemon.json ]; then
+    sudo cp /etc/docker/daemon.json /etc/docker/daemon.json.bak
+  fi
+  sudo cat >/etc/docker/daemon.json <<EOF
+{
+  "registry-mirrors": [
+    "https://mirror.iscas.ac.cn",
+    "https://mirror.ccs.tencentyun.com",
+    "https://docker.nju.edu.cn",
+    "http://hub-mirror.c.163.com",
+    "https://docker.mirrors.ustc.edu.cn"
+  ]
+}
+EOF
+  if sudo systemctl status docker >/dev/null 2>&1; then
+    sudo systemctl daemon-reload
+    sudo systemctl restart docker
+  fi
+  echo "docker mirror already set"
+}

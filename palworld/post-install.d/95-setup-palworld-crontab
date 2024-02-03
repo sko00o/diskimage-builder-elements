@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -o errexit
+set -o nounset
+set -o pipefail
+
+CRONTAB_FILE=/etc/cron.d/palworld
+cat <<EOF >${CRONTAB_FILE}
+# update on 02:00 every day
+0 2 * * * ${INSTALL_BASE}/pwserver update > /dev/null 2>&1
+# backup on 03:00 every day
+0 3 * * * ${INSTALL_BASE}/pwserver backup > /dev/null 2>&1
+EOF
