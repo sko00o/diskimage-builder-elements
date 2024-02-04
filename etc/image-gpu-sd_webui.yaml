@@ -25,8 +25,11 @@
   no-tmpfs: true
   environment:
     DIB_RELEASE: jammy # Ubuntu Server 22.04 LTS
-    DIB_CLOUD_INIT_DATASOURCES: "OpenStack"
+    DIB_CLOUD_INIT_DATASOURCES: "OpenStack,NoCloud"
     DIB_OFFLINE: "true"
-    DIB_MINICONDA_RELEASE: py311_23.5.2-0
+    DIB_MINICONDA_RELEASE: py310_23.11.0-2
     DIB_TIMEZONE: Asia/Shanghai
     DIB_MOTD_BIG_MSG: HOLDCLOUD
+    DIB_DCGM_VERSION: "3.3.0"
+    DIB_DCGM_EXPORTER_VERSION: "3.3.0-3.2.0"
+    DIB_SD_WEBUI_FILE: "/root/public/sd_webui/sd_webui_20240201.tar.xz"
