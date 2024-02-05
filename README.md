@@ -39,10 +39,10 @@ python3 -m pip install diskimage-builder
 ## build image
 
 ```sh
-./build.sh etc/ubuntu18.04-miniconda3.yaml
+./build.sh etc/image-mini.yaml
 ```
 
-Image file **ubuntu18.04-miniconda3.qcow2** will be generated.
+Image file **image-mini.qcow2** will be generated.
 
 ## upload images to OpenStack
 
@@ -57,6 +57,6 @@ openstack image create \
   --container-format bare \
   --disk-format qcow2 \
   --public \
-  --file ubuntu18.04-miniconda3.qcow2
+  --file image-mini.qcow2
   ubuntu18.04_miniconda3
 ```
