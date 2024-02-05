@@ -67,7 +67,7 @@ pw_restore() {
     fi
 
     pw_stop
-    tar -xvf "${DATA_BACKUP_BASE}/${backup}" -C "${INSTALL_BASE}/"
+    tar -xf "${DATA_BACKUP_BASE}/${backup}" -C "${INSTALL_BASE}/"
     chown -R ${INSTALL_USER}:${INSTALL_USER} ${INSTALL_BASE}
     pw_start
     echo "存档 ${backup} 已恢复"
@@ -87,7 +87,8 @@ set_new_password() {
 
 bootstrap() {
     new_password $1
-    pw_restart
+    #pw_restart
+    systemctl restart palworld.service
 }
 
 case "$1" in
@@ -121,7 +122,7 @@ backup)
     pw_backup
     ;;
 restore)
-    restore
+    pw_restore
     ;;
 passwd)
     set_new_password
