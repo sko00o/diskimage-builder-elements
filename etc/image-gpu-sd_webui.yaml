@@ -33,4 +33,4 @@
     DIB_DCGM_VERSION: "3.3.0"
     DIB_DCGM_EXPORTER_VERSION: "3.3.0-3.2.0"
     DIB_SD_WEBUI_FILE: "/root/public/sd_webui/sd_webui_20240201.tar.xz"
-    DIB_SD_WEBUI_DATA_FILE: "/root/public/sd_webui/sd_webui_20240201_data.tar.xz"
+    DIB_SD_WEBUI_DATA_FILE: "/root/public/sd_webui/sd_webui_20240201_data.tar"

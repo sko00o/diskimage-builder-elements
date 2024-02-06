@@ -14,7 +14,7 @@ else
 fi
 
 # if SD_WEBUI_DATA_FILE is not "-", then copy the file to the image
-DEFAULT_SD_WEBUI_DATA_TAR="/root/sd_webui_data.tar.xz"
+DEFAULT_SD_WEBUI_DATA_TAR="/root/sd_webui_data.tar"
 if [ -n "${SD_WEBUI_DATA_FILE}" ] && [ "${SD_WEBUI_DATA_FILE}" != "-" ]; then
     echo ">> Copy sd_webui data file from HOST"
     cp "${SD_WEBUI_DATA_FILE}" "${TMP_MOUNT_PATH}/${DEFAULT_SD_WEBUI_DATA_TAR}"
