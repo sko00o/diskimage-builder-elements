@@ -11,3 +11,9 @@ TAR_FILE=/tmp/$(basename ${SD_WEBUI_FILE})
 tar -xvf ${TAR_FILE} -C /root/
 
 ln -s /usr/local/bin/start_sd_webui /root/start_sd_webui
+
+# if SD_WEBUI_DATA_LINK_FILE is not "-"
+if [ -n "${SD_WEBUI_DATA_LINK_FILE}" ] && [ "${SD_WEBUI_DATA_LINK_FILE}" != "-" ]; then
+    echo ">> link a sd_webui data file on HOST"
+    ln -s "${SD_WEBUI_DATA_LINK_FILE}" "${SD_WEBUI_DATA_TAR}"
+fi
