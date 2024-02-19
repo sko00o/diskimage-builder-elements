@@ -38,7 +38,7 @@ if [ -L "${SD_WEBUI_DIR}/venv" ]; then
 
         echo "Uncompressing data from ${SD_WEBUI_DATA_TAR} to ${SD_WEBUI_DATA_VOLUME}"
         tar -xf "${SD_WEBUI_DATA_TAR}" -C "${SD_WEBUI_DATA_VOLUME}" \
-            --checkpoint=$(($(stat -c %s "${SD_WEBUI_DATA_TAR}") / 512 / 20 / 100)) \
+            --checkpoint=$(($(stat -L -c %s "${SD_WEBUI_DATA_TAR}") / 512 / 20 / 100)) \
             --checkpoint-action=. &&
             echo "Done"
 
