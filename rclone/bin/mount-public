@@ -3,4 +3,5 @@ set -euo pipefail
 
 update-rclone-config $1 $2 $3
 bucket=$4
-systemctl enable --now mount-public@${bucket}.service
+# systemctl enable --now mount-public@${bucket}.service
+systemctl enable --now root-public.mount
