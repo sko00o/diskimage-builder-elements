@@ -1,0 +1,32 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -o errexit
+set -o nounset
+set -o pipefail
+
+cat <<EOF >/etc/systemd/system/filebrowser.service
+[Unit]
+Description=Filebrowser
+
+[Service]
+Type=simple
+PIDFile=/run/filebrowser.pid
+ExecStart=filebrowser
+User=root
+WorkingDirectory=/root/
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+mkdir -p /etc/filebrowser/
+cat <<EOF >/etc/filebrowser/.filebrowser.yaml
+root: ${FILEBROWSER_ROOT}
+database: ${FILEBROWSER_DB}
+address: 0.0.0.0
+EOF
