@@ -10,21 +10,28 @@ if __name__ == "__main__":
     parser.add_argument("password", help="gradio password")
     args = parser.parse_args()
 
-    with open(cfg_path, 'r') as file:
-        # file format is
-        #   username1:password1
-        #   username2:password2
-        # loop all line in file if username match then update password
-        # if username not exist then add new line
-        lines = file.readlines()
-        found = False
-        for i in range(len(lines)):
-            if lines[i].split(":")[0] == args.username:
-                lines[i] = args.username + ":" + args.password + "\n"
-                found = True
-                break
-        if not found:
-            lines.append(args.username + ":" + args.password + "\n")
+    # check if file exist
+    lines = []
+    try:
+        with open(cfg_path, 'r') as file:
+            lines = file.readlines()
+    except FileNotFoundError:
+        pass
+
+
+    # file format is
+    #   username1:password1
+    #   username2:password2
+    # loop all line in file if username match then update password
+    # if username not exist then add new line
+    found = False
+    for i in range(len(lines)):
+        if lines[i].split(":")[0] == args.username:
+            lines[i] = args.username + ":" + args.password + "\n"
+            found = True
+            break
+    if not found:
+        lines.append(args.username + ":" + args.password + "\n")
 
     with open(cfg_path, 'w') as file:
         file.writelines(lines)
