@@ -1,4 +1,4 @@
-- imagename: image-palworld
+- imagename: app-palworld
   elements:
     # base
     - vm
