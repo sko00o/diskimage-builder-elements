@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PIP_LINKS=${PIP_LINKS:-"whl"}
-TENSORFLOW_VERSION=${TENSORFLOW_VERSION:-"2.12.*"}
+TENSORFLOW_VERSION=${TENSORFLOW_VERSION:-"2.15.0"}
 TENSORFLOW_LINKS=${TENSORFLOW_LINKS:-"$PIP_LINKS"}
 TENSORRT_VERSION=${TENSORRT_VERSION:-"8.6.1"}
 TENSORRT_LINKS=${TENSORRT_LINKS:-"$PIP_LINKS"}
@@ -12,7 +12,7 @@ install_tensorflow_pip() {
         echo "TensorFlow install from local whl files: ${TENSORFLOW_LINKS}"
         option="--no-index --find-links ${TENSORFLOW_LINKS}"
     fi
-    python3 -m pip install tensorflow==${TENSORFLOW_VERSION} ${option}
+    python3 -m pip install tensorflow[and-cuda]==${TENSORFLOW_VERSION} ${option}
 }
 
 install_tensorrt_pip() {
