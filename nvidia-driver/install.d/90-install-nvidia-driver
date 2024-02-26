@@ -12,5 +12,12 @@ install_nvidia_driver() {
         nvidia-modprobe=${NVIDIA_DRIVER_VERSION}-0ubuntu1
 }
 
+freeze_nvidia_driver() {
+    major_version=${NVIDIA_DRIVER_VERSION%%.*}
+    # prevent nvidia driver from being upgraded
+    sudo apt-mark hold nvidia-driver-${major_version}
+}
+
 install_nvidia_driver
+freeze_nvidia_driver
 echo "Nvidia Driver ${NVIDIA_DRIVER_VERSION} installed"
