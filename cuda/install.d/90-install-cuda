@@ -15,10 +15,19 @@ install_cuda_driver() {
         cuda-drivers-${major_version}=${CUDA_DRIVER_VERSION}-1
 }
 
+freeze_cuda_driver() {
+    major_version=${CUDA_DRIVER_VERSION%%.*}
+    # prevent nvidia driver from being upgraded
+    sudo apt-mark hold cuda-drivers-${major_version}
+}
+
+# https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#common-installation-instructions-for-ubuntu
 install_cuda_toolkit() {
     cuda_version=$(version_short $CUDA_VERSION)
     sudo apt-get -y install \
         cuda-toolkit-${cuda_version//./-}=$CUDA_VERSION-1
+    sudo apt-get -y install \
+        nvidia-gds-${cuda_version//./-}=$CUDA_VERSION-1
 }
 
 install_cudnn() {
@@ -31,6 +40,7 @@ install_cudnn() {
 # all in one
 install_all() {
     install_cuda_driver
+    freeze_cuda_driver
     echo "CUDA driver ${CUDA_DRIVER_VERSION} installed"
     install_cuda_toolkit
     echo "CUDA toolkit ${CUDA_VERSION} installed"
