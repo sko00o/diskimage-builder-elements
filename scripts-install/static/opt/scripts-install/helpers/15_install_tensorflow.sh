@@ -35,14 +35,14 @@ verify_tensorrt() {
 install_tensorflow() {
     install_miniconda
 
+    ## Install TensorRT
+    if ! verify_tensorrt; then
+        install_tensorrt_pip
+    fi
+
     ## Install TensorFlow
     if ! verify_tensorflow; then
         install_tensorflow_pip
-    fi
-
-    ## (optional) Install TensorRT
-    if ! verify_tensorrt; then
-        install_tensorrt_pip
     fi
 
     echo "TensorFlow ${TENSORFLOW_VERSION} and TensorRT ${TENSORRT_VERSION} installed"
