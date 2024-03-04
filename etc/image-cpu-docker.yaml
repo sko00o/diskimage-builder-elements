@@ -9,6 +9,7 @@
     - scripts-install
     - setup-timezone
     - setup-motd
+    - remove-unattended-upgrades
     # webapp
     - jupyterlab
     # mount
@@ -27,3 +28,6 @@
     DIB_MINICONDA_RELEASE: py310_23.11.0-2
     DIB_TIMEZONE: Asia/Shanghai
     DIB_MOTD_BIG_MSG: HOLDCLOUD
+    DIB_PROMETHEUS_VERSION: "2.49.1"
+    DIB_NODE_EXPORTER_VER: "1.7.0"
+    DIB_JUPYTERLAB_VER: "4.1.2"
