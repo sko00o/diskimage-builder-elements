@@ -8,9 +8,9 @@ users:
     shell: /bin/bash
 packages:
   - python3-pip
-  - kpartx 
-  - debootstrap 
+  - kpartx
+  - debootstrap
   - qemu-utils
+  - rclone
 runcmd:
   - pip3 install diskimage-builder
-  
