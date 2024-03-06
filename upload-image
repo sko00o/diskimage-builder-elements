@@ -10,7 +10,7 @@ install-openstack-client() {
 
 upload() {
     install-openstack-client
-    openstack image create \
+    eval openstack image create \
         --container-format bare \
         --progress \
         --public $@
