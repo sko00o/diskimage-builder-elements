@@ -30,16 +30,16 @@ image-ubuntu() {
         --property os_type=linux \
         --property os_distro=ubuntu \
         --property os_admin_user=root \
-        --property os_version=${os_version}"
+        --property os_version='${os_version}'"
 
     id_file="${name}.id.txt"
     if [ -f "${id_file}" ]; then
-        upload_options="${upload_options} --id $(cat ${id_file})"
+        upload_options="${upload_options} --id '$(cat ${id_file})'"
     fi
 
     desc_file="${name}.desc.txt"
     if [ -f "${desc_file}" ]; then
-        upload_options="${upload_options} --property description $(cat ${desc_file})"
+        upload_options="${upload_options} --property description='$(cat ${desc_file})'"
     fi
 
     img_file="${name}.qcow2"
