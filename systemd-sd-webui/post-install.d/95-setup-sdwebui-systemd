@@ -26,5 +26,3 @@ RestartSec=10
 [Install]
 WantedBy=multi-user.target
 EOF
-
-# systemctl enable sdwebui.service

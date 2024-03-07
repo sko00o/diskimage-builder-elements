@@ -13,11 +13,10 @@ if __name__ == "__main__":
     # check if file exist
     lines = []
     try:
-        with open(cfg_path, 'r') as file:
+        with open(cfg_path, "r") as file:
             lines = file.readlines()
     except FileNotFoundError:
         pass
-
 
     # file format is
     #   username1:password1
@@ -33,10 +32,11 @@ if __name__ == "__main__":
     if not found:
         lines.append(args.username + ":" + args.password + "\n")
 
-    with open(cfg_path, 'w') as file:
+    with open(cfg_path, "w") as file:
         file.writelines(lines)
     print(f"Updated password for {args.username}")
 
     # start sd-webui service
     import subprocess
+
     subprocess.run(["systemctl", "enable", "--now", "sdwebui.service"])
