@@ -1,0 +1,28 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -o errexit
+set -o nounset
+set -o pipefail
+
+SYSTEMD_UNIT_FILE=/etc/systemd/system/comfyui.service
+cat <<EOF >${SYSTEMD_UNIT_FILE}
+[Unit]
+Description=ComfyUI
+After=root-public.mount root-data.mount network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+PIDFile=/run/comfyui.pid
+User=root
+WorkingDirectory=/root/
+ExecStart=start_comfyui --listen 127.0.0.1 --port 10001
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
