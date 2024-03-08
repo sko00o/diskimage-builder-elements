@@ -47,7 +47,7 @@ if [ -L "${APP_DIR}/venv" ]; then
         # sync controlnet modules
         if [ -d "${APP_PUBLIC_DATA}" ]; then
             echo "Syncing public data to ${target}/"
-            rclone sync --progress --delete=0 \
+            rclone sync --progress --max-delete=0 \
                 "${APP_PUBLIC_DATA}/models/ControlNet" \
                 "${target}/models/controlnet/"
         fi
