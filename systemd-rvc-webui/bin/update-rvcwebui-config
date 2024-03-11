@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+
+cfg_path = "/etc/nginx/.htpasswd"
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("username", help="htpassed username")
+    parser.add_argument("password", help="htpassed password")
+    args = parser.parse_args()
+
+    # check if file exist
+    lines = []
+    try:
+        with open(cfg_path, "r") as file:
+            lines = file.readlines()
+    except FileNotFoundError:
+        pass
+
+    # encode password using htpasswd
+    import subprocess
+
+    p = subprocess.run(
+        ["htpasswd", "-bn", args.username, args.password], stdout=subprocess.PIPE
+    )
+    userpass = p.stdout.decode("utf-8").strip()
+
+    # file format is
+    #   username1:enc_password1
+    #   username2:enc_password2
+    # loop all line in file if username match then update password
+    # if username not exist then add new line
+    found = False
+    for i in range(len(lines)):
+        if lines[i].split(":")[0] == args.username:
+            lines[i] = userpass + "\n"
+            found = True
+            break
+    if not found:
+        lines.append(userpass + "\n")
+
+    with open(cfg_path, "w") as file:
+        file.writelines(lines)
+    print(f"Updated password for {args.username}")
+
+    # start rvcwebui service
+    os.system("systemctl enable --now rvcwebui.service")
+
+    # then start nginx reverse proxy
+    if os.system("systemctl is-active --quiet nginx.service") != 0:
+        os.system("systemctl enable --now nginx.service")
+    else:
+        os.system("systemctl restart nginx.service")

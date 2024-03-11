@@ -1,0 +1,29 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -o errexit
+set -o nounset
+set -o pipefail
+
+SYSTEMD_UNIT_FILE=/etc/systemd/system/rvcwebui.service
+cat <<EOF >${SYSTEMD_UNIT_FILE}
+[Unit]
+Description=Retrieval-based-Voice-Conversion-WebUI
+After=root-public.mount root-data.mount network-online.target
+Wants=network-online.target
+
+[Service]
+Environment="RVC_WEBUI_PORT=10001"
+Type=simple
+PIDFile=/run/rvcwebui.pid
+User=root
+WorkingDirectory=/root/
+ExecStart=start_rvc_webui
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF

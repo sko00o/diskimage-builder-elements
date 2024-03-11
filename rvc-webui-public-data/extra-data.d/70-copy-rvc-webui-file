@@ -12,3 +12,9 @@ if [ -n "${RVC_WEBUI_FILE}" ]; then
 else
     echo "ERROR: RVC_WEBUI_FILE is not set."
 fi
+
+# if RVC_WEBUI_DATA_FILE is not "-", then copy the file to the image
+if [ -n "${RVC_WEBUI_DATA_FILE}" ] && [ "${RVC_WEBUI_DATA_FILE}" != "-" ]; then
+    echo ">> Copy RVC_WEBUI data file from HOST"
+    cp "${RVC_WEBUI_DATA_FILE}" "${TMP_MOUNT_PATH}/${RVC_WEBUI_DATA_TAR}"
+fi
