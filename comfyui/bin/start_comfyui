@@ -6,6 +6,7 @@ APP_DIR=${COMFYUI_DIR:-"/root/${APP_NAME}"}
 APP_PORT=${COMFYUI_PORT:-"10000"}
 APP_DATA_TAR=${COMFYUI_DATA_TAR:-"/root/${APP_NAME}_data.tar"}
 APP_DATA_VOLUME=${COMFYUI_DATA_VOLUME:-"/root/data"}
+APP_VENV_DIR=${COMFYUI_VENV_DIR:-"${APP_DIR}/venv"}
 # share public data with sd_webui
 APP_PUBLIC_DATA=${COMFYUI_PUBLIC_DATA:-"/root/public/sd_webui/data"}
 
@@ -19,9 +20,9 @@ if ! $(conda env list | grep -q "${APP_NAME}"); then
 fi
 
 # check if venv is a link file
-if [ -L "${APP_DIR}/venv" ]; then
+if [ -L "${APP_VENV_DIR}" ]; then
     # try extract from existing tar file
-    if [ ! -d "$(readlink "${APP_DIR}/venv")" ] && [ -f "${APP_DATA_TAR}" ]; then
+    if [ ! -d "$(readlink "${APP_VENV_DIR}")" ] && [ -f "${APP_DATA_TAR}" ]; then
         echo "First launch will take some time, please be patient..."
 
         target="${APP_DATA_VOLUME}/${APP_NAME}"
@@ -65,12 +66,13 @@ fi
 
 load_venv() {
     if [[ -z "${VIRTUAL_ENV}" ]]; then
-        venv_dir="${APP_DIR}/venv"
-        if [[ -f "${venv_dir}"/bin/activate ]]; then
-            source "${venv_dir}"/bin/activate
+        if [[ -f "${APP_VENV_DIR}/bin/activate" ]]; then
+            source "${APP_VENV_DIR}/bin/activate"
         else
+            echo "No venv found, creating a new one"
             "$(conda env list | awk '$1 == "'${APP_NAME}'" { print $NF }')/bin/python" \
-                -m venv "$([[ -L "${venv_dir}" ]] && readlink "${venv_dir}" || echo "${venv_dir}")"
+                -m venv "$([[ -L "${APP_VENV_DIR}" ]] && readlink "${APP_VENV_DIR}" || echo "${APP_VENV_DIR}")"
+            source "${APP_VENV_DIR}/bin/activate"
             # first launch
             pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu121
             pip install -r "${APP_DIR}/requirements.txt"
