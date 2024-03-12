@@ -1,0 +1,18 @@
+[Unit]
+Description=ComfyUI
+After=network-online.target
+Wants=network-online.target
+Requires=root-public.mount root-data.mount
+
+[Service]
+Environment="COMFYUI_PORT=10001"
+Type=simple
+PIDFile=/run/comfyui.pid
+User=root
+WorkingDirectory=/root/
+ExecStart=start_comfyui --listen 127.0.0.1
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
