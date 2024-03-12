@@ -1,22 +1,83 @@
 #!/usr/bin/env bash
+set -e
 
-RVC_WEBUI_DIR=${RVC_WEBUI_DIR:-"/root/RVC-WebUI"}
-RVC_WEBUI_VENV_DIR=${RVC_WEBUI_VENV_DIR:-"/root/RVC-WebUI/venv"}
-RVC_WEBUI_PORT=${RVC_WEBUI_PORT:-"8080"}
+APP_NAME="RVC-WebUI"
+APP_DIR=${RVC_WEBUI_DIR:-"/root/${APP_NAME}"}
+APP_PORT=${RVC_WEBUI_PORT:-"10000"}
+APP_DATA_TAR=${RVC_WEBUI_TAR:-"/root/${APP_NAME}_data.tar"}
+APP_DATA_VOLUME=${RVC_WEBUI_VOLUME:-"/root/data"}
+APP_VENV_DIR=${RVC_WEBUI_VENV_DIR:-"${APP_DIR}/venv"}
 
-# install ffmpeg if ffmpeg or ffprob not installed 
+# install ffmpeg if ffmpeg or ffprob not installed
 if ! command -v ffmpeg >/dev/null 2>&1 || ! command -v ffprobe >/dev/null 2>&1; then
     sudo apt-get update
     sudo apt-get -y install ffmpeg
 fi
 
-# active python venv if not active
-if [ -z "$VIRTUAL_ENV" ]; then
-    source ${RVC_WEBUI_VENV_DIR}/bin/activate
+# make sure conda env exist
+if ! $(conda env list | grep -q "${APP_NAME}"); then
+    echo "Creating conda env '${APP_NAME}'"
+    conda create -y --name "${APP_NAME}" python=3.10.13
 fi
 
+# check if venv is a link file
+if [ -L "${APP_VENV_DIR}" ]; then
+    # try extract from existing tar file
+    if [ ! -d "$(readlink "${APP_VENV_DIR}")" ] && [ -f "${APP_DATA_TAR}" ]; then
+        echo "First launch will take some time, please be patient..."
+
+        target="${APP_DATA_VOLUME}/${APP_NAME}"
+        if [ -d "${target}" ] && [ ! -z "ls -A ${target}" ]; then
+            # prompt for confirmation
+            read -p "Target dir ${target} is not empty. It will be moved to new dir. Do you want to continue? (y/N) " -n 1 -r REPLY && echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                echo "Aborted"
+                exit 1
+            fi
+            # rename the target dir
+            backup_target="${target}_$(date +%s)"
+            echo "Renaming ${target} to ${backup_target}"
+            mv "${target}" "${backup_target}"
+        fi
+
+        echo "Uncompressing data from ${APP_DATA_TAR} to ${APP_DATA_VOLUME}"
+        tar -xf "${APP_DATA_TAR}" -C "${APP_DATA_VOLUME}" \
+            --checkpoint=$(($(stat -L -c %s "${APP_DATA_TAR}") / 512 / 20 / 100)) \
+            --checkpoint-action=. &&
+            echo "Done"
+
+    else
+        # check all link files in ${APP_DIR}, if link target dir not exist, create the target dir
+        for f in $(find "${APP_DIR}" -type l); do
+            target="$(readlink "${f}")"
+            if [ ! -d "${target}" ]; then
+                mkdir -p "${target}"
+            fi
+        done
+    fi
+fi
+
+load_venv() {
+    if [ -z "$VIRTUAL_ENV" ]; then
+        if [[ -f "${APP_VENV_DIR}/bin/activate" ]]; then
+            source "${APP_VENV_DIR}/bin/activate"
+        else
+            echo "No venv found, creating a new one"
+            "$(conda env list | awk '$1 == "'${APP_NAME}'" { print $NF }')/bin/python" \
+                -m venv "$([[ -L "${APP_VENV_DIR}" ]] && readlink "${APP_VENV_DIR}" || echo "${APP_VENV_DIR}")"
+            source "${APP_VENV_DIR}/bin/activate"
+            # first launch
+            pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+            pip install -r "${APP_DIR}/requirements.txt"
+        fi
+    else
+        printf "python venv already activate or run without venv: ${VIRTUAL_ENV}"
+    fi
+}
+
 # launch
-cd ${RVC_WEBUI_DIR} && python infer-web.py \
-        --port "${RVC_WEBUI_PORT}" \
+cd "${APP_DIR}" && load_venv &&
+    python3 infer-web.py \
+        --port "${APP_PORT}" \
         --noautoopen \
         $@

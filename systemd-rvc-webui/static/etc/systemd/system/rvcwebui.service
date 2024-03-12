@@ -1,0 +1,18 @@
+[Unit]
+Description=Retrieval-based-Voice-Conversion-WebUI
+After=network-online.target
+Wants=network-online.target
+Requires=root-public.mount root-data.mount
+
+[Service]
+Environment="RVC_WEBUI_PORT=10001"
+Type=simple
+PIDFile=/run/rvcwebui.pid
+User=root
+WorkingDirectory=/root/
+ExecStart=start_rvc_webui
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

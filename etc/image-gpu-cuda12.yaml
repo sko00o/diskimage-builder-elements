@@ -1,0 +1,39 @@
+- imagename: image-gpu-cuda12
+  elements:
+    # base
+    - vm
+    - ubuntu
+    - cloud-init-root-login
+    - qemu-guest-agent
+    - miniconda
+    - scripts-install
+    - setup-timezone
+    - setup-motd
+    - remove-unattended-upgrades
+    # webapp
+    - jupyterlab
+    # mount
+    - rclone
+    # monitor
+    - node-exporter
+    - prometheus
+    # gpu
+    - dcgm-exporter
+    - cuda
+  debug-trace: 0
+  no-tmpfs: true
+  environment:
+    DIB_RELEASE: jammy # Ubuntu Server 22.04 LTS
+    DIB_CLOUD_INIT_DATASOURCES: "OpenStack,NoCloud"
+    DIB_OFFLINE: "true"
+    DIB_MINICONDA_RELEASE: py310_23.11.0-2
+    DIB_TIMEZONE: Asia/Shanghai
+    DIB_MOTD_BIG_MSG: HOLDCLOUD
+    DIB_DCGM_VERSION: "3.3.0"
+    DIB_DCGM_EXPORTER_VERSION: "3.3.0-3.2.0"
+    DIB_PROMETHEUS_VERSION: "2.49.1"
+    DIB_NODE_EXPORTER_VER: "1.7.0"
+    DIB_JUPYTERLAB_VER: "4.1.2"
+    DIB_NVIDIA_DRIVER_VERSION: "535.161.07"
+    DIB_CUDATOOLKIT_VERSION: "12.2.2"
+    DIB_CUDNN_VERSION: "8.9.7.29"

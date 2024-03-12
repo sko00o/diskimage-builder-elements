@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
+set -e
+
 SD_WEBUI_DIR=${SD_WEBUI_DIR:-"/root/stable-diffusion-webui"}
 SD_WEBUI_DATA_DIR=${SD_WEBUI_DATA_DIR:-"${SD_WEBUI_DIR}"}
 SD_WEBUI_PORT=${SD_WEBUI_PORT:-"10000"}
+SD_WEBUI_DATA_TAR=${SD_WEBUI_DATA_TAR:-"/root/sd_webui_data.tar"}
+SD_WEBUI_DATA_VOLUME=${SD_WEBUI_DATA_VOLUME:-"/root/data"}
+SD_WEBUI_PUBLIC_DATA=${SD_WEBUI_PUBLIC_DATA:-"/root/public/sd_webui/data"}
 
 CACHE=${SD_WEBUI_DIR}/.cache
 CLIP_CACHE=${CACHE}/clip
@@ -10,9 +15,55 @@ export HF_HOME=${CACHE}/huggingface
 export HF_DATASETS_CACHE=${HF_HOME}/datasets
 export TRANSFORMERS_CACHE=${HF_HOME}/transformers
 
+# check if venv is a link file
+if [ -L "${SD_WEBUI_DIR}/venv" ]; then
+    # if target of link is not a directory, that means we can do fresh install
+    if [ ! -d "$(readlink "${SD_WEBUI_DIR}/venv")" ] && [ -f "${SD_WEBUI_DATA_TAR}" ]; then
+        echo "First launch will take more than 10 minutes, please be patient..."
+
+        # check if the target data dir is not empty
+        target=${SD_WEBUI_DATA_VOLUME}/stable-diffusion-webui
+        if [ -d "${target}" ] && [ ! -z "$(ls -A ${target})" ]; then
+            # prompt for confirmation
+            read -p "Target dir ${target} is not empty. It will be moved to new dir. Do you want to continue? (y/N) " -n 1 -r REPLY && echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                echo "Aborted"
+                exit 1
+            fi
+            # rename the target dir
+            backup_target="${target}_$(date +%s)"
+            echo "Renaming ${target} to ${backup_target}"
+            mv "${target}" "${backup_target}"
+        fi
+
+        echo "Uncompressing data from ${SD_WEBUI_DATA_TAR} to ${SD_WEBUI_DATA_VOLUME}"
+        tar -xf "${SD_WEBUI_DATA_TAR}" -C "${SD_WEBUI_DATA_VOLUME}" \
+            --checkpoint=$(($(stat -L -c %s "${SD_WEBUI_DATA_TAR}") / 512 / 20 / 100)) \
+            --checkpoint-action=. &&
+            echo "Done"
+
+        # sync controlnet models
+        if [ -d "${SD_WEBUI_PUBLIC_DATA}" ]; then
+            echo "Syncing controlnet models to ${target}/models/ControlNet"
+            rclone sync --progress \
+                "${SD_WEBUI_PUBLIC_DATA}/models/ControlNet" \
+                "${target}/models/ControlNet"
+        fi
+
+    else
+        # check all link files in ${SD_WEBUI_DIR}, if link target dir not exist, create the target dir
+        for f in $(find "${SD_WEBUI_DIR}" -type l); do
+            target="$(readlink "${f}")"
+            if [ ! -d "${target}" ]; then
+                mkdir -p "${target}"
+            fi
+        done
+    fi
+fi
+
 if ! $(conda env list | grep -q "sd_webui"); then
     echo "Creating conda env 'sd_webui'"
-    conda create -y --name sd_webui python=3.10
+    conda create -y --name sd_webui python=3.10.13
 fi
 
 if ! ldconfig -p | grep -q libtcmalloc_minimal.so.4; then

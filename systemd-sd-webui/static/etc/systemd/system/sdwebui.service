@@ -1,0 +1,17 @@
+[Unit]
+Description=Stable Diffusion Web UI
+After=network-online.target
+Wants=network-online.target
+Requires=root-public.mount root-data.mount 
+
+[Service]
+Type=simple
+PIDFile=/run/sdwebui.pid
+User=root
+WorkingDirectory=/root/
+ExecStart=start_sd_webui --gradio-auth-path /root/.gradio.passwd.txt
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

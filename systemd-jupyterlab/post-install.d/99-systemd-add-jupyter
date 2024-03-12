@@ -7,39 +7,4 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-cat <<EOF >/etc/systemd/system/jupyter-lab.service
-[Unit]
-Description=Jupyter Lab
-
-[Service]
-Environment="SHELL=/bin/bash"
-Type=simple
-PIDFile=/run/jupyter-lab.pid
-ExecStart=/usr/local/bin/jupyter lab --allow-root --config /root/.jupyter/jupyter_lab_config.py
-User=root
-WorkingDirectory=/root/
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-mkdir -p /root/.jupyter/
-cat <<EOF >/root/.jupyter/jupyter_lab_config.py
-c = get_config()
-c.ServerApp.ip = '0.0.0.0'
-c.ServerApp.port = 8888
-c.LabApp.open_browser = False
-c.ServerApp.root_dir = '/root/'
-c.ServerApp.tornado_settings = {
-    'headers': {
-        'Content-Security-Policy': "frame-ancestors * 'self' "
-    }
-}
-c.ServerApp.allow_remote_access = True
-c.ServerApp.base_url = '/jupyter/'
-c.ServerApp.allow_origin = '*'
-EOF
-
 systemctl enable jupyter-lab.service

@@ -1,0 +1,15 @@
+[Unit]
+Description=Jupyter Lab
+
+[Service]
+Environment="SHELL=/bin/bash"
+Type=simple
+PIDFile=/run/jupyter-lab.pid
+ExecStart=/usr/local/bin/jupyter lab --allow-root --config /root/.jupyter/jupyter_lab_config.py
+User=root
+WorkingDirectory=/root/
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

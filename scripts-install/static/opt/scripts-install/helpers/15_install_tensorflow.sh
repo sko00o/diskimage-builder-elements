@@ -1,22 +1,23 @@
 #!/bin/bash
 
-TENSORFLOW_VERSION=${TENSORFLOW_VERSION:-"2.12.*"}
+PIP_LINKS=${PIP_LINKS:-"whl"}
+TENSORFLOW_VERSION=${TENSORFLOW_VERSION:-"2.15.0"}
 TENSORFLOW_LINKS=${TENSORFLOW_LINKS:-"$PIP_LINKS"}
 TENSORRT_VERSION=${TENSORRT_VERSION:-"8.6.1"}
 TENSORRT_LINKS=${TENSORRT_LINKS:-"$PIP_LINKS"}
 
 install_tensorflow_pip() {
     local option=""
-    if [[ -n "${TENSORFLOW_LINKS}" ]]; then
+    if [[ -d "${TENSORFLOW_LINKS}" ]]; then
         echo "TensorFlow install from local whl files: ${TENSORFLOW_LINKS}"
         option="--no-index --find-links ${TENSORFLOW_LINKS}"
     fi
-    python3 -m pip install tensorflow==${TENSORFLOW_VERSION} ${option}
+    python3 -m pip install tensorflow[and-cuda]==${TENSORFLOW_VERSION} ${option}
 }
 
 install_tensorrt_pip() {
     local option=""
-    if [[ -n "${TENSORRT_LINKS}" ]]; then
+    if [[ -d "${TENSORRT_LINKS}" ]]; then
         echo "TensorRT install from local whl files: ${TENSORRT_LINKS}"
         option="--no-index --find-links ${TENSORRT_LINKS}"
     fi
@@ -34,14 +35,14 @@ verify_tensorrt() {
 install_tensorflow() {
     install_miniconda
 
+    ## Install TensorRT
+    if ! verify_tensorrt; then
+        install_tensorrt_pip
+    fi
+
     ## Install TensorFlow
     if ! verify_tensorflow; then
         install_tensorflow_pip
-    fi
-
-    ## (optional) Install TensorRT
-    if ! verify_tensorrt; then
-        install_tensorrt_pip
     fi
 
     echo "TensorFlow ${TENSORFLOW_VERSION} and TensorRT ${TENSORRT_VERSION} installed"

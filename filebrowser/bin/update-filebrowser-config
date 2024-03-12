@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+
+import argparse
+import yaml
+
+cfg_path = "/etc/filebrowser/.filebrowser.yaml"
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("username", help="filebrowser username")
+    parser.add_argument("password", help="filebrowser password")
+    args = parser.parse_args()
+
+    config = None
+    with open(cfg_path, 'r') as file:
+        config = yaml.safe_load(file)
+
+    # change key value in root section 
+    config["username"] = args.username
+
+    # call filebrowser hash command to bcrpyt
+    import subprocess
+    password = args.password
+    hash_password = subprocess.run(["filebrowser", "hash", password], capture_output=True, text=True).stdout.strip()
+    config["password"] = hash_password
+    
+    with open(cfg_path, 'w') as file:
+        yaml.dump(config, file)
+    print(f"Updated filebrowser configuration")
+
+    # start filebrowser
+    subprocess.run(["systemctl", "enable", "--now", "filebrowser.service"])

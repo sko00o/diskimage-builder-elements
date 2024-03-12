@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -o errexit
+set -o nounset
+set -o pipefail
+
+echo ">> Download filebrowser if it not exists"
+
+if [ ! -f $FILEBROWSER_FILE ]; then
+    # https://github.com/filebrowser/filebrowser/releases/download/v2.27.0/linux-amd64-filebrowser.tar.gz
+    curl -sfL -o "$FILEBROWSER_FILE" "${FILEBROWSER_REPO}/v${FILEBROWSER_VERSION}/linux-amd64-filebrowser.tar.gz"
+else
+    echo "$FILEBROWSER_FILE already exists."
+fi

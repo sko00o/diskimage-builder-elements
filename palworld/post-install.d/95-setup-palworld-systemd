@@ -12,7 +12,8 @@ cat <<EOF >${SYSTEMD_UNIT_FILE}
 [Unit]
 Description=Palworld Server
 After=network-online.target
-Wants=network-online.target,root-data.mount
+Wants=network-online.target
+Requires=root-data.mount
 
 [Service]
 Type=forking
