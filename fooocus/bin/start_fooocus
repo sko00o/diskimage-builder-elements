@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+set -e
+
+APP_NAME="Fooocus"
+APP_DIR=${FOOOCUS_DIR:-"/root/${APP_NAME}"}
+APP_PORT=${FOOOCUS_PORT:-"10000"}
+APP_DATA_TAR=${FOOOCUS_DATA_TAR:-"/root/${APP_NAME}_data.tar"}
+APP_DATA_VOLUME=${FOOOCUS_DATA_VOLUME:-"/root/data"}
+APP_VENV_DIR=${FOOOCUS_VENV_DIR:-"${APP_DIR}/venv"}
+APP_PUBLIC_DATA=${FOOOCUS_PUBLIC_DATA:-"/root/public/${APP_NAME}/data"}
+
+CACHE="${APP_DATA_VOLUME}/${APP_NAME}/.cache"
+# export XDG_CACHE_HOME=${CACHE}
+
+# make sure conda env exist
+if ! $(conda env list | grep -q "${APP_NAME}"); then
+    echo "Creating conda env '${APP_NAME}'"
+    conda create -y --name "${APP_NAME}" python=3.10.13
+fi
+
+# check if venv is a link file
+if [ -L "${APP_VENV_DIR}" ]; then
+    # try extract from existing tar file
+    if [ ! -d "$(readlink "${APP_VENV_DIR}")" ] && [ -f "${APP_DATA_TAR}" ]; then
+        echo "First launch will take some time, please be patient..."
+
+        target="${APP_DATA_VOLUME}/${APP_NAME}"
+        if [ -d "${target}" ] && [ ! -z "ls -A ${target}" ]; then
+            # # prompt for confirmation
+            # read -p "Target dir ${target} is not empty. It will be moved to new dir. Do you want to continue? (y/N) " -n 1 -r REPLY && echo
+            # if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            #     echo "Aborted"
+            #     exit 1
+            # fi
+            # rename the target dir
+            backup_target="${target}_$(date +%s)"
+            echo "Renaming ${target} to ${backup_target}"
+            mv "${target}" "${backup_target}"
+        fi
+
+        echo "Uncompressing data from ${APP_DATA_TAR} to ${APP_DATA_VOLUME}"
+        tar -xf "${APP_DATA_TAR}" -C "${APP_DATA_VOLUME}" \
+            --checkpoint=$(($(stat -L -c %s "${APP_DATA_TAR}") / 512 / 20 / 100)) \
+            --checkpoint-action=. &&
+            echo "Done"
+
+        # sync all models
+        if [ -d "${APP_PUBLIC_DATA}" ]; then
+            echo "Syncing public data to ${target}/"
+            rclone sync --progress --max-delete=0 \
+                "${APP_PUBLIC_DATA}/models/" \
+                "${target}/models/"
+        fi
+
+    else
+        # check all link files in ${APP_DIR}, if link target dir not exist, create the target dir
+        for f in $(find "${APP_DIR}" -type l); do
+            target="$(readlink "${f}")"
+            if [ ! -d "${target}" ]; then
+                mkdir -p "${target}"
+            fi
+        done
+    fi
+fi
+
+load_venv() {
+    if [[ -z "${VIRTUAL_ENV}" ]]; then
+        if [[ -f "${APP_VENV_DIR}/bin/activate" ]]; then
+            source "${APP_VENV_DIR}/bin/activate"
+        else
+            echo "No venv found, creating a new one"
+            "$(conda env list | awk '$1 == "'${APP_NAME}'" { print $NF }')/bin/python" \
+                -m venv "$([[ -L "${APP_VENV_DIR}" ]] && readlink "${APP_VENV_DIR}" || echo "${APP_VENV_DIR}")"
+            source "${APP_VENV_DIR}/bin/activate"
+            # first launch
+            pip install -r requirements_versions.txt
+        fi
+    else
+        printf "python venv already activate or run without venv: ${VIRTUAL_ENV}"
+    fi
+}
+
+cd "${APP_DIR}" && load_venv &&
+    python3 entry_with_update.py \
+        --listen \
+        --port "${APP_PORT}" \
+        --cache-path "${CACHE}" \
+        
+        $@

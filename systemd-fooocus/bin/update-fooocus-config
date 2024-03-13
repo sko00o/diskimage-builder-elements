@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+
+import argparse
+import json
+
+cfg_path = "/root/Fooocus/auth.json"
+service_name = "fooocus.service"
+
+# update user pass in cfg file
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("username", help="gradio username")
+    parser.add_argument("password", help="gradio password")
+    args = parser.parse_args()
+
+    # check if file exist
+    try:
+        # load json config file
+        # file format is:
+        #   [{"user":"","pass":""}]
+        with open(cfg_path, "r") as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        pass
+
+    # check if data is an array
+    found = False
+    if not isinstance(data, list):
+        data = []
+    else:
+        for i in range(len(data)):
+            if data[i]["user"] == args.username:
+                data[i]["pass"] = args.password
+                found = True
+                break
+
+    if not found:
+        data.append({"user": args.username, "pass": args.password})
+
+    with open(cfg_path, "w") as file:
+        json.dump(data, file, indent=4)
+    print(f"Updated password for {args.username}")
+
+    # start service
+    import subprocess
+
+    subprocess.run(["systemctl", "enable", "--now", service_name])
