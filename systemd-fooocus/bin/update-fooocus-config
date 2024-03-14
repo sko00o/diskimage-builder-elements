@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import os
 
 cfg_path = "/root/Fooocus/auth.json"
 service_name = "fooocus.service"
@@ -14,6 +15,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # check if file exist
+    data = None
     try:
         # load json config file
         # file format is:
@@ -41,7 +43,8 @@ if __name__ == "__main__":
         json.dump(data, file, indent=4)
     print(f"Updated password for {args.username}")
 
-    # start service
-    import subprocess
-
-    subprocess.run(["systemctl", "enable", "--now", service_name])
+    # if service not running then start it
+    if os.system(f"systemctl is-active --quiet {service_name}") != 0:
+        os.system(f"systemctl enable --now {service_name}")
+    else:
+        os.system(f"systemctl restart {service_name}")

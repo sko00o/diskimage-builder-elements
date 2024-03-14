@@ -41,6 +41,7 @@ if [ -L "${APP_VENV_DIR}" ]; then
         fi
 
         # set a empty file to indicate init start
+        mkdir -p "${APP_DATA_DIR}"
         touch "${APP_INIT_START}"
 
         echo "Uncompressing data from ${APP_DATA_TAR} to ${APP_DATA_VOLUME}"
