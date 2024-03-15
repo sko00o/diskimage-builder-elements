@@ -65,8 +65,8 @@ install_sd_webui() {
     cd "${SD_WEBUI_DIR}"
 
     install_miniconda
-    conda create -y -n sd_webui python=3.10.12
-    $(conda info --base)/envs/sd_webui/bin/python3.10 -m venv venv
+    conda create -y -n sd_webui python=3.10.13
+    $(conda info --base)/envs/sd_webui/bin/python3 -m venv venv
 
     install_sd_requirements
 }
