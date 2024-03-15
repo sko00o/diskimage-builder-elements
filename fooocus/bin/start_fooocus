@@ -30,8 +30,8 @@ if [ -L "${APP_VENV_DIR}" ]; then
         if [ -d "${APP_DATA_DIR}" ] && [ ! -z "ls -A ${APP_DATA_DIR}" ]; then
             # last init not complete
             if [ -f "${APP_INIT_START}" ] && [ ! -f "${APP_INIT_DONE}" ]; then
-                echo "Last init not complete, delete it and try again."
-                rm -vrf "${APP_DATA_DIR}"
+                echo "Last init not complete, delete ${APP_DATA_DIR} and try again."
+                rm -rf "${APP_DATA_DIR}"
             else
                 # rename the dir
                 BAK="${APP_DATA_DIR}_$(date +%s)"

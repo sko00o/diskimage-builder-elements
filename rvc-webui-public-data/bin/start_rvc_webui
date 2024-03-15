@@ -8,6 +8,10 @@ APP_DATA_TAR=${RVC_WEBUI_TAR:-"/root/${APP_NAME}_data.tar"}
 APP_DATA_VOLUME=${RVC_WEBUI_VOLUME:-"/root/data"}
 APP_VENV_DIR=${RVC_WEBUI_VENV_DIR:-"${APP_DIR}/venv"}
 
+APP_DATA_DIR="${APP_DATA_VOLUME}/${APP_NAME}"
+APP_INIT_START="${APP_DATA_DIR}/.init-start"
+APP_INIT_DONE="${APP_DATA_DIR}/.init-done"
+
 # install ffmpeg if ffmpeg or ffprob not installed
 if ! command -v ffmpeg >/dev/null 2>&1 || ! command -v ffprobe >/dev/null 2>&1; then
     sudo apt-get update
@@ -23,28 +27,34 @@ fi
 # check if venv is a link file
 if [ -L "${APP_VENV_DIR}" ]; then
     # try extract from existing tar file
-    if [ ! -d "$(readlink "${APP_VENV_DIR}")" ] && [ -f "${APP_DATA_TAR}" ]; then
+    if [ -f "${APP_DATA_TAR}" ] && ([ ! -d "$(readlink "${APP_VENV_DIR}")" ] || [ ! -f "${APP_INIT_DONE}" ]); then
         echo "First launch will take some time, please be patient..."
 
-        target="${APP_DATA_VOLUME}/${APP_NAME}"
-        if [ -d "${target}" ] && [ ! -z "ls -A ${target}" ]; then
-            # prompt for confirmation
-            read -p "Target dir ${target} is not empty. It will be moved to new dir. Do you want to continue? (y/N) " -n 1 -r REPLY && echo
-            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-                echo "Aborted"
-                exit 1
+        if [ -d "${APP_DATA_DIR}" ] && [ ! -z "ls -A ${APP_DATA_DIR}" ]; then
+            # last init not complete
+            if [ -f "${APP_INIT_START}" ] && [ ! -f "${APP_INIT_DONE}" ]; then
+                echo "Last init not complete, delete ${APP_DATA_DIR} and try again."
+                rm -rf "${APP_DATA_DIR}"
+            else
+                # rename the dir
+                BAK="${APP_DATA_DIR}_$(date +%s)"
+                echo "Renaming ${APP_DATA_DIR} to ${BAK}"
+                mv -v "${APP_DATA_DIR}" "${BAK}"
             fi
-            # rename the target dir
-            backup_target="${target}_$(date +%s)"
-            echo "Renaming ${target} to ${backup_target}"
-            mv "${target}" "${backup_target}"
         fi
+
+        # set a empty file to indicate init start
+        mkdir -p "${APP_DATA_DIR}"
+        touch "${APP_INIT_START}"
 
         echo "Uncompressing data from ${APP_DATA_TAR} to ${APP_DATA_VOLUME}"
         tar -xf "${APP_DATA_TAR}" -C "${APP_DATA_VOLUME}" \
             --checkpoint=$(($(stat -L -c %s "${APP_DATA_TAR}") / 512 / 20 / 100)) \
             --checkpoint-action=. &&
             echo "Done"
+
+        # set a empty file to indicate init complete
+        touch "${APP_INIT_DONE}"
 
     else
         # check all link files in ${APP_DIR}, if link target dir not exist, create the target dir
