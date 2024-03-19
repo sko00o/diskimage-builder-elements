@@ -1,4 +1,4 @@
-- imagename: image-gpu-cuda12
+- imagename: app-fooocus
   elements:
     # base
     - vm
@@ -19,7 +19,11 @@
     - prometheus
     # gpu
     - dcgm-exporter
-    - cuda
+    - nvidia-driver
+    # app
+    - fooocus
+    - systemd-fooocus
+    - filebrowser
   debug-trace: 0
   no-tmpfs: true
   environment:
@@ -35,5 +39,6 @@
     DIB_NODE_EXPORTER_VER: "1.7.0"
     DIB_JUPYTERLAB_VER: "4.1.2"
     DIB_NVIDIA_DRIVER_VERSION: "535.161.07"
-    DIB_CUDATOOLKIT_VERSION: "12.2.2"
-    DIB_CUDNN_VERSION: "8.9.7.29"
+    DIB_FOOOCUS_FILE: "/root/public/Fooocus/fooocus_20240314.tar.xz"
+    DIB_FOOOCUS_DATA_LINK_FILE: "/root/public/Fooocus/fooocus_20240314_data.tar"
+    DIB_FILEBROWSER_ROOT: "/root/Fooocus"

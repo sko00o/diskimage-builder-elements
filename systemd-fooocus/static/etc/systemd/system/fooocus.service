@@ -1,0 +1,17 @@
+[Unit]
+Description=Fooocus
+After=network-online.target
+Wants=network-online.target
+Requires=root-public.mount root-data.mount 
+
+[Service]
+Type=simple
+PIDFile=/run/fooocus.pid
+User=root
+WorkingDirectory=/root/
+ExecStart=start_fooocus
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

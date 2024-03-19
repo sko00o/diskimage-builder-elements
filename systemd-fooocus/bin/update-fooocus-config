@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
 import argparse
+import json
 import os
 
-cfg_path = "/root/.gradio.passwd.txt"
-service_name = "sdwebui.service"
+cfg_path = "/root/Fooocus/auth.json"
+service_name = "fooocus.service"
 
+# update user pass in cfg file
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("username", help="gradio username")
@@ -13,29 +15,32 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # check if file exist
-    lines = []
+    data = None
     try:
+        # load json config file
+        # file format is:
+        #   [{"user":"","pass":""}]
         with open(cfg_path, "r") as file:
-            lines = file.readlines()
+            data = json.load(file)
     except FileNotFoundError:
         pass
 
-    # file format is
-    #   username1:password1
-    #   username2:password2
-    # loop all line in file if username match then update password
-    # if username not exist then add new line
+    # check if data is an array
     found = False
-    for i in range(len(lines)):
-        if lines[i].split(":")[0] == args.username:
-            lines[i] = args.username + ":" + args.password + "\n"
-            found = True
-            break
+    if not isinstance(data, list):
+        data = []
+    else:
+        for i in range(len(data)):
+            if data[i]["user"] == args.username:
+                data[i]["pass"] = args.password
+                found = True
+                break
+
     if not found:
-        lines.append(args.username + ":" + args.password + "\n")
+        data.append({"user": args.username, "pass": args.password})
 
     with open(cfg_path, "w") as file:
-        file.writelines(lines)
+        json.dump(data, file, indent=4)
     print(f"Updated password for {args.username}")
 
     # if service not running then start it
