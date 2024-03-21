@@ -19,4 +19,4 @@ ExecStart= \
 ExecStop=/bin/fusermount -u /root/public
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target
