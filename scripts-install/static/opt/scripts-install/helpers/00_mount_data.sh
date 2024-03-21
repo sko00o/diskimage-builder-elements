@@ -20,16 +20,15 @@ systemd_mount_partition() {
     partition="$1"
     mount_point="$2"
 
-    # e.g. mount_point=/disk/sdb1 -> unit_file=disk-sdb1.mount
-    unit_file="${mount_point//\//-}.mount"
-    unit_file="${unit_file#-}"
-    systemd_file="/etc/systemd/system/${unit_file}"
+    # e.g. mount_point=/disk/sdb1 -> filename=disk-sdb1.mount
+    filename="${mount_point//\//-}"
+    filename="${filename#-}"
 
     # create mount point directory
     mkdir -p "$mount_point"
 
     # create systemd mount unit file
-    cat <<EOF >"$systemd_file"
+    cat <<EOF >"/etc/systemd/system/${filename}.mount"
 [Unit]
 Description=Mount disk $partition to $mount_point
 [Mount]
@@ -37,11 +36,19 @@ What=$partition
 Where=$mount_point
 Type=ext4
 Options=defaults
+EOF
+    # create systemd automount unit file
+    cat >/etc/systemd/system/${filename}.automount <<EOF
+[Unit]
+Description=Auto mount $mount_point
+Requires=cloud-init.target
+[Automount]
+Where=$mount_point
 [Install]
 WantedBy=multi-user.target
 EOF
     systemctl daemon-reload
-    systemctl enable "${unit_file}"
-    systemctl start "${unit_file}"
+    systemctl disable "${filename}.mount"
+    systemctl enable --now "${filename}.automount"
     echo "mount $partition to $mount_point success"
 }
