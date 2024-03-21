@@ -49,6 +49,11 @@ WantedBy=multi-user.target
 EOF
     systemctl daemon-reload
     systemctl disable "${filename}.mount"
-    systemctl enable --now "${filename}.automount"
+    systemctl enable "${filename}.automount"
+    # if .automount not start and .mount is started
+    if ! systemctl is-active --quiet "${filename}.automount" && systemctl is-active --quiet "${filename}.mount"; then
+        systemctl stop "${filename}.mount"
+    fi
+    systemctl start "${filename}.automount"
     echo "mount $partition to $mount_point success"
 }
