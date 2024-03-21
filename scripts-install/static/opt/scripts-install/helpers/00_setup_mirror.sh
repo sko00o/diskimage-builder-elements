@@ -4,9 +4,7 @@ setup_pip_mirror() {
   mkdir -p ${HOME}/.pip
   cat >${HOME}/.pip/pip.conf <<EOF
 [global]
-index-url = http://mirrors.aliyun.com/pypi/simple/
-[install]
-trusted-host=mirrors.aliyun.com
+index-url = https://mirrors.ustc.edu.cn/pypi/web/simple
 EOF
   echo "pip mirror already set"
 }
