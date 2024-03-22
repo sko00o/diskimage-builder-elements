@@ -12,7 +12,9 @@ setup_disk_partition() {
 
     # create partition and format to ext4
     echo "partition $partition not exist, will format $device"
-    echo -e "n\np\n1\n\n\nw" | fdisk "$device"
+    # echo -e "n\np\n1\n\n\nw" | fdisk "$device"
+    # Using parted instead of fdisk for more than 2TB partition
+    parted -s "$device" mklabel gpt mkpart primary ext4 0% 100%
     mkfs.ext4 "$partition"
 }
 
