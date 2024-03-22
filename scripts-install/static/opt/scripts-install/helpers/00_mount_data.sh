@@ -16,6 +16,7 @@ setup_disk_partition() {
     # Using parted instead of fdisk for more than 2TB partition
     parted -s "$device" mklabel gpt mkpart primary ext4 0% 100%
     mkfs.ext4 "$partition"
+    echo "format $partition success"
 }
 
 systemd_mount_partition() {
@@ -58,4 +59,27 @@ EOF
     fi
     systemctl start "${filename}.automount"
     echo "mount $partition to $mount_point success"
+}
+
+trigger_mount_service() {
+    mount_point="$1"
+
+    # e.g. mount_point=/disk/sdb1 -> filename=disk-sdb1.mount
+    filename="${mount_point//\//-}"
+    filename="${filename#-}"
+
+    # exec stat once on $mount_point
+    cat >/etc/systemd/system/${filename}.service <<EOF
+[Unit]
+Description=trigger mount $mount_point
+Requires=${filename}.mount
+[Service]
+Type=oneshot
+ExecStart=stat $mount_point
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    systemctl enable --now "${filename}.service"
+    echo "trigger mount $mount_point success"
 }

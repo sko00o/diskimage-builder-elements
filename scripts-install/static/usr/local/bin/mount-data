@@ -14,3 +14,4 @@ done
 source /opt/scripts-install/helpers/00_mount_data.sh
 setup_disk_partition "$device"
 systemd_mount_partition "$partition" "$mount_point"
+trigger_mount_service "$mount_point"
