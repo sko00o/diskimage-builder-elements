@@ -13,7 +13,9 @@ setup_disk_partition() {
     # create partition
     echo "partition $partition not exist, creating..."
     # Using parted instead of fdisk for more than 2TB partition
-    parted -s "$device" mklabel gpt mkpart primary ext4 0% 100%
+    #   mklabel label-type
+    #   mkpart [part-type name fs-type] start end
+    parted --align optimal --script "$device" -- mklabel gpt mkpart primary ext4 0% 100%
 
     # Wait for partition to be created
     while ! lsblk -rno NAME "$partition" >/dev/null 2>&1; do
@@ -27,12 +29,13 @@ systemd_mount_partition() {
     mount_point="$2"
 
     # check if partition is ext4 format
-    if blkid -s TYPE -o value "$partition" | grep -q ext4; then
-        echo "partition $partition is ext4"
-    else
-        mkfs.ext4 "$partition"
+    while ! blkid -s TYPE -o value "$partition" | grep -q ext4; do
+        if ! mkfs.ext4 "$partition"; then
+            sleep 1
+            continue
+        fi
         echo "format $partition to ext4 success"
-    fi
+    done
 
     # e.g. mount_point=/disk/sdb1 -> filename=disk-sdb1.mount
     filename="${mount_point//\//-}"
