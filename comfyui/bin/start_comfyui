@@ -8,7 +8,7 @@ APP_DATA_TAR=${COMFYUI_DATA_TAR:-"/root/${APP_NAME}_data.tar"}
 APP_DATA_VOLUME=${COMFYUI_DATA_VOLUME:-"/root/data"}
 APP_VENV_DIR=${COMFYUI_VENV_DIR:-"${APP_DIR}/venv"}
 # share public data
-APP_PUBLIC_DATA=${COMFYUI_PUBLIC_DATA:-"/root/public/sd_data"}
+APP_PUBLIC_DATA=${COMFYUI_PUBLIC_DATA:-"public-data:public/sd_data"}
 
 APP_DATA_DIR="${APP_DATA_VOLUME}/${APP_NAME}"
 data_version="$(basename "$(readlink "${APP_DATA_TAR}")")"
@@ -54,11 +54,20 @@ if [ -L "${APP_VENV_DIR}" ]; then
             echo "Done"
 
         # sync models from public data
-        if [ -d "${APP_PUBLIC_DATA}" ]; then
-            echo "Syncing public data to ${APP_DATA_DIR}/"
+        if rclone lsd "${APP_PUBLIC_DATA}" &>/dev/null; then
+            echo "Syncing public data: from ${APP_PUBLIC_DATA}/ to ${APP_DATA_DIR}/"
+            rclone sync --progress \
+                "${APP_PUBLIC_DATA}/models/embeddings/" \
+                "${APP_DATA_DIR}/models/embeddings/"
             rclone sync --progress \
                 "${APP_PUBLIC_DATA}/models/checkpoints/" \
                 "${APP_DATA_DIR}/models/checkpoints/"
+            rclone sync --progress \
+                "${APP_PUBLIC_DATA}/models/vae/" \
+                "${APP_DATA_DIR}/models/vae/"
+            rclone sync --progress \
+                "${APP_PUBLIC_DATA}/models/vae_approx/" \
+                "${APP_DATA_DIR}/models/vae_approx/"
             rclone sync --progress \
                 "${APP_PUBLIC_DATA}/models/controlnet/" \
                 "${APP_DATA_DIR}/models/controlnet/"
