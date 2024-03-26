@@ -39,6 +39,6 @@
     DIB_NODE_EXPORTER_VER: "1.7.0"
     DIB_JUPYTERLAB_VER: "4.1.2"
     DIB_NVIDIA_DRIVER_VERSION: "535.161.07"
-    DIB_COMFYUI_FILE: "/root/public/ComfyUI/comfyui_20240307.tar.xz"
-    DIB_COMFYUI_DATA_LINK_FILE: "/root/public/ComfyUI/comfyui_20240307_data.tar"
+    DIB_COMFYUI_FILE: "/root/public/ComfyUI/comfyui_20240326.tar.xz"
+    DIB_COMFYUI_DATA_LINK_FILE: "/root/public/ComfyUI/comfyui_20240326_data.tar"
     DIB_FILEBROWSER_ROOT: "/root/ComfyUI"
