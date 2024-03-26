@@ -11,8 +11,9 @@ APP_VENV_DIR=${COMFYUI_VENV_DIR:-"${APP_DIR}/venv"}
 APP_PUBLIC_DATA=${COMFYUI_PUBLIC_DATA:-"/root/public/sd_data"}
 
 APP_DATA_DIR="${APP_DATA_VOLUME}/${APP_NAME}"
-APP_INIT_START="${APP_DATA_DIR}/.init-start"
-APP_INIT_DONE="${APP_DATA_DIR}/.init-done"
+data_version="$(basename "$(readlink "${APP_DATA_TAR}")")"
+APP_INIT_START="${APP_DATA_DIR}/${data_version}.init-start"
+APP_INIT_DONE="${APP_DATA_DIR}/${data_version}.init-done"
 
 CACHE=${APP_DIR}/.cache
 export XDG_CACHE_HOME=${CACHE}
