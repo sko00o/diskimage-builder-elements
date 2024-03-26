@@ -7,8 +7,8 @@ APP_PORT=${COMFYUI_PORT:-"10000"}
 APP_DATA_TAR=${COMFYUI_DATA_TAR:-"/root/${APP_NAME}_data.tar"}
 APP_DATA_VOLUME=${COMFYUI_DATA_VOLUME:-"/root/data"}
 APP_VENV_DIR=${COMFYUI_VENV_DIR:-"${APP_DIR}/venv"}
-# share public data with sd_webui
-APP_PUBLIC_DATA=${COMFYUI_PUBLIC_DATA:-"/root/public/sd_webui/data"}
+# share public data
+APP_PUBLIC_DATA=${COMFYUI_PUBLIC_DATA:-"/root/public/sd_data"}
 
 APP_DATA_DIR="${APP_DATA_VOLUME}/${APP_NAME}"
 APP_INIT_START="${APP_DATA_DIR}/.init-start"
@@ -52,11 +52,14 @@ if [ -L "${APP_VENV_DIR}" ]; then
             --checkpoint-action=. &&
             echo "Done"
 
-        # sync controlnet modules
+        # sync models from public data
         if [ -d "${APP_PUBLIC_DATA}" ]; then
             echo "Syncing public data to ${APP_DATA_DIR}/"
-            rclone sync --progress --max-delete=0 \
-                "${APP_PUBLIC_DATA}/models/ControlNet/" \
+            rclone sync --progress \
+                "${APP_PUBLIC_DATA}/models/checkpoints/" \
+                "${APP_DATA_DIR}/models/checkpoints/"
+            rclone sync --progress \
+                "${APP_PUBLIC_DATA}/models/controlnet/" \
                 "${APP_DATA_DIR}/models/controlnet/"
         fi
 
@@ -96,4 +99,5 @@ cd "${APP_DIR}" && load_venv &&
     python3 main.py \
         --listen \
         --port "${APP_PORT}" \
+        --preview-method auto \
         $@
