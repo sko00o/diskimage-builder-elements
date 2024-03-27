@@ -10,8 +10,9 @@ APP_VENV_DIR=${FOOOCUS_VENV_DIR:-"${APP_DIR}/venv"}
 APP_PUBLIC_DATA=${FOOOCUS_PUBLIC_DATA:-"/root/public/${APP_NAME}/data"}
 
 APP_DATA_DIR="${APP_DATA_VOLUME}/${APP_NAME}"
-APP_INIT_START="${APP_DATA_DIR}/.init-start"
-APP_INIT_DONE="${APP_DATA_DIR}/.init-done"
+data_version="$(basename "$(readlink "${APP_DATA_TAR}")")"
+APP_INIT_START="${APP_DATA_DIR}/${data_version}.init-start"
+APP_INIT_DONE="${APP_DATA_DIR}/${data_version}.init-done"
 APP_CACHE="${APP_DATA_VOLUME}/${APP_NAME}/.cache"
 # export XDG_CACHE_HOME=${APP_CACHE}
 
