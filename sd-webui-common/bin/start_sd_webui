@@ -3,7 +3,6 @@ set -e
 
 APP_NAME="sd_webui"
 APP_DIR=${SD_WEBUI_DIR:-"/root/stable-diffusion-webui"}
-APP_DATA_DIR=${SD_WEBUI_DATA_DIR:-"${APP_DIR}"}
 APP_PORT=${SD_WEBUI_PORT:-"10000"}
 APP_DATA_TAR=${SD_WEBUI_DATA_TAR:-"/root/${APP_NAME}_data.tar"}
 APP_DATA_VOLUME=${SD_WEBUI_DATA_VOLUME:-"/root/data"}
@@ -11,7 +10,7 @@ APP_VENV_DIR=${SD_WEBUI_VENV_DIR:-"${APP_DIR}/venv"}
 # share public data
 APP_PUBLIC_DATA=${SD_WEBUI_PUBLIC_DATA:-"public-data:public/sd_data"}
 
-APP_DATA_DIR="${APP_DATA_VOLUME}/stable-diffusion-webui"
+APP_DATA_DIR=${SD_WEBUI_DATA_DIR:-"${APP_DATA_VOLUME}/stable-diffusion-webui"}
 data_version="$(basename "$(readlink "${APP_DATA_TAR}")")"
 APP_INIT_START="${APP_DATA_DIR}/${data_version}.init-start"
 APP_INIT_DONE="${APP_DATA_DIR}/${data_version}.init-done"
