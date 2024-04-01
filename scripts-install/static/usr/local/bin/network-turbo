@@ -24,7 +24,7 @@ proxy_unset() {
 setup_http_proxy() {
     local https_proxy="$1"
     if [ ! -z "$https_proxy" ]; then
-        echo "http_proxy=$http_proxy" >"$turbo_cfg"
+        echo "http_proxy=$https_proxy" >"$turbo_cfg"
     fi
 
     cat >/etc/profile.d/099_proxy.sh <<EOF
