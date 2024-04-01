@@ -9,8 +9,9 @@ APP_DATA_VOLUME=${RVC_WEBUI_VOLUME:-"/root/data"}
 APP_VENV_DIR=${RVC_WEBUI_VENV_DIR:-"${APP_DIR}/venv"}
 
 APP_DATA_DIR="${APP_DATA_VOLUME}/${APP_NAME}"
-APP_INIT_START="${APP_DATA_DIR}/.init-start"
-APP_INIT_DONE="${APP_DATA_DIR}/.init-done"
+data_version="$(basename "$(readlink "${APP_DATA_TAR}")")"
+APP_INIT_START="${APP_DATA_DIR}/${data_version}.init-start"
+APP_INIT_DONE="${APP_DATA_DIR}/${data_version}.init-done"
 
 # install ffmpeg if ffmpeg or ffprob not installed
 if ! command -v ffmpeg >/dev/null 2>&1 || ! command -v ffprobe >/dev/null 2>&1; then

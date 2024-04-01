@@ -7,12 +7,13 @@ APP_PORT=${FOOOCUS_PORT:-"10000"}
 APP_DATA_TAR=${FOOOCUS_DATA_TAR:-"/root/${APP_NAME}_data.tar"}
 APP_DATA_VOLUME=${FOOOCUS_DATA_VOLUME:-"/root/data"}
 APP_VENV_DIR=${FOOOCUS_VENV_DIR:-"${APP_DIR}/venv"}
-APP_PUBLIC_DATA=${FOOOCUS_PUBLIC_DATA:-"/root/public/${APP_NAME}/data"}
+APP_PUBLIC_DATA=${FOOOCUS_PUBLIC_DATA:-"public-data:public/${APP_NAME}/data"}
 
 APP_DATA_DIR="${APP_DATA_VOLUME}/${APP_NAME}"
-APP_INIT_START="${APP_DATA_DIR}/.init-start"
-APP_INIT_DONE="${APP_DATA_DIR}/.init-done"
-APP_CACHE="${APP_DATA_VOLUME}/${APP_NAME}/.cache"
+data_version="$(basename "$(readlink "${APP_DATA_TAR}")")"
+APP_INIT_START="${APP_DATA_DIR}/${data_version}.init-start"
+APP_INIT_DONE="${APP_DATA_DIR}/${data_version}.init-done"
+APP_CACHE="${APP_DATA_DIR}/.cache"
 # export XDG_CACHE_HOME=${APP_CACHE}
 
 # make sure conda env exist
@@ -51,9 +52,9 @@ if [ -L "${APP_VENV_DIR}" ]; then
             echo "Done"
 
         # sync all models
-        if [ -d "${APP_PUBLIC_DATA}" ]; then
-            echo "Syncing public data to ${APP_DATA_DIR}/"
-            rclone sync --progress --max-delete=0 \
+        if rclone lsd "${APP_PUBLIC_DATA}" &>/dev/null; then
+            echo "Syncing public data: from ${APP_PUBLIC_DATA}/ to ${APP_DATA_DIR}/"
+            rclone sync --progress \
                 "${APP_PUBLIC_DATA}/models/" \
                 "${APP_DATA_DIR}/models/"
         fi

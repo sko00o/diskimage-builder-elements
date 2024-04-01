@@ -3,16 +3,17 @@ set -e
 
 APP_NAME="sd_webui"
 APP_DIR=${SD_WEBUI_DIR:-"/root/stable-diffusion-webui"}
-APP_DATA_DIR=${SD_WEBUI_DATA_DIR:-"${APP_DIR}"}
 APP_PORT=${SD_WEBUI_PORT:-"10000"}
 APP_DATA_TAR=${SD_WEBUI_DATA_TAR:-"/root/${APP_NAME}_data.tar"}
 APP_DATA_VOLUME=${SD_WEBUI_DATA_VOLUME:-"/root/data"}
 APP_VENV_DIR=${SD_WEBUI_VENV_DIR:-"${APP_DIR}/venv"}
-APP_PUBLIC_DATA=${SD_WEBUI_PUBLIC_DATA:-"/root/public/${APP_NAME}/data"}
+# share public data
+APP_PUBLIC_DATA=${SD_WEBUI_PUBLIC_DATA:-"public-data:public/sd_data"}
 
-APP_DATA_DIR="${APP_DATA_VOLUME}/stable-diffusion-webui"
-APP_INIT_START="${APP_DATA_DIR}/.init-start"
-APP_INIT_DONE="${APP_DATA_DIR}/.init-done"
+APP_DATA_DIR=${SD_WEBUI_DATA_DIR:-"${APP_DATA_VOLUME}/stable-diffusion-webui"}
+data_version="$(basename "$(readlink "${APP_DATA_TAR}")")"
+APP_INIT_START="${APP_DATA_DIR}/${data_version}.init-start"
+APP_INIT_DONE="${APP_DATA_DIR}/${data_version}.init-done"
 
 CACHE=${APP_DIR}/.cache
 CLIP_CACHE=${CACHE}/clip
@@ -62,11 +63,23 @@ if [ -L "${APP_VENV_DIR}" ]; then
             --checkpoint-action=. &&
             echo "Done"
 
-        # sync controlnet models
-        if [ -d "${APP_PUBLIC_DATA}" ]; then
-            echo "Syncing public data to ${APP_DATA_DIR}"
+        # sync public data
+        if rclone lsd "${APP_PUBLIC_DATA}" &>/dev/null; then
+            echo "Syncing public data: from ${APP_PUBLIC_DATA}/ to ${APP_DATA_DIR}/"
             rclone sync --progress \
-                "${APP_PUBLIC_DATA}/models/ControlNet/" \
+                "${APP_PUBLIC_DATA}/models/embeddings/" \
+                "${APP_DATA_DIR}/embeddings/"
+            rclone sync --progress \
+                "${APP_PUBLIC_DATA}/models/checkpoints/" \
+                "${APP_DATA_DIR}/models/Stable-diffusion/"
+            rclone sync --progress \
+                "${APP_PUBLIC_DATA}/models/vae/" \
+                "${APP_DATA_DIR}/models/VAE/"
+            rclone sync --progress \
+                "${APP_PUBLIC_DATA}/models/vae_approx/" \
+                "${APP_DATA_DIR}/models/VAE-approx/"
+            rclone sync --progress \
+                "${APP_PUBLIC_DATA}/models/controlnet/" \
                 "${APP_DATA_DIR}/models/ControlNet/"
         fi
 
