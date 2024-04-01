@@ -21,8 +21,71 @@ proxy_unset() {
     unset no_proxy
 }
 
-if [ "$1" = "reset" ]; then
+setup_http_proxy() {
+    local https_proxy="$1"
+    if [ ! -z "$https_proxy" ]; then
+        echo "http_proxy=$http_proxy" >"$turbo_cfg"
+    fi
+
+    cat >/etc/profile.d/099_proxy.sh <<EOF
+source network-turbo && proxy_set
+EOF
+    chmod +x /etc/profile.d/099_proxy.sh
+
+    echo "setup http proxy"
+}
+
+setup_ca_bundle() {
+    local cert_file="${1:-"/usr/local/share/ca-certificates/squid-self-signed.crt"}"
+    local target_cert_file="/usr/local/share/ca-certificates/squid-self-signed.crt"
+    if [ ! -f $cert_file ]; then
+        echo "skip: ca bundle file $cert_file not found"
+        return
+    fi
+
+    if $cert_file != $target_cert_file; then
+        cp -f "$cert_file" "$target_cert_file"
+    fi
+    sudo update-ca-certificates
+    local pem_file="/etc/ssl/certs/squid-self-signed.pem"
+    if [ -f $pem_file ]; then
+        cat >/etc/profile.d/099_ca_bundle.sh <<EOF
+export REQUESTS_CA_BUNDLE=$pem_file
+EOF
+        chmod +x /etc/profile.d/099_ca_bundle.sh
+        echo "setup CA Bundle"
+    fi
+}
+
+case $1 in
+help)
+    echo "network-turbo help:"
+    echo "  set: set turbo config"
+    echo "  unset: unset turbo config"
+    echo "  reset : reset turbo config"
+    echo "  init [proxy [ca_bundle]] : set turbo config in profile"
+    ;;
+set)
+    proxy_set
+    echo "已设置加速配置"
+    ;;
+unset)
+    proxy_unset
+    echo "已取消加速配置"
+    ;;
+reset)
+    proxy_unset
+    rm -f /etc/profile.d/099_proxy.sh
+    rm -f /etc/profile.d/099_ca_bundle.sh
     rm -f "$turbo_cfg"
     echo "已重置加速配置"
-    exit 0
-fi
+    ;;
+init)
+    setup_http_proxy $2
+    setup_ca_bundle $3
+    echo "已初始化加速配置"
+    ;;
+*)
+    # keep silent
+    ;;
+esac
