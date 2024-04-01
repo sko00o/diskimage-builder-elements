@@ -43,9 +43,7 @@ setup_ca_bundle() {
         return
     fi
 
-    if $cert_file != $target_cert_file; then
-        cp -f "$cert_file" "$target_cert_file"
-    fi
+    cp -vf "$cert_file" "$target_cert_file"
     sudo update-ca-certificates
     local pem_file="/etc/ssl/certs/squid-self-signed.pem"
     if [ -f $pem_file ]; then
