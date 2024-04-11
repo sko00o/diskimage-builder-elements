@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+# set http proxy 
+. network-turbo && proxy_set
+
 APP_NAME="sd_webui"
 APP_DIR=${SD_WEBUI_DIR:-"/root/stable-diffusion-webui"}
 APP_PORT=${SD_WEBUI_PORT:-"10000"}

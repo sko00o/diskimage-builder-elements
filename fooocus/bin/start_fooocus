@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+# set http proxy 
+. network-turbo && proxy_set
+
 APP_NAME="Fooocus"
 APP_DIR=${FOOOCUS_DIR:-"/root/${APP_NAME}"}
 APP_PORT=${FOOOCUS_PORT:-"10000"}

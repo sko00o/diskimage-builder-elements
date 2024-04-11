@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+# set http proxy 
+. network-turbo && proxy_set
+
 APP_NAME="ComfyUI"
 APP_DIR=${COMFYUI_DIR:-"/root/${APP_NAME}"}
 APP_PORT=${COMFYUI_PORT:-"10000"}

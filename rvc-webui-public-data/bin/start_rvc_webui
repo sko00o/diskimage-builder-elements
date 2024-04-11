@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+# set http proxy 
+. network-turbo && proxy_set
+
 APP_NAME="RVC-WebUI"
 APP_DIR=${RVC_WEBUI_DIR:-"/root/${APP_NAME}"}
 APP_PORT=${RVC_WEBUI_PORT:-"10000"}
