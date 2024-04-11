@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+check_cloud_init_datasource() {
+    # check if datasource is openstack
+    if cloud-id | grep -q openstack; then
+        echo "cloud-init datasource is openstack"
+        return 0
+    else
+        return 1
+    fi
+}
+
+check_app_running_on_port() {
+    # check port is open
+    local port=$1
+    if ss -anp | grep -q :$port; then
+        echo "app is running on port $port"
+        return 0
+    else
+        return 1
+    fi
+}
+
+if ! check_cloud_init_datasource; then
+    echo "health-check: Failed to check cloud-init datasource"
+    exit 1
+fi
+
+# jupyter lab port check
+if ! check_app_running_on_port 8888; then
+    echo "health-check: Failed to check app running on port 8888"
+    exit 1
+fi
+
+echo "health-check: OK"
