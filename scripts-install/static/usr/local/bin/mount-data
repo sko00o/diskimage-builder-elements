@@ -15,3 +15,10 @@ source /opt/scripts-install/helpers/00_mount_data.sh
 setup_disk_partition "$device"
 systemd_mount_partition "$partition" "$mount_point"
 trigger_mount_service "$mount_point"
+
+# move default cache dir to data volume
+cache_dir="/root/.cache"
+if [ -d "$cache_dir" ]; then
+    mv "$cache_dir" "$mount_point"
+    ln -s "$mount_point/.cache" "$cache_dir"
+fi
