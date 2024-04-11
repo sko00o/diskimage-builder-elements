@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 turbo_cfg="/etc/network-turbo.conf"
+shellname="$(basename $0)"
 
 proxy_set() {
     http_proxy=$([ ! -f "$turbo_cfg" ] || cat "$turbo_cfg" | grep http_proxy | awk -F '=' '{print $2}')
@@ -13,12 +14,18 @@ proxy_set() {
     export http_proxy="$http_proxy"
     export https_proxy="$http_proxy"
     export no_proxy="10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,127.0.0.1,::1,localhost"
+    export HTTP_PROXY=$http_proxy
+    export HTTPS_PROXY=$https_proxy
+    export NO_PROXY=$no_proxy
 }
 
 proxy_unset() {
     unset http_proxy
     unset https_proxy
     unset no_proxy
+    unset HTTP_PROXY
+    unset HTTPS_PROXY
+    unset NO_PROXY
 }
 
 setup_http_proxy() {
@@ -57,25 +64,26 @@ EOF
 
 case $1 in
 help)
-    echo "network-turbo help:"
-    echo "  set: set turbo config"
-    echo "  unset: unset turbo config"
-    echo "  reset : reset turbo config"
+    echo "Usage:"
+    echo "  $shellname [command]"
+    echo 
+    echo "Available Commands:"
+    echo "  help   : print help message"
+    echo "  reset  : reset turbo config"
     echo "  init [proxy [ca_bundle]] : set turbo config in profile"
     ;;
 set)
-    proxy_set
-    echo "已设置加速配置"
+    echo "配置加速请执行："
+    echo "  source $shellname && proxy_set"
     ;;
 unset)
-    proxy_unset
-    echo "已取消加速配置"
+    echo "取消加速请执行："
+    echo "  source $shellname && proxy_unset"
     ;;
 reset)
-    proxy_unset
     rm -f /etc/profile.d/099_proxy.sh
     rm -f /etc/profile.d/099_ca_bundle.sh
-    rm -f "$turbo_cfg"
+    [ -f "${turbo_cfg}" ] && mv "${turbo_cfg}" "${turbo_cfg}.bak"
     echo "已重置加速配置"
     ;;
 init)
