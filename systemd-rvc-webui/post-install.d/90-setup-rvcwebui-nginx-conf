@@ -8,3 +8,6 @@ set -o nounset
 set -o pipefail
 
 ln -s /etc/nginx/sites-available/rvcwebui.conf /etc/nginx/sites-enabled/
+
+# will not start nginx on first boot
+systemctl disable nginx.service
