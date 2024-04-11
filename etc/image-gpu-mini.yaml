@@ -12,7 +12,6 @@
     - remove-unattended-upgrades
     # webapp
     - jupyterlab
-    - health-check
     # mount
     - rclone
     # monitor
