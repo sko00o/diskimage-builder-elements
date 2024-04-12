@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 turbo_cfg="/etc/network-turbo.conf"
-shellname="$(basename $0)"
+shellname="network-turbo"
 
 proxy_set() {
     http_proxy=$([ ! -f "$turbo_cfg" ] || cat "$turbo_cfg" | grep http_proxy | awk -F '=' '{print $2}')
