@@ -18,7 +18,9 @@ trigger_mount_service "$mount_point"
 
 # move default cache dir to data volume
 cache_dir="/root/.cache"
-if [ -d "$cache_dir" ]; then
-    mv "$cache_dir" "$mount_point"
-    ln -s "$mount_point/.cache" "$cache_dir"
+if [ -d "${cache_dir}" ]; then
+    mkdir -p "${mount_point}/.cache"
+    rsync --progress "${cache_dir}" "${mount_point}/.cache"
+    mv "${cache_dir}" "${cache_dir}.bak"
+    ln -s "${mount_point}/.cache" "${cache_dir}"
 fi
