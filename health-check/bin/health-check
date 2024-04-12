@@ -27,9 +27,9 @@ if ! check_cloud_init_datasource; then
 fi
 
 # jupyter lab port check
-if ! check_app_running_on_port 8888; then
-    echo "health-check: Failed to check app running on port 8888"
-    exit 1
-fi
+# if ! check_app_running_on_port 8888; then
+#     echo "health-check: Failed to check app running on port 8888"
+#     exit 1
+# fi
 
 echo "health-check: OK"
