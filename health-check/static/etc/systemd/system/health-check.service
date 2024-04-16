@@ -1,0 +1,12 @@
+[Unit]
+DefaultDependencies=no
+Requires=cloud-final.service
+After=cloud-final.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/health-check
+StandardOutput=journal+console
+
+[Install]
+WantedBy=cloud-init.target
