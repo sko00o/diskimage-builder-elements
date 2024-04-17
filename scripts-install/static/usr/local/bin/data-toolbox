@@ -22,6 +22,7 @@ prompts = {
         'select_operation': "Select an operation:",
         'backup': "Backup",
         'restore': "Restore",
+        'no_backups': "No backups available",
         'manage_backup': "Manage Backup",
         'rename': "Rename",
         'delete': "Delete",
@@ -45,6 +46,7 @@ prompts = {
         'select_operation': "选择一个操作:",
         'backup': "备份",
         'restore': "恢复",
+        'no_backups': "无备份可用",
         'manage_backup': "管理备份",
         'rename': "重命名",
         'delete': "删除",
@@ -80,9 +82,16 @@ class Toolbox:
             print(self.prompts['invalid_operation'])
             exit(1)
 
-    def perform_backup(self):
-        backup_names = subprocess.getoutput(f'rclone lsd "{self.backup_destination}"').split("\n")
+    def get_backup_names(self):
+        names = subprocess.getoutput(f'rclone lsd "{self.backup_destination}"')
+        if names == "":
+            return []
+        backup_names = names.split("\n")
         backup_names = [name.split()[-1] for name in backup_names]
+        return backup_names
+
+    def perform_backup(self):
+        backup_names = self.get_backup_names()
         backup_names.insert(0, self.prompts['type_new_name'])
 
         print(self.prompts['select_backup'])
@@ -108,8 +117,10 @@ class Toolbox:
         print(self.prompts['backup_completed'])
 
     def perform_restore(self):
-        backup_names = subprocess.getoutput(f'rclone lsd "{self.backup_destination}"').split("\n")
-        backup_names = [name.split()[-1] for name in backup_names]
+        backup_names = self.get_backup_names()
+        if len(backup_names) == 0:
+            print(self.prompts['no_backups'])
+            exit(1)
 
         print(self.prompts['select_restore'])
         for i, name in enumerate(backup_names):
@@ -131,8 +142,10 @@ class Toolbox:
         print(self.prompts['restore_completed'])
 
     def manage_backup(self):
-        backup_names = subprocess.getoutput(f'rclone lsd "{self.backup_destination}"').split("\n")
-        backup_names = [name.split()[-1] for name in backup_names]
+        backup_names = self.get_backup_names()
+        if len(backup_names) == 0:
+            print(self.prompts['no_backups'])
+            exit(1)
 
         print(self.prompts['select_manage'])
         for i, name in enumerate(backup_names):
