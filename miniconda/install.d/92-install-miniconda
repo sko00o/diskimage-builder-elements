@@ -17,5 +17,4 @@ conda --version
 if [ -n "${MINICONDA_BASE_PYTHON_VERSION}" ] && [ "${MINICONDA_BASE_PYTHON_VERSION}" != "-" ]; then
     echo ">> change base python version to ${MINICONDA_BASE_PYTHON_VERSION}"
     conda install python=${MINICONDA_BASE_PYTHON_VERSION} -y
-    python -V
 fi
