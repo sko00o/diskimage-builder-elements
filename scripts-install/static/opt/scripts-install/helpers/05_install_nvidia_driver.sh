@@ -56,7 +56,7 @@ install_nvidia_driver() {
         ##   https://us.download.nvidia.com/XFree86/Linux-x86_64/535.98/NVIDIA-Linux-x86_64-535.98.run
         wget -O "${NVIDIA_DRIVER_FILE}" "$NVIDIA_DRIVER_REPO/${NVIDIA_DRIVER_TYPE}/${NVIDIA_DRIVER_VERSION}/NVIDIA-Linux-x86_64-${NVIDIA_DRIVER_VERSION}.run"
     fi
-    sudo sh "${NVIDIA_DRIVER_FILE}" --no-questions
+    sudo sh "${NVIDIA_DRIVER_FILE}" --ui=none --no-questions --accept-license
 
     echo "nvidia-driver ${NVIDIA_DRIVER_VERSION} for ${NVIDIA_DRIVER_TYPE} installed"
 }
