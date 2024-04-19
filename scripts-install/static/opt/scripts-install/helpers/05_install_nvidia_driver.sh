@@ -23,7 +23,9 @@ install_nvidia_driver_deps() {
 INSTALL_KERNEL="${INSTALL_KERNEL:-false}"
 
 install_kernel_headers() {
-    sudo apt-get -y install linux-headers-$(uname -r)
+    # sudo apt-get -y install linux-headers-$(uname -r)
+    local KERNEL_VERSION="$(ls /boot/vmlinuz*generic | sort -n | tail -n1 | cut -d'-' -f2-)"
+    sudo apt-get -y install linux-headers-$KERNEL_VERSION
 }
 freeze_kernel_headers() {
     # prevent kernel from being upgraded
