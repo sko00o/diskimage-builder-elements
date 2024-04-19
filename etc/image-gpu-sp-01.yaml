@@ -19,9 +19,10 @@
     - prometheus
     # gpu
     - dcgm-exporter
-    - nvidia-driver
+    - nvidia-driver-runfile
     # AI Framework
     - conda-pytorch
+    # bionic needs install latest fuse3
     - fuse3
   debug-trace: 0
   no-tmpfs: true
