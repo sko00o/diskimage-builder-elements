@@ -17,7 +17,7 @@ NVIDIA_DRIVER_FILE=${NVIDIA_DRIVER_FILE:-"/tmp/NVIDIA-Linux-x86_64-${NVIDIA_DRIV
 
 # reference: https://gist.github.com/wangruohui/df039f0dc434d6486f5d4d098aa52d07#install-nvidia-graphics-driver-via-apt-get
 install_nvidia_driver_deps() {
-    sudo apt-get -y install build-essential dkms
+    sudo apt-get -y install build-essential dkms initramfs-tools
 }
 
 INSTALL_KERNEL="${INSTALL_KERNEL:-false}"
@@ -56,7 +56,8 @@ install_nvidia_driver() {
         ##   https://us.download.nvidia.com/XFree86/Linux-x86_64/535.98/NVIDIA-Linux-x86_64-535.98.run
         wget -O "${NVIDIA_DRIVER_FILE}" "$NVIDIA_DRIVER_REPO/${NVIDIA_DRIVER_TYPE}/${NVIDIA_DRIVER_VERSION}/NVIDIA-Linux-x86_64-${NVIDIA_DRIVER_VERSION}.run"
     fi
-    sudo sh "${NVIDIA_DRIVER_FILE}" --ui=none --no-questions --accept-license
+    local KERNEL_VERSION="$(ls /boot/vmlinuz*generic | sort -n | tail -n1 | cut -d'-' -f2-)"
+    sudo sh "${NVIDIA_DRIVER_FILE}" --ui=none --no-questions --accept-license --kernel-source-path=/usr/src/linux-headers-$KERNEL_VERSION
 
     echo "nvidia-driver ${NVIDIA_DRIVER_VERSION} for ${NVIDIA_DRIVER_TYPE} installed"
 }
