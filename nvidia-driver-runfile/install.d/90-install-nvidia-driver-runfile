@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+for f in /opt/scripts-install/helpers/*; do
+    source $f
+done
+install_nvidia_driver

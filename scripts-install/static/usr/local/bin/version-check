@@ -1,87 +1,65 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python3
 
-# -v means verbose mode
-if [ "$1" == "-v" ]; then
-    verbose=true
-fi
+import json
+import sys
+import subprocess
 
-echo === START VERSION CHECK ===
 
-echo --- Kernel ---
-if command -v uname &>/dev/null; then
-    uname -a
-fi
+class Check:
+    def __init__(self, command: str = ""):
+        self.command = command
 
-echo --- Nvidia Driver ---
-if command -v nvidia-smi &>/dev/null; then
-    if [ "$verbose" == "true" ]; then
-        nvidia-smi
-    else
-        nvidia-smi --query-gpu=driver_version --format=csv,noheader
-    fi
-fi
+    def _is_command(self, command: str) -> bool:
+        if not self.command:
+            return True
 
-echo --- Jupyter Lab ---
-if command -v jupyter &>/dev/null; then
-    jupyter lab --version
-fi
+        if (
+            subprocess.call(
+                f"command -v {command.split()[0]}",
+                shell=True,
+                stdout=subprocess.DEVNULL,
+            )
+            != 0
+        ):
+            return True
+        return False
 
-echo --- Rclone ---
-if command -v rclone &>/dev/null; then
-    if [ "$verbose" == "true" ]; then
-        rclone version
-    else
-        rclone version | head -1
-    fi
-fi
+    def version(self) -> str:
+        if self._is_command(self.command):
+            return "Not found"
+        try:
+            return (
+                subprocess.check_output(self.command, shell=True)
+                .decode("utf-8")
+                .strip()
+            )
+        except Exception as e:
+            return str(e)
 
-echo --- Prometheus ---
-if command -v prometheus &>/dev/null; then
-    if [ "$verbose" == "true" ]; then
-        prometheus --version
-    else
-        prometheus --version | head -1
-    fi
-fi
 
-echo --- Node Exporter ---
-if command -v node_exporter &>/dev/null; then
-    if [ "$verbose" == "true" ]; then
-        node_exporter --version
-    else
-        node_exporter --version | head -1
-    fi
-fi
+if __name__ == "__main__":
 
-echo --- DCGM ---
-if command -v dcgmi &>/dev/null; then
-    if [ "$verbose" == "true" ]; then
-        dcgmi -v
-    else
-        dcgmi -v | head -1
-    fi
-fi
+    components = {
+        "Kernel": "uname -r",
+        "Python": "python3 -V | awk '{print $2}'",
+        "Conda": "conda -V | awk '{print $2}'",
+        "Nvidia Driver": "nvidia-smi --query-gpu=driver_version --format=csv,noheader",
+        "Jupyter Lab": "jupyter lab --version",
+        "Rclone": "rclone version | head -1 | awk '{print $2}'",
+        "Prometheus": "prometheus --version | head -1 | awk '{print $3}'",
+        "Node Exporter": "node_exporter --version | head -1 | awk '{print $3}'",
+        "DCGM": "dcgmi --version | grep -v '^$' | awk '{print $3}'",
+        "DCGM Exporter": "dcgm-exporter --version | awk '{print $NF}'",
+        "cloud-init": "cloud-init --version | awk '{print $NF}'",
+        "cloud-config-version": "test -e /etc/cloud-config-version && cat /etc/cloud-config-version || exit 0",
+    }
 
-echo --- DCGM Exporter ---
-if command -v dcgm-exporter $ >/dev/null; then
-    dcgm-exporter --version
-fi
+    result = {}
+    for component, command in components.items():
+        result[component] = Check(command).version()
 
-echo --- cloud-init ---
-if command -v cloud-init &>/dev/null; then
-    cloud-init --version
-fi
-
-echo --- cloud-config-version ---
-if [ -f /etc/cloud-config-version ]; then
-    cat /etc/cloud-config-version
-fi
-
-if [ "$verbose" == "true" ]; then
-    echo --- cloud-config ---
-    if [ -f /var/lib/cloud/instance/cloud-config.txt ]; then
-        base64 /var/lib/cloud/instance/cloud-config.txt
-    fi
-fi
-
-echo === END VERSION CHECK ===
+    arg = sys.argv[1:]
+    if arg and arg[0] == "--pretty":
+        print(json.dumps(result, indent=4))
+    else:
+        print(json.dumps(result))

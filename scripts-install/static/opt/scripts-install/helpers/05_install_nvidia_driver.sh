@@ -17,12 +17,23 @@ NVIDIA_DRIVER_FILE=${NVIDIA_DRIVER_FILE:-"/tmp/NVIDIA-Linux-x86_64-${NVIDIA_DRIV
 
 # reference: https://gist.github.com/wangruohui/df039f0dc434d6486f5d4d098aa52d07#install-nvidia-graphics-driver-via-apt-get
 install_nvidia_driver_deps() {
-    sudo apt-get -y install build-essential dkms
+    sudo apt-get -y install build-essential dkms initramfs-tools
+}
+
+INSTALL_KERNEL="${INSTALL_KERNEL:-false}"
+
+install_kernel_headers() {
     # sudo apt-get -y install linux-headers-$(uname -r)
+    local KERNEL_VERSION="$(ls /boot/vmlinuz*generic | sort -n | tail -n1 | cut -d'-' -f2-)"
+    sudo apt-get -y install linux-headers-$KERNEL_VERSION
+}
+freeze_kernel_headers() {
+    # prevent kernel from being upgraded
+    sudo apt-mark hold linux-image-generic linux-headers-generic
 }
 
 setup_blacklist_nouveau() {
-    cat <<EOF | sudo tee /etc/modprobe.d/blacklist-nouveau.conf
+    cat <<EOF | sudo tee /etc/modprobe.d/disable-nouveau.conf
 blacklist nouveau
 options nouveau modeset=0
 EOF
@@ -30,7 +41,11 @@ EOF
 }
 
 install_nvidia_driver() {
-    install_kernel_headers
+    install_nvidia_driver_deps
+    if [ "${INSTALL_KERNEL}" = "true" ]; then
+        install_kernel_headers
+        freeze_kernel_headers
+    fi
     setup_blacklist_nouveau
 
     if [ ! -f "${NVIDIA_DRIVER_FILE}" ]; then
@@ -41,7 +56,8 @@ install_nvidia_driver() {
         ##   https://us.download.nvidia.com/XFree86/Linux-x86_64/535.98/NVIDIA-Linux-x86_64-535.98.run
         wget -O "${NVIDIA_DRIVER_FILE}" "$NVIDIA_DRIVER_REPO/${NVIDIA_DRIVER_TYPE}/${NVIDIA_DRIVER_VERSION}/NVIDIA-Linux-x86_64-${NVIDIA_DRIVER_VERSION}.run"
     fi
-    sudo sh "${NVIDIA_DRIVER_FILE}" --no-questions
+    local KERNEL_VERSION="$(ls /boot/vmlinuz*generic | sort -n | tail -n1 | cut -d'-' -f2-)"
+    sudo sh "${NVIDIA_DRIVER_FILE}" --ui=none --no-questions --accept-license --kernel-source-path=/usr/src/linux-headers-$KERNEL_VERSION
 
     echo "nvidia-driver ${NVIDIA_DRIVER_VERSION} for ${NVIDIA_DRIVER_TYPE} installed"
 }
