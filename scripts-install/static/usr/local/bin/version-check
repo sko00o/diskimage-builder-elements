@@ -40,18 +40,19 @@ class Check:
 if __name__ == "__main__":
 
     components = {
-        "Kernel": "uname -r",
-        "Python": "python3 -V | awk '{print $2}'",
-        "Conda": "conda -V | awk '{print $2}'",
-        "Nvidia Driver": "nvidia-smi --query-gpu=driver_version --format=csv,noheader",
-        "Jupyter Lab": "jupyter lab --version",
-        "Rclone": "rclone version | head -1 | awk '{print $2}'",
-        "Prometheus": "prometheus --version | head -1 | awk '{print $3}'",
-        "Node Exporter": "node_exporter --version | head -1 | awk '{print $3}'",
-        "DCGM": "dcgmi --version | grep -v '^$' | awk '{print $3}'",
-        "DCGM Exporter": "dcgm-exporter --version | awk '{print $NF}'",
-        "cloud-init": "cloud-init --version | awk '{print $NF}'",
-        "cloud-config-version": "test -e /etc/cloud-config-version && cat /etc/cloud-config-version || exit 0",
+        "kernel": "uname -r",
+        "python": "python -V | awk '{print $2}'",
+        "conda": "conda -V | awk '{print $2}'",
+        "nvidia_driver": "nvidia-smi --query-gpu=driver_version --format=csv,noheader",
+        "jupyter_lab": "jupyter lab --version",
+        "rclone": "rclone version | head -1 | awk '{print $2}'",
+        "prometheus": "prometheus --version | head -1 | awk '{print $3}'",
+        "node_exporter": "node_exporter --version | head -1 | awk '{print $3}'",
+        "dcgm": "dcgmi --version | grep -v '^$' | awk '{print $3}'",
+        "dcgm_exporter": "dcgm-exporter --version | awk '{print $NF}'",
+        "instance_id": "cloud-init query instance-id",
+        "image_id": "test -e /etc/cloud-image-id && cat /etc/cloud-image-id || exit 0",
+        "config_version": "test -e /etc/cloud-config-version && cat /etc/cloud-config-version || exit 0",
     }
 
     result = {}
