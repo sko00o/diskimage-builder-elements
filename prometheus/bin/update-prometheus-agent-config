@@ -2,38 +2,61 @@
 
 import argparse
 import yaml
+import os
+import subprocess
 
 cfg_path = "/etc/prometheus/prometheus.yml"
 default_url = "http://prometheus.service.yoga:9094/api/v1/write"
+service_name = "prometheus-agent.service"
 
-# Parse command-line arguments
-parser = argparse.ArgumentParser()
-parser.add_argument('--url', default=default_url, help='URL value')
-parser.add_argument('--instance', required=True, help='Instance value')
-args = parser.parse_args()
 
-remote_write = [
-    {
-        'url': args.url,
-        'write_relabel_configs': [
-            {
-                'target_label': 'instance',
-                'replacement': args.instance,
-            },
-        ],
-    },
-]
+def get_instance_id():
+    # get cloud-init command output
+    instance_id = "UNKNOWN"
+    try:
+        instance_id = (
+            subprocess.check_output(["cloud-init", "query", "instance-id"])
+            .strip()
+            .decode("utf-8")
+        )
+    finally:
+        return instance_id
 
-# Load the Prometheus configuration file
-with open(cfg_path, 'r') as file:
-    config = yaml.safe_load(file)
 
-# Modify the configuration
-if 'remote_write' in config:
-    config['remote_write'] = remote_write
+if __name__ == "__main__":
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--url", default=default_url, help="URL value")
+    parser.add_argument("--instance", default=get_instance_id(), help="Instance value")
+    args = parser.parse_args()
 
-# Save the modified configuration
-with open(cfg_path, 'w') as file:
-    yaml.dump(config, file)
+    remote_write = [
+        {
+            "url": args.url,
+            "write_relabel_configs": [
+                {
+                    "target_label": "instance",
+                    "replacement": args.instance,
+                },
+            ],
+        },
+    ]
 
-print(f"Updated Prometheus configuration: {cfg_path}")
+    # Load the Prometheus configuration file
+    with open(cfg_path, "r") as file:
+        config = yaml.safe_load(file)
+
+    # Modify the configuration
+    if "remote_write" in config:
+        config["remote_write"] = remote_write
+
+    # Save the modified configuration
+    with open(cfg_path, "w") as file:
+        yaml.dump(config, file)
+    print(f"Updated Prometheus configuration: {cfg_path}")
+
+    # if service not running then start it
+    if os.system(f"systemctl is-active --quiet {service_name}") != 0:
+        os.system(f"systemctl enable --now {service_name}")
+    else:
+        os.system(f"systemctl restart {service_name}")
