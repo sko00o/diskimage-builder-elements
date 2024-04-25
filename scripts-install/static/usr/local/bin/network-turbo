@@ -29,10 +29,13 @@ proxy_unset() {
 }
 
 setup_http_proxy() {
-    local https_proxy="$1"
-    if [ ! -z "$https_proxy" ]; then
-        echo "http_proxy=$https_proxy" >"$turbo_cfg"
+    local cfg_http_proxy="$([ ! -f "$turbo_cfg" ] || cat "$turbo_cfg" | grep http_proxy | awk -F '=' '{print $2}')"
+    local http_proxy="${1:-${cfg_http_proxy}}"
+    if [ -z "$http_proxy" ]; then
+        echo "输入代理地址 (例如： http://proxy.example.com:8080):"
+        read -r http_proxy
     fi
+    echo "http_proxy=$http_proxy" >"$turbo_cfg"
 
     cat >/etc/profile.d/099_proxy.sh <<EOF
 source network-turbo && proxy_set
@@ -43,7 +46,7 @@ EOF
 }
 
 setup_ca_bundle() {
-    local cert_file="${1:-"/usr/local/share/ca-certificates/squid-self-signed.crt"}"
+    local cert_file="${1:-"/root/public/scripts/ssl_cert/squid-self-signed.pem"}"
     local target_cert_file="/usr/local/share/ca-certificates/squid-self-signed.crt"
     if [ ! -f $cert_file ]; then
         echo "skip: ca bundle file $cert_file not found"
@@ -66,7 +69,7 @@ case $1 in
 help)
     echo "Usage:"
     echo "  $shellname [command]"
-    echo 
+    echo
     echo "Available Commands:"
     echo "  help   : print help message"
     echo "  reset  : reset turbo config"
