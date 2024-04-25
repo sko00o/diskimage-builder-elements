@@ -39,7 +39,7 @@ setup_http_proxy() {
     echo "http_proxy=$http_proxy" >"$turbo_cfg"
 
     cat >/etc/profile.d/099_proxy.sh <<EOF
-source network-turbo && proxy_set
+. network-turbo && proxy_set
 EOF
     chmod +x /etc/profile.d/099_proxy.sh
 
