@@ -2,6 +2,7 @@
 
 turbo_cfg="/etc/network-turbo.conf"
 shellname="network-turbo"
+source_cert_file="/root/public/scripts/ssl_cert/squid-self-signed.pem"
 
 proxy_set() {
     http_proxy=$([ ! -f "$turbo_cfg" ] || cat "$turbo_cfg" | grep http_proxy | awk -F '=' '{print $2}')
@@ -46,7 +47,7 @@ EOF
 }
 
 setup_ca_bundle() {
-    local cert_file="${1:-"/root/public/scripts/ssl_cert/squid-self-signed.pem"}"
+    local cert_file="${1:-"$source_cert_file"}"
     local target_cert_file="/usr/local/share/ca-certificates/squid-self-signed.crt"
     if [ ! -f $cert_file ]; then
         echo "skip: ca bundle file $cert_file not found"
