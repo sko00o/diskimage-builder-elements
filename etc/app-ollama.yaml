@@ -39,4 +39,5 @@
     DIB_JUPYTERLAB_VER: "4.1.2"
     DIB_NVIDIA_DRIVER_VERSION: "535.161.08"
     DIB_OLLAMA_MODELS_TAR: "/root/public/apps/ollama/ollama_models_20240429.tar"
+    DIB_OLLAMA_VERSION: "0.1.32"
     DIB_FILEBROWSER_ROOT: "/root/"
