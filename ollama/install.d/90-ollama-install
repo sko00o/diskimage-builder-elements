@@ -103,7 +103,7 @@ After=network-online.target
 Requires=root-public.mount root-data.mount
 
 [Service]
-ExecStartPre=/usr/local/bin/setup-ollama
+ExecStartPre=+/usr/local/bin/setup-ollama
 ExecStart=$BINDIR/ollama serve
 User=ollama
 Group=ollama
