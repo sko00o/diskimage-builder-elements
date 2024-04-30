@@ -36,9 +36,6 @@ if [ -f "${APP_DATA_TAR}" ] && [ ! -f "${APP_INIT_DONE}" ]; then
         --checkpoint-action=. &&
         echo "Done"
 
-    # change owner
-    chown ollama:ollama -R "${APP_DATA_DIR}"
-
     # set a empty file to indicate init complete
     touch "${APP_INIT_DONE}"
 fi

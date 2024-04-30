@@ -79,21 +79,21 @@ $SUDO install -o0 -g0 -m755 -d $BINDIR
 $SUDO install -o0 -g0 -m755 $TEMP_DIR/ollama $BINDIR/ollama
 
 configure_systemd() {
-    if ! id ollama >/dev/null 2>&1; then
-        status "Creating ollama user..."
-        $SUDO useradd -r -s /bin/false -U -m -d /usr/share/ollama ollama
-    fi
-    if getent group render >/dev/null 2>&1; then
-        status "Adding ollama user to render group..."
-        $SUDO usermod -a -G render ollama
-    fi
-    if getent group video >/dev/null 2>&1; then
-        status "Adding ollama user to video group..."
-        $SUDO usermod -a -G video ollama
-    fi
+    # if ! id ollama >/dev/null 2>&1; then
+    #     status "Creating ollama user..."
+    #     $SUDO useradd -r -s /bin/false -U -m -d /usr/share/ollama ollama
+    # fi
+    # if getent group render >/dev/null 2>&1; then
+    #     status "Adding ollama user to render group..."
+    #     $SUDO usermod -a -G render ollama
+    # fi
+    # if getent group video >/dev/null 2>&1; then
+    #     status "Adding ollama user to video group..."
+    #     $SUDO usermod -a -G video ollama
+    # fi
 
-    status "Adding current user to ollama group..."
-    $SUDO usermod -a -G ollama $(whoami)
+    # status "Adding current user to ollama group..."
+    # $SUDO usermod -a -G ollama $(whoami)
 
     status "Creating ollama systemd service..."
     cat <<EOF | $SUDO tee /etc/systemd/system/ollama.service >/dev/null
@@ -105,8 +105,8 @@ Requires=root-public.mount root-data.mount
 [Service]
 ExecStartPre=+/usr/local/bin/setup-ollama
 ExecStart=$BINDIR/ollama serve
-User=ollama
-Group=ollama
+User=root
+Group=root
 Restart=always
 RestartSec=3
 Environment="OLLAMA_MODELS=$OLLAMA_MODELS"
