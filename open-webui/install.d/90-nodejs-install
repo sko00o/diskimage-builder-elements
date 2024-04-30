@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -o errexit
+set -o nounset
+set -o pipefail
+
+# installs NVM (Node Version Manager)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+
+# download and install Node.js
+nvm install 20
+
+# ref: https://blog.npmjs.org/post/78085451721/npms-self-signed-certificate-is-no-more
+npm config set ca=""

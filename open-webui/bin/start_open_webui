@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -e
+
+APP_NAME="open_webui"
+APP_DIR=${OPEN_WEBUI_DIR:-"/root/open-webui/backend"}
+APP_PORT=${OPEN_WEBUI_PORT:-"10000"}
+APP_VENV_DIR=${OPEN_WEBUI_VENV_DIR:-"${APP_DIR}/venv"}
+
+# make sure conda env exist
+if ! $(conda env list | grep -q "${APP_NAME}"); then
+    echo "Creating conda env '${APP_NAME}'"
+    conda create -y --name "${APP_NAME}" python=3.11
+fi
+
+load_venv() {
+    if [[ -z "${VIRTUAL_ENV}" ]]; then
+        if [[ -f "${APP_VENV_DIR}/bin/activate" ]]; then
+            source "${APP_VENV_DIR}/bin/activate"
+        else
+            echo "No venv found, creating a new one"
+            "$(conda env list | awk '$1 == "'${APP_NAME}'" { print $NF }')/bin/python" \
+                -m venv "$([[ -L "${APP_VENV_DIR}" ]] && readlink "${APP_VENV_DIR}" || echo "${APP_VENV_DIR}")"
+            source "${APP_VENV_DIR}/bin/activate"
+
+            pip install -r "${APP_DIR}/requirements.txt"
+        fi
+    else
+        printf "python venv already activate or run without venv: ${VIRTUAL_ENV}"
+    fi
+}
+
+cd "${APP_DIR}" && load_venv
+
+# if --install-only, exit now
+if [[ "${1:-}" == "--install-only" ]]; then
+    exit 0
+fi
+
+export PORT="${APP_PORT}"
+bash start.sh

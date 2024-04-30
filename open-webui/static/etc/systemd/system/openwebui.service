@@ -1,0 +1,16 @@
+[Unit]
+Description=Open WebUI
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+PIDFile=/run/openwebui.pid
+User=root
+WorkingDirectory=/root/
+ExecStart=start_open_webui
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
