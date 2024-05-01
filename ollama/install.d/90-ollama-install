@@ -113,7 +113,7 @@ Environment="OLLAMA_MODELS=$OLLAMA_MODELS"
 Environment="OLLAMA_HOST=0.0.0.0"
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target
 EOF
     SYSTEMCTL_RUNNING="$(systemctl is-system-running || true)"
     case $SYSTEMCTL_RUNNING in
