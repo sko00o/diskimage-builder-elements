@@ -79,22 +79,6 @@ $SUDO install -o0 -g0 -m755 -d $BINDIR
 $SUDO install -o0 -g0 -m755 $TEMP_DIR/ollama $BINDIR/ollama
 
 configure_systemd() {
-    # if ! id ollama >/dev/null 2>&1; then
-    #     status "Creating ollama user..."
-    #     $SUDO useradd -r -s /bin/false -U -m -d /usr/share/ollama ollama
-    # fi
-    # if getent group render >/dev/null 2>&1; then
-    #     status "Adding ollama user to render group..."
-    #     $SUDO usermod -a -G render ollama
-    # fi
-    # if getent group video >/dev/null 2>&1; then
-    #     status "Adding ollama user to video group..."
-    #     $SUDO usermod -a -G video ollama
-    # fi
-
-    # status "Adding current user to ollama group..."
-    # $SUDO usermod -a -G ollama $(whoami)
-
     status "Creating ollama systemd service..."
     cat <<EOF | $SUDO tee /etc/systemd/system/ollama.service >/dev/null
 [Unit]
@@ -115,18 +99,7 @@ Environment="OLLAMA_HOST=0.0.0.0"
 [Install]
 WantedBy=multi-user.target
 EOF
-    SYSTEMCTL_RUNNING="$(systemctl is-system-running || true)"
-    case $SYSTEMCTL_RUNNING in
-    running | degraded)
-        status "Enabling and starting ollama service..."
-        $SUDO systemctl daemon-reload
-        $SUDO systemctl enable ollama
-
-        # start_service() { $SUDO systemctl restart ollama; }
-        # trap start_service EXIT
-        # ;;
-        ;;
-    esac
+    $SUDO systemctl enable ollama
 }
 
 if available systemctl; then
