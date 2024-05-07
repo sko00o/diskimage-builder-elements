@@ -44,6 +44,6 @@
     DIB_OPENWEBUI_VERSION: "0.1.123"
     DIB_OLLAMA_VERSION: "0.1.32"
     DIB_OLLAMA_MODELS_LINK_FILE: "/root/public/apps/ollama/ollama_models_20240429.tar"
-    DIB_COMFYUI_FILE: "/root/public/ComfyUI/comfyui_20240326.tar.xz"
-    DIB_COMFYUI_DATA_LINK_FILE: "/root/public/ComfyUI/comfyui_20240326_data.tar"
+    DIB_COMFYUI_FILE: "/root/public/apps/ComfyUI/comfyui_20240507.tar.xz"
+    DIB_COMFYUI_DATA_LINK_FILE: "/root/public/apps/ComfyUI/comfyui_20240507_data.tar"
     DIB_FILEBROWSER_ROOT: "/root/"
