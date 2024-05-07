@@ -41,4 +41,6 @@ fi
 
 export PORT="${APP_PORT}"
 export DEFAULT_MODELS="${DEFAULT_MODELS:-llama3:latest}"
+export COMFYUI_BASE_URL="${COMFYUI_BASE_URL:-http://localhost:10001}"
+export ENABLE_IMAGE_GENERATION="True"
 bash start.sh

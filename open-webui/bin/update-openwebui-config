@@ -11,6 +11,7 @@ import json
 cfg_path = "/root/open-webui/backend/data/webui.db"
 service_name = "openwebui.service"
 default_endpoint = "http://localhost:10000"
+gen_img_service_name = "comfyui.service"
 
 
 def create_auth(username, password, endpoint) -> bool:
@@ -78,3 +79,8 @@ if __name__ == "__main__":
         os.system(f"systemctl enable --now {service_name}")
     else:
         os.system(f"systemctl restart {service_name}")
+
+    if os.system(f"systemctl is-active --quiet {gen_img_service_name}") != 0:
+        os.system(f"systemctl enable --now {gen_img_service_name}")
+    else:
+        os.system(f"systemctl restart {gen_img_service_name}")
