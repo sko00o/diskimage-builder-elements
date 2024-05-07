@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+# load login profile
+. /etc/profile
+
 APP_NAME="open_webui"
 APP_DIR=${OPEN_WEBUI_DIR:-"/root/open-webui/backend"}
 APP_PORT=${OPEN_WEBUI_PORT:-"10000"}
@@ -37,4 +40,5 @@ if [[ "${1:-}" == "--install-only" ]]; then
 fi
 
 export PORT="${APP_PORT}"
+export DEFAULT_MODELS="${DEFAULT_MODELS:-llama3:latest}"
 bash start.sh
