@@ -5,6 +5,7 @@ import os
 import urllib.request
 from urllib.error import HTTPError
 import json
+import time
 
 # ref: https://docs.openwebui.com/getting-started/troubleshooting#reset-admin-password
 
@@ -71,10 +72,6 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    if not create_auth(args.username, args.password, args.endpoint):
-        update_auth(args.username, args.password)
-
-    # if service not running then start it
     if os.system(f"systemctl is-active --quiet {service_name}") != 0:
         os.system(f"systemctl enable --now {service_name}")
     else:
@@ -84,3 +81,16 @@ if __name__ == "__main__":
         os.system(f"systemctl enable --now {gen_img_service_name}")
     else:
         os.system(f"systemctl restart {gen_img_service_name}")
+
+    # waiting for endpoint to be ready
+    while True:
+        try:
+            urllib.request.urlopen(args.endpoint)
+            break
+        except Exception as e:
+            print(f"Waiting for {args.endpoint} to be ready")
+            time.sleep(1)
+            continue
+
+    if not create_auth(args.username, args.password, args.endpoint):
+        update_auth(args.username, args.password)
