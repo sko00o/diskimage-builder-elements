@@ -32,9 +32,14 @@ proxy_unset() {
 setup_http_proxy() {
     local cfg_http_proxy="$([ ! -f "$turbo_cfg" ] || cat "$turbo_cfg" | grep http_proxy | awk -F '=' '{print $2}')"
     local http_proxy="${1:-${cfg_http_proxy}}"
-    if [ -z "$http_proxy" ]; then
+    if [ -z "$http_proxy" ] && [ -t 0 ]; then
+        # Standard input is coming from a terminal.
         echo "输入代理地址 (例如： http://proxy.example.com:8080):"
         read -r http_proxy
+    fi
+    if [ -z "$http_proxy" ]; then
+        echo "skip: http proxy not set"
+        return 1
     fi
     echo "http_proxy=$http_proxy" >"$turbo_cfg"
 
@@ -44,6 +49,7 @@ EOF
     chmod +x /etc/profile.d/099_proxy.sh
 
     echo "setup http proxy"
+    return 0
 }
 
 setup_ca_bundle() {
@@ -92,9 +98,9 @@ reset)
     echo "已重置加速配置"
     ;;
 init)
-    setup_http_proxy $2
-    setup_ca_bundle $3
-    echo "已初始化加速配置"
+    setup_http_proxy $2 &&
+        setup_ca_bundle $3 &&
+        echo "已初始化加速配置"
     ;;
 *)
     # keep silent
