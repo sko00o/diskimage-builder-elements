@@ -60,6 +60,7 @@ setup_ca_bundle() {
     if [ -f $pem_file ]; then
         cat >/etc/profile.d/099_ca_bundle.sh <<EOF
 export REQUESTS_CA_BUNDLE=$pem_file
+export SSL_CERT_DIR=/etc/ssl/certs
 EOF
         chmod +x /etc/profile.d/099_ca_bundle.sh
         echo "setup CA Bundle"
