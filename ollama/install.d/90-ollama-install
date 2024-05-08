@@ -83,10 +83,12 @@ configure_systemd() {
     cat <<EOF | $SUDO tee /etc/systemd/system/ollama.service >/dev/null
 [Unit]
 Description=Ollama Service
-#After=network-online.target
+After=mount-public@public.service
 Requires=root-public.mount root-data.mount
 
 [Service]
+Type=simple
+PIDFile=/run/ollama.pid
 ExecStartPre=/usr/local/bin/setup-ollama
 ExecStart=$BINDIR/ollama serve
 User=root
