@@ -15,6 +15,15 @@ if ! $(conda env list | grep -q "${APP_NAME}"); then
     conda create -y --name "${APP_NAME}" python=3.11
 fi
 
+# setup ollama
+if [ -f /usr/local/bin/setup-ollama ];then
+    if ps aux | grep -v grep | grep -q "setup-ollama"; then
+        echo "setup-ollama is running, skip"
+    else
+        /usr/local/bin/setup-ollama
+    fi
+fi
+
 load_venv() {
     if [[ -z "${VIRTUAL_ENV}" ]]; then
         if [[ -f "${APP_VENV_DIR}/bin/activate" ]]; then

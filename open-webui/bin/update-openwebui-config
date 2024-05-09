@@ -10,9 +10,13 @@ import time
 # ref: https://docs.openwebui.com/getting-started/troubleshooting#reset-admin-password
 
 cfg_path = "/root/open-webui/backend/data/webui.db"
-service_name = "openwebui.service"
 default_endpoint = "http://localhost:10000"
-gen_img_service_name = "comfyui.service"
+
+service_list = [
+    # "ollama.service",
+    "comfyui.service",
+    "openwebui.service",
+]
 
 
 def create_auth(username, password, endpoint) -> bool:
@@ -72,15 +76,11 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    if os.system(f"systemctl is-active --quiet {service_name}") != 0:
-        os.system(f"systemctl enable --now {service_name}")
-    else:
-        os.system(f"systemctl restart {service_name}")
-
-    if os.system(f"systemctl is-active --quiet {gen_img_service_name}") != 0:
-        os.system(f"systemctl enable --now {gen_img_service_name}")
-    else:
-        os.system(f"systemctl restart {gen_img_service_name}")
+    for service_name in service_list:
+        if os.system(f"systemctl is-active --quiet {service_name}") != 0:
+            os.system(f"systemctl enable --now {service_name}")
+        else:
+            os.system(f"systemctl restart {service_name}")
 
     # waiting for endpoint to be ready
     while True:
