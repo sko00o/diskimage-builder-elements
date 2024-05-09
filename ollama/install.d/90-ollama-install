@@ -84,7 +84,7 @@ configure_systemd() {
 [Unit]
 Description=Ollama Service
 After=mount-public@public.service
-Requires=root-public.mount root-data.mount
+Requisite=root-public.mount root-data.mount
 
 [Service]
 Type=simple
