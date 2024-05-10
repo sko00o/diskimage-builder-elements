@@ -28,4 +28,4 @@ npm run build
 # install python dependencies
 start_open_webui --install-only
 
-ln -s "/usr/local/bin/${COMFYUI_START_SCRIPT}" "/root/${COMFYUI_START_SCRIPT}"
+ln -s "/usr/local/bin/${OPENWEBUI_START_SCRIPT}" "/root/${OPENWEBUI_START_SCRIPT}"
