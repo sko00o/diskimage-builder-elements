@@ -96,7 +96,7 @@ Group=root
 Restart=always
 RestartSec=3
 Environment="OLLAMA_MODELS=$OLLAMA_MODELS"
-Environment="OLLAMA_HOST=0.0.0.0"
+# Environment="OLLAMA_HOST=0.0.0.0"
 
 [Install]
 WantedBy=multi-user.target

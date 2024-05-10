@@ -14,7 +14,7 @@ default_endpoint = "http://localhost:10000"
 
 service_list = [
     # "ollama.service",
-    "comfyui.service",
+    # "comfyui.service",
     "openwebui.service",
 ]
 

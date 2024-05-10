@@ -40,7 +40,21 @@ if [[ "${1:-}" == "--install-only" ]]; then
 fi
 
 export PORT="${APP_PORT}"
+
 export DEFAULT_MODELS="${DEFAULT_MODELS:-llama3:latest}"
-export COMFYUI_BASE_URL="${COMFYUI_BASE_URL:-http://localhost:10001}"
-export ENABLE_IMAGE_GENERATION="True"
+
+GEN_IMG_SERVICE="comfyui.service"
+if [[ -f "/etc/systemd/system/${GEN_IMG_SERVICE}" ]]; then
+    # check if service is not active
+    if ! systemctl is-active --quiet "${GEN_IMG_SERVICE}"; then
+        systemctl enable --now "${GEN_IMG_SERVICE}"
+    fi
+    export ENABLE_IMAGE_GENERATION="True"
+    export IMAGE_GENERATION_ENGINE="comfyui"
+    export COMFYUI_BASE_URL="${COMFYUI_BASE_URL:-http://localhost:10001}"
+    export IMAGE_GENERATION_MODEL="animaPencilXL_v100.safetensors"
+    export IMAGE_SIZE="1152x864"
+    export IMAGE_STEPS="30"
+fi
+
 bash start.sh
