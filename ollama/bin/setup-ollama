@@ -9,6 +9,13 @@ data_version="$(basename "$(readlink "${APP_DATA_TAR}")")"
 APP_INIT_START="${APP_DATA_DIR}/${data_version}.init-start"
 APP_INIT_DONE="${APP_DATA_DIR}/${data_version}.init-done"
 
+if [ -L "${APP_DATA_DIR}" ]; then
+    while [ ! -f "${APP_DATA_DIR}" ]; do
+        echo "Waiting for ${APP_DATA_DIR} to be available..."
+        sleep 1
+    done
+fi
+
 # try extract from existing tar file
 if [ -f "${APP_DATA_TAR}" ] && [ ! -f "${APP_INIT_DONE}" ]; then
     echo "First launch will take some time, please be patient..."
