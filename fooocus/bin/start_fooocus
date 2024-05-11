@@ -3,6 +3,8 @@ set -e
 
 # set http proxy 
 . network-turbo && proxy_set
+# load login profile
+. /etc/profile
 
 APP_NAME="Fooocus"
 APP_DIR=${FOOOCUS_DIR:-"/root/${APP_NAME}"}

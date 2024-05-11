@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+import urllib.request
+from urllib.error import HTTPError
+import json
+import time
+
+# ref: https://docs.openwebui.com/getting-started/troubleshooting#reset-admin-password
+
+cfg_path = "/root/open-webui/backend/data/webui.db"
+default_endpoint = "http://localhost:10000"
+
+service_list = [
+    # "ollama.service",
+    # "comfyui.service",
+    "openwebui.service",
+]
+
+
+def create_auth(username, password, endpoint) -> bool:
+    # request email, password, name in json format
+    data = {
+        "name": "admin",
+        "email": username,
+        "password": password,
+    }
+    headers = {"Content-Type": "application/json"}
+    encode_data = json.dumps(data).encode("utf-8")
+    req = urllib.request.Request(
+        endpoint + "/api/v1/auths/signup",
+        data=encode_data,
+        headers=headers,
+        method="POST",
+    )
+
+    try:
+        resp = urllib.request.urlopen(req)
+        resp_data = resp.read().decode("utf-8")
+        print(f"Created admin {username}: {resp_data}")
+    except HTTPError as e:
+        if e.code == 400:
+            print(f"Admin {username} already exists")
+            return False
+        else:
+            raise e
+    return True
+
+
+def update_auth(username, password):
+    # encode password using htpasswd
+    import subprocess
+
+    p = subprocess.run(
+        ["htpasswd", "-bnBC", "10", "", password], stdout=subprocess.PIPE
+    )
+    password = p.stdout.decode("utf-8").strip().split(":")[1]
+
+    p = subprocess.run(
+        [
+            "sqlite3",
+            cfg_path,
+            f"UPDATE auth SET password='{password}' WHERE email='{username}';",
+        ]
+    )
+    print(f"Updated password for {username}")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("username", help="openwebui username")
+    parser.add_argument("password", help="openwebui password")
+    parser.add_argument(
+        "--endpoint", help="openwebui base url", default=default_endpoint
+    )
+    args = parser.parse_args()
+
+    for service_name in service_list:
+        if os.system(f"systemctl is-active --quiet {service_name}") != 0:
+            os.system(f"systemctl enable --now {service_name}")
+        else:
+            os.system(f"systemctl restart {service_name}")
+
+    # waiting for endpoint to be ready
+    while True:
+        try:
+            urllib.request.urlopen(args.endpoint)
+            break
+        except Exception as e:
+            print(f"Waiting for {args.endpoint} to be ready")
+            time.sleep(1)
+            continue
+
+    if not create_auth(args.username, args.password, args.endpoint):
+        update_auth(args.username, args.password)

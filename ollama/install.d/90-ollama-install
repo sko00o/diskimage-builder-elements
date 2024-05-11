@@ -1,0 +1,115 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -o errexit
+set -o nounset
+set -o pipefail
+
+# ref: https://ollama.com/install.sh
+
+status() { echo ">>> $*" >&2; }
+error() {
+    echo "ERROR $*"
+    exit 1
+}
+warning() { echo "WARNING: $*"; }
+
+TEMP_DIR=$(mktemp -d)
+cleanup() { rm -rf $TEMP_DIR; }
+trap cleanup EXIT
+
+available() { command -v $1 >/dev/null; }
+require() {
+    local MISSING=''
+    for TOOL in $*; do
+        if ! available $TOOL; then
+            MISSING="$MISSING $TOOL"
+        fi
+    done
+
+    echo $MISSING
+}
+
+ARCH=$(uname -m)
+case "$ARCH" in
+x86_64) ARCH="amd64" ;;
+aarch64 | arm64) ARCH="arm64" ;;
+*) error "Unsupported architecture: $ARCH" ;;
+esac
+
+KERN=$(uname -r)
+case "$KERN" in
+*icrosoft*WSL2 | *icrosoft*wsl2) ;;
+*icrosoft) error "Microsoft WSL1 is not currently supported. Please upgrade to WSL2 with 'wsl --set-version <distro> 2'" ;;
+*) ;;
+esac
+
+VER_PARAM="${OLLAMA_VERSION:+?version=$OLLAMA_VERSION}"
+
+SUDO=
+if [ "$(id -u)" -ne 0 ]; then
+    # Running as root, no need for sudo
+    if ! available sudo; then
+        error "This script requires superuser permissions. Please re-run as root."
+    fi
+
+    SUDO="sudo"
+fi
+
+NEEDS=$(require curl awk grep sed tee xargs)
+if [ -n "$NEEDS" ]; then
+    status "ERROR: The following tools are required but missing:"
+    for NEED in $NEEDS; do
+        echo "  - $NEED"
+    done
+    exit 1
+fi
+
+status "Downloading ollama..."
+curl --fail --show-error --location --progress-bar -o $TEMP_DIR/ollama "https://ollama.com/download/ollama-linux-${ARCH}${VER_PARAM}"
+
+for BINDIR in /usr/local/bin /usr/bin /bin; do
+    echo $PATH | grep -q $BINDIR && break || continue
+done
+
+status "Installing ollama to $BINDIR..."
+$SUDO install -o0 -g0 -m755 -d $BINDIR
+$SUDO install -o0 -g0 -m755 $TEMP_DIR/ollama $BINDIR/ollama
+
+configure_systemd() {
+    status "Creating ollama systemd service..."
+    cat <<EOF | $SUDO tee /etc/systemd/system/ollama.service >/dev/null
+[Unit]
+Description=Ollama Service
+After=mount-public@public.service
+Requisite=root-public.mount root-data.mount
+
+[Service]
+Type=simple
+PIDFile=/run/ollama.pid
+ExecStartPre=/usr/local/bin/setup-ollama
+ExecStart=$BINDIR/ollama serve
+User=root
+Group=root
+Restart=always
+RestartSec=3
+Environment="OLLAMA_MODELS=$OLLAMA_MODELS"
+# Environment="OLLAMA_HOST=0.0.0.0"
+
+[Install]
+WantedBy=multi-user.target
+EOF
+    $SUDO systemctl enable ollama
+}
+
+if available systemctl; then
+    configure_systemd
+fi
+
+# if OLLAMA_MODELS_LINK_FILE is not "-"
+if [ -n "${OLLAMA_MODELS_LINK_FILE}" ] && [ "${OLLAMA_MODELS_LINK_FILE}" != "-" ]; then
+    echo ">> link data file on HOST"
+    ln -s "${OLLAMA_MODELS_LINK_FILE}" "${OLLAMA_MODELS_TAR}"
+fi

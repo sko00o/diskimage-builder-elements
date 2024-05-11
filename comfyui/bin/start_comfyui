@@ -3,6 +3,8 @@ set -e
 
 # set http proxy 
 . network-turbo && proxy_set
+# load login profile
+. /etc/profile
 
 APP_NAME="ComfyUI"
 APP_DIR=${COMFYUI_DIR:-"/root/${APP_NAME}"}

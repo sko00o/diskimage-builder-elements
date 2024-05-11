@@ -3,6 +3,8 @@ set -e
 
 # set http proxy 
 . network-turbo && proxy_set
+# load login profile
+. /etc/profile
 
 APP_NAME="RVC-WebUI"
 APP_DIR=${RVC_WEBUI_DIR:-"/root/${APP_NAME}"}

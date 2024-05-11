@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+set -e
+
+# trim "models" suffix in $OLLAMA_MODELS
+APP_DATA_DIR=${OLLAMA_DIR:-${OLLAMA_MODELS%/"models"}}
+APP_DATA_TAR=${OLLAMA_DATA_TAR:-"/root/ollama_models.tar"}
+data_version="$(basename "$(readlink "${APP_DATA_TAR}")")"
+APP_INIT_START="${APP_DATA_DIR}/${data_version}.init-start"
+APP_INIT_DONE="${APP_DATA_DIR}/${data_version}.init-done"
+
+if [ -L "${APP_DATA_TAR}" ]; then
+    while [ ! -f "${APP_DATA_TAR}" ]; do
+        echo "Waiting for ${APP_DATA_TAR} to be available..."
+        sleep 1
+    done
+fi
+
+# try extract from existing tar file
+if [ -f "${APP_DATA_TAR}" ] && [ ! -f "${APP_INIT_DONE}" ]; then
+    echo "First launch will take some time, please be patient..."
+
+    if [ -d "${APP_DATA_DIR}" ] && [ ! -z "ls -A ${APP_DATA_DIR}" ]; then
+        # last init not complete
+        if [ -f "${APP_INIT_START}" ] && [ ! -f "${APP_INIT_DONE}" ]; then
+            echo "Last init not complete, delete ${APP_DATA_DIR} and try again."
+            rm -rf "${APP_DATA_DIR}"
+        else
+            # rename the dir
+            BAK="${APP_DATA_DIR}_$(date +%s)"
+            echo "Renaming ${APP_DATA_DIR} to ${BAK}"
+            mv -v "${APP_DATA_DIR}" "${BAK}"
+        fi
+    fi
+
+    # set a empty file to indicate init start
+    mkdir -p "${APP_DATA_DIR}"
+    touch "${APP_INIT_START}"
+
+    echo "Uncompressing data from ${APP_DATA_TAR} to ${APP_DATA_DIR}"
+    tar -xf "${APP_DATA_TAR}" -C "${APP_DATA_DIR}" \
+        --checkpoint=$(($(stat -L -c %s "${APP_DATA_TAR}") / 512 / 20 / 100)) \
+        --checkpoint-action=. &&
+        echo "Done"
+
+    # set a empty file to indicate init complete
+    touch "${APP_INIT_DONE}"
+fi
+
+echo "Setup complete"
