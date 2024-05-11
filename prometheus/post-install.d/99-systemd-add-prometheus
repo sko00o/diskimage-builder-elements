@@ -1,47 +1,6 @@
 #!/bin/bash
 
 if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
-    set -x
+  set -x
 fi
 set -euo pipefail
-
-mkdir -p /etc/prometheus
-cat <<EOF >/etc/prometheus/prometheus.yml
-global:
-  scrape_interval: 5s
-  external_labels:
-    cluster: openstack
-    replica: 0
-
-scrape_configs:
-  - job_name: "prometheus"
-    static_configs:
-      - targets: ["localhost:9090"]
-  - job_name: "node_exporter"
-    static_configs:
-      - targets: ["localhost:9100"]
-  - job_name: "dcgm-exporter"
-    static_configs:
-      - targets: ["localhost:9400"]
-
-remote_write:
-  - url: "http://prometheus.service.yoga:9094/api/v1/write"
-EOF
-
-cat <<EOF >/etc/systemd/system/prometheus-agent.service
-[Unit]
-Description=Prometheus Agent
-Wants=network-online.target
-After=network-online.target
-
-[Service]
-User=root
-Group=root
-Type=simple
-ExecStart=/usr/local/bin/prometheus --enable-feature=agent --config.file /etc/prometheus/prometheus.yml
-Restart=always
-RestartSec=3
-
-[Install]
-WantedBy=multi-user.target
-EOF

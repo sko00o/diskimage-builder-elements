@@ -1,0 +1,15 @@
+[Unit]
+Description=Prometheus Agent
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=root
+Group=root
+Type=simple
+ExecStart=/usr/local/bin/prometheus --enable-feature=agent --config.file /etc/prometheus/prometheus.yml
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
