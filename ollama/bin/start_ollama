@@ -2,8 +2,8 @@
 
 set -e
 
-# trim "models" suffix in $OLLAMA_MODELS
-APP_DATA_DIR=${OLLAMA_DIR:-${OLLAMA_MODELS%/"models"}}
+APP_NAME="ollama"
+APP_DATA_DIR=${OLLAMA_DIR:-"/root/data/${APP_NAME}"}
 APP_DATA_TAR=${OLLAMA_DATA_TAR:-"/root/ollama_models.tar"}
 data_version="$(basename "$(readlink "${APP_DATA_TAR}")")"
 APP_INIT_START="${APP_DATA_DIR}/${data_version}.init-start"
@@ -45,6 +45,8 @@ if [ -f "${APP_DATA_TAR}" ] && [ ! -f "${APP_INIT_DONE}" ]; then
 
     # set a empty file to indicate init complete
     touch "${APP_INIT_DONE}"
+    echo "Setup complete"
 fi
 
-echo "Setup complete"
+export OLLAMA_MODELS=${OLLAMA_MODELS:-"${APP_DATA_DIR}/models"}
+ollama serve

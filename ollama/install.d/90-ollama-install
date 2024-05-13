@@ -78,36 +78,6 @@ status "Installing ollama to $BINDIR..."
 $SUDO install -o0 -g0 -m755 -d $BINDIR
 $SUDO install -o0 -g0 -m755 $TEMP_DIR/ollama $BINDIR/ollama
 
-configure_systemd() {
-    status "Creating ollama systemd service..."
-    cat <<EOF | $SUDO tee /etc/systemd/system/ollama.service >/dev/null
-[Unit]
-Description=Ollama Service
-After=mount-public@public.service
-Requisite=root-public.mount root-data.mount
-
-[Service]
-Type=simple
-PIDFile=/run/ollama.pid
-ExecStartPre=/usr/local/bin/setup-ollama
-ExecStart=$BINDIR/ollama serve
-User=root
-Group=root
-Restart=always
-RestartSec=3
-Environment="OLLAMA_MODELS=$OLLAMA_MODELS"
-# Environment="OLLAMA_HOST=0.0.0.0"
-
-[Install]
-WantedBy=multi-user.target
-EOF
-    $SUDO systemctl enable ollama
-}
-
-if available systemctl; then
-    configure_systemd
-fi
-
 # if OLLAMA_MODELS_LINK_FILE is not "-"
 if [ -n "${OLLAMA_MODELS_LINK_FILE}" ] && [ "${OLLAMA_MODELS_LINK_FILE}" != "-" ]; then
     echo ">> link data file on HOST"
