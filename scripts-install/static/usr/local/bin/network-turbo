@@ -18,6 +18,12 @@ proxy_set() {
     export HTTP_PROXY=$http_proxy
     export HTTPS_PROXY=$https_proxy
     export NO_PROXY=$no_proxy
+
+    local pem_file="/etc/ssl/certs/squid-self-signed.pem"
+    if [ -f $pem_file ]; then
+        export REQUESTS_CA_BUNDLE=$pem_file
+        export SSL_CERT_DIR=/etc/ssl/certs
+    fi
 }
 
 proxy_unset() {
@@ -27,6 +33,9 @@ proxy_unset() {
     unset HTTP_PROXY
     unset HTTPS_PROXY
     unset NO_PROXY
+
+    unset REQUESTS_CA_BUNDLE
+    unset SSL_CERT_DIR
 }
 
 setup_http_proxy() {
@@ -43,6 +52,17 @@ setup_http_proxy() {
     fi
     echo "http_proxy=$http_proxy" >"$turbo_cfg"
 
+    # setup ca bundle
+    local cert_file="${2:-"$source_cert_file"}"
+    local target_cert_file="/usr/local/share/ca-certificates/squid-self-signed.crt"
+    if [ ! -f $cert_file ]; then
+        echo "skip: ca bundle file $cert_file not found"
+        return
+    fi
+    cp -vf "$cert_file" "$target_cert_file"
+    sudo update-ca-certificates
+
+    # auto enable proxy
     cat >/etc/profile.d/099_proxy.sh <<EOF
 . network-turbo && proxy_set
 EOF
@@ -50,27 +70,6 @@ EOF
 
     echo "setup http proxy"
     return 0
-}
-
-setup_ca_bundle() {
-    local cert_file="${1:-"$source_cert_file"}"
-    local target_cert_file="/usr/local/share/ca-certificates/squid-self-signed.crt"
-    if [ ! -f $cert_file ]; then
-        echo "skip: ca bundle file $cert_file not found"
-        return
-    fi
-
-    cp -vf "$cert_file" "$target_cert_file"
-    sudo update-ca-certificates
-    local pem_file="/etc/ssl/certs/squid-self-signed.pem"
-    if [ -f $pem_file ]; then
-        cat >/etc/profile.d/099_ca_bundle.sh <<EOF
-export REQUESTS_CA_BUNDLE=$pem_file
-export SSL_CERT_DIR=/etc/ssl/certs
-EOF
-        chmod +x /etc/profile.d/099_ca_bundle.sh
-        echo "setup CA Bundle"
-    fi
 }
 
 case $1 in
@@ -98,8 +97,7 @@ reset)
     echo "已重置加速配置"
     ;;
 init)
-    setup_http_proxy $2 &&
-        setup_ca_bundle $3 &&
+    setup_http_proxy $2 $3 &&
         echo "已初始化加速配置"
     ;;
 *)
