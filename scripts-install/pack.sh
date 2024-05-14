@@ -8,6 +8,7 @@ cp -av ../node-exporter/static/* static/
 cp -av ../health-check/bin/* static/usr/local/bin/
 cp -av ../systemd-jupyterlab/bin/* static/usr/local/bin/
 cp -av ../prometheus/bin/* static/usr/local/bin/
+cp -av ../open-webui/bin/* static/usr/local/bin/
 
 cp -av ../comfyui/bin/* static/usr/local/bin/
 cp -av ../rvc-webui-public-data/bin/* static/usr/local/bin/
