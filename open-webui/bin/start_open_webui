@@ -5,14 +5,52 @@ set -e
 . /etc/profile
 
 APP_NAME="open_webui"
-APP_DIR=${OPEN_WEBUI_DIR:-"/root/open-webui/backend"}
-APP_PORT=${OPEN_WEBUI_PORT:-"10000"}
-APP_VENV_DIR=${OPEN_WEBUI_VENV_DIR:-"${APP_DIR}/venv"}
+APP_DIR=${OPENWEBUI_DIR:-"/root/open-webui/backend"}
+APP_PORT=${OPENWEBUI_PORT:-"10000"}
+APP_DATA_TAR=${OPENWEBUI_DATA_TAR:-"/root/${APP_NAME}_data.tar"}
+APP_DATA_VOLUME=${OPENWEBUI_DATA_VOLUME:-"/root/data"}
+APP_VENV_DIR=${OPENWEBUI_VENV_DIR:-"${APP_DIR}/venv"}
+
+APP_DATA_DIR="${APP_DATA_VOLUME}/${APP_NAME}"
+data_version="$(basename "$(readlink "${APP_DATA_TAR}")")"
+APP_INIT_START="${APP_DATA_DIR}/${data_version}.init-start"
+APP_INIT_DONE="${APP_DATA_DIR}/${data_version}.init-done"
 
 # make sure conda env exist
 if ! $(conda env list | grep -q "${APP_NAME}"); then
     echo "Creating conda env '${APP_NAME}'"
     conda create -y --name "${APP_NAME}" python=3.11
+fi
+
+# try extract from existing tar file
+if [ -f "${APP_DATA_TAR}" ] && [ ! -f "${APP_INIT_DONE}" ]; then
+    echo "First launch will take some time, please be patient..."
+
+    if [ -d "${APP_DATA_DIR}" ] && [ ! -z "ls -A ${APP_DATA_DIR}" ]; then
+        # last init not complete
+        if [ -f "${APP_INIT_START}" ] && [ ! -f "${APP_INIT_DONE}" ]; then
+            echo "Last init not complete, delete ${APP_DATA_DIR} and try again."
+            rm -rf "${APP_DATA_DIR}"
+        else
+            # rename the dir
+            BAK="${APP_DATA_DIR}_$(date +%s)"
+            echo "Renaming ${APP_DATA_DIR} to ${BAK}"
+            mv -v "${APP_DATA_DIR}" "${BAK}"
+        fi
+    fi
+
+    # set a empty file to indicate init start
+    mkdir -p "${APP_DATA_DIR}"
+    touch "${APP_INIT_START}"
+
+    echo "Uncompressing data from ${APP_DATA_TAR} to ${APP_DATA_DIR}"
+    tar -xf "${APP_DATA_TAR}" -C "${APP_DATA_DIR}" \
+        --checkpoint=$(($(stat -L -c %s "${APP_DATA_TAR}") / 512 / 20 / 100)) \
+        --checkpoint-action=. &&
+        echo "Done"
+
+    # set a empty file to indicate init complete
+    touch "${APP_INIT_DONE}"
 fi
 
 load_venv() {
@@ -56,5 +94,9 @@ if [[ -f "/etc/systemd/system/${GEN_IMG_SERVICE}" ]]; then
     export IMAGE_SIZE="1152x864"
     export IMAGE_STEPS="30"
 fi
+
+export ENABLE_SIGNUP="False"
+export DATA_DIR="${APP_DATA_DIR}/data"
+export FRONTEND_BUILD_DIR="${APP_DATA_DIR}/ui"
 
 bash start.sh

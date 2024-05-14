@@ -29,3 +29,9 @@ npm run build
 start_open_webui --install-only
 
 ln -s "/usr/local/bin/${OPENWEBUI_START_SCRIPT}" "/root/${OPENWEBUI_START_SCRIPT}"
+
+# if OPENWEBUI_DATA_LINK_FILE is not "-"
+if [ -n "${OPENWEBUI_DATA_LINK_FILE}" ] && [ "${OPENWEBUI_DATA_LINK_FILE}" != "-" ]; then
+    echo ">> link a OPENWEBUI data file on HOST"
+    ln -s "${OPENWEBUI_DATA_LINK_FILE}" "${OPENWEBUI_DATA_TAR}"
+fi
