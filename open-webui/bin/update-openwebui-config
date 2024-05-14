@@ -9,7 +9,7 @@ import time
 
 # ref: https://docs.openwebui.com/getting-started/troubleshooting#reset-admin-password
 
-cfg_path = "/root/data/open-webui/data/webui.db"
+cfg_path = "/root/data/open_webui/data/webui.db"
 default_endpoint = "http://localhost:10000"
 
 service_list = [
