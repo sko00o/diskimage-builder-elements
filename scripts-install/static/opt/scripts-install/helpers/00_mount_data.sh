@@ -87,7 +87,6 @@ trigger_mount_service() {
     cat >/etc/systemd/system/${filename}.service <<EOF
 [Unit]
 Description=trigger mount $mount_point
-Requires=${filename}.mount cloud-final.service
 After=cloud-final.service
 [Service]
 Type=oneshot
