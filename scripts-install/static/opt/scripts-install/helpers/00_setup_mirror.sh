@@ -38,6 +38,7 @@ setup_docker_mirror() {
   fi
   sudo cat >/etc/docker/daemon.json <<EOF
 {
+  "mtu": 1450,
   "registry-mirrors": [
     "https://mirror.iscas.ac.cn",
     "https://mirror.ccs.tencentyun.com",
