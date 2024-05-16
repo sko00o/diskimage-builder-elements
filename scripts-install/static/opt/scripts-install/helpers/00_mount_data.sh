@@ -95,6 +95,6 @@ ExecStart=stat $mount_point
 WantedBy=cloud-init.target
 EOF
 
-    systemctl enable --now "${filename}.service"
+    systemctl enable --now --no-block "${filename}.service"
     echo "trigger mount $mount_point success"
 }
