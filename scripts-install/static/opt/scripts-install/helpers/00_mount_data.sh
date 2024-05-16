@@ -83,15 +83,17 @@ trigger_mount_service() {
     filename="${filename#-}"
 
     # exec stat once on $mount_point
+    # this must exec after cloud-init.target
     cat >/etc/systemd/system/${filename}.service <<EOF
 [Unit]
 Description=trigger mount $mount_point
-Requires=${filename}.mount
+Requires=${filename}.mount cloud-final.service
+After=cloud-final.service
 [Service]
 Type=oneshot
 ExecStart=stat $mount_point
 [Install]
-WantedBy=multi-user.target
+WantedBy=cloud-init.target
 EOF
 
     systemctl enable --now "${filename}.service"
