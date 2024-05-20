@@ -5,6 +5,8 @@ cd "$(dirname "$0")"
 cp -av ../health-check/static/* static/
 cp -av ../node-exporter/static/* static/
 cp -av ../docker-ce/static/* static/
+cp -av ../comfyui/static/* static/
+cp -av ../rvcwebui/static/* static/
 
 cp -av ../health-check/bin/* static/usr/local/bin/
 cp -av ../systemd-jupyterlab/bin/* static/usr/local/bin/
