@@ -98,3 +98,33 @@ EOF
     systemctl enable --now --no-block "${filename}.service"
     echo "trigger mount $mount_point success"
 }
+
+grow_partition() {
+    local partition="$1"
+    # get device name from partition
+    local device=$(lsblk -o PKNAME -bnr "${partition}")
+
+    # compare device size and partition size
+    local device_size=$(lsblk -o SIZE -bnr "${device}" | head -n 1)
+    local partition_size=$(lsblk -o SIZE -bnr "${partition}")
+    local diff_size=$((device_size - partition_size))
+
+    # if diff_size <= 1GB, do nothing
+    if [ "$diff_size" -le 1073741824 ]; then
+        echo "partition ${partition} will not grow, diff_size=${diff_size}"
+        return
+    fi
+
+    # find the mount point of the partition
+    local mount_point=$(findmnt -n -o TARGET --source "${partition}")
+
+    # some magic
+    printf "fix\n" | parted ---pretend-input-tty "${device}" print
+
+    umount "${partition}"
+    growpart "${device}" 1
+    e2fsck -f "${partition}"
+    resize2fs "${partition}"
+    mount "${partition}" "${mount_point}"
+    echo "grow partition ${partition} success"
+}
