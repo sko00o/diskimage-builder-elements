@@ -1,15 +1,7 @@
 - imagename: image-gpu-mini
   elements:
     # base
-    - vm
-    - ubuntu
-    - cloud-init-root-login
-    - qemu-guest-agent
-    - miniconda
-    - scripts-install
-    - setup-timezone
-    - setup-motd
-    - remove-unattended-upgrades
+    - hc-image-base
     # webapp
     - jupyterlab
     # mount

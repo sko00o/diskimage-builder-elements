@@ -1,0 +1,10 @@
+vm
+ubuntu
+cloud-init-root-login
+cloud-init-datasource-openstack
+qemu-guest-agent
+miniconda
+scripts-install
+setup-timezone
+setup-motd
+remove-unattended-upgrades
