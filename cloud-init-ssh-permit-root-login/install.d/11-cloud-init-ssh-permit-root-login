@@ -9,7 +9,13 @@ set -o pipefail
 echo ">> ssh permit root login"
 
 cat >/etc/cloud/cloud.cfg.d/06-dib-root-pwauth.cfg <<EOF
-runcmd:
+#cloud-config
+merge_how:
+ - name: list
+   settings: [append]
+ - name: dict
+   settings: [no_replace, recurse_list]
+bootcmd:
   - sed -i 's/#PermitRootLogin .*/PermitRootLogin yes/' /etc/ssh/sshd_config
   - service ssh reload
 EOF
