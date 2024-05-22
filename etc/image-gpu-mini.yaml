@@ -1,6 +1,8 @@
 - imagename: image-gpu-mini
   elements:
     # base
+    - vm
+    - ubuntu
     - hc-image-base
     # webapp
     - jupyterlab
