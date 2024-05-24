@@ -101,8 +101,8 @@ EOF
 
 grow_partition() {
     local partition="$1"
-    # get device name from partition
-    local device=$(lsblk -o PKNAME -bnr "${partition}")
+    # get device from partition
+    local device=/dev/$(lsblk -o PKNAME -bnr "${partition}")
 
     # compare device size and partition size
     local device_size=$(lsblk -o SIZE -bnr "${device}" | head -n 1)
