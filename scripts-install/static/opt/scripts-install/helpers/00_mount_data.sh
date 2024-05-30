@@ -76,7 +76,8 @@ EOF
 }
 
 trigger_mount_service() {
-    local mount_point="$1"
+    local partition="$1"
+    local mount_point="$2"
 
     # e.g. mount_point=/disk/sdb1 -> filename=disk-sdb1
     local filename="${mount_point//\//-}"
@@ -86,15 +87,16 @@ trigger_mount_service() {
     # this must exec after cloud-init.target
     cat <<EOF >"/etc/systemd/system/${filename}.service"
 [Unit]
-Description=trigger mount $mount_point
+Description=grow partition "$partition" and trigger mount "$mount_point"
 After=cloud-final.service
 [Service]
 Type=oneshot
-ExecStart=stat $mount_point
+ExecStart=bash -c 'source /opt/scripts-install/helpers/00_mount_data.sh && grow_partition "$partition" "$mount_point"'
 [Install]
 WantedBy=cloud-init.target
 EOF
 
+    systemctl daemon-reload
     systemctl enable --now --no-block "${filename}.service"
     echo "trigger mount $mount_point success"
 }
@@ -102,6 +104,7 @@ EOF
 grow_partition() {
     local partition="$1"
     local mount_point="$2"
+
     # get device from partition
     local device=/dev/$(lsblk -o PKNAME -bnr "${partition}")
 
@@ -113,6 +116,9 @@ grow_partition() {
     # if diff_size <= 1GB, do nothing
     if [ "$diff_size" -le 1073741824 ]; then
         echo "partition ${partition} will not grow, diff_size=${diff_size}"
+
+        # trigger auto mount
+        stat "${mount_point}"
         return
     fi
 
@@ -123,29 +129,33 @@ grow_partition() {
     growpart "${device}" 1
     e2fsck -p -f "${partition}"
     resize2fs "${partition}"
-    mount "${partition}" "${mount_point}"
     echo "grow partition ${partition} success"
+
+    # trigger auto mount
+    stat "${mount_point}"
 }
 
-grow_partition_service() {
-    local partition="$1"
-    # e.g. partition=/dev/sdb1 -> filename=dev-sdb1-growpart
-    local filename="${partition//\//-}"
-    filename="${filename#-}"
-    filename="${filename}-growpart"
+# grow_partition_service() {
+#     local partition="$1"
+#     local mount_point="$2"
 
-    # create systemd service file
-    cat <<EOF >"/etc/systemd/system/${filename}.service"
-[Unit]
-Description=grow partition $partition
-After=cloud-final.service
-[Service]
-Type=oneshot
-ExecStart=bash -c 'source /opt/scripts-install/helpers/00_mount_data.sh && grow_partition "$partition"'
-[Install]
-WantedBy=cloud-init.target
-EOF
+#     # e.g. partition=/dev/sdb1 -> filename=dev-sdb1-growpart
+#     local filename="${partition//\//-}"
+#     filename="${filename#-}"
+#     filename="${filename}-growpart"
 
-    systemctl enable --now --no-block "${filename}.service"
-    echo "auto grow partition ${partition} success"
-}
+#     # create systemd service file
+#     cat <<EOF >"/etc/systemd/system/${filename}.service"
+# [Unit]
+# Description=grow partition $partition
+# After=cloud-final.service
+# [Service]
+# Type=oneshot
+# ExecStart=bash -c 'source /opt/scripts-install/helpers/00_mount_data.sh && grow_partition "$partition" "$mount_point"'
+# [Install]
+# WantedBy=cloud-init.target
+# EOF
+
+#     systemctl enable --now --no-block "${filename}.service"
+#     echo "auto grow partition ${partition} success"
+# }
