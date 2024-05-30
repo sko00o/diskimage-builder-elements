@@ -1,0 +1,9 @@
+cloud-init-root-login
+cloud-init-datasource-openstack
+cloud-init-ssh-keepalive
+qemu-guest-agent
+miniconda
+scripts-install
+setup-timezone
+setup-motd
+remove-unattended-upgrades

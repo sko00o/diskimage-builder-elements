@@ -1,8 +1,8 @@
 #!/bin/bash
 
 setup_disk_partition() {
-    device="$1"
-    partition="${device}1"
+    local device="$1"
+    local partition="${device}1"
 
     # check if partition exists
     if lsblk -rno NAME "$partition" >/dev/null 2>&1; then
@@ -25,8 +25,8 @@ setup_disk_partition() {
 }
 
 systemd_mount_partition() {
-    partition="$1"
-    mount_point="$2"
+    local partition="$1"
+    local mount_point="$2"
 
     # check if partition is ext4 format
     while ! blkid -s TYPE -o value "$partition" | grep -q ext4; do
@@ -37,8 +37,8 @@ systemd_mount_partition() {
         echo "format $partition to ext4 success"
     done
 
-    # e.g. mount_point=/disk/sdb1 -> filename=disk-sdb1.mount
-    filename="${mount_point//\//-}"
+    # e.g. mount_point=/disk/sdb1 -> filename=disk-sdb1
+    local filename="${mount_point//\//-}"
     filename="${filename#-}"
 
     # create mount point directory
@@ -55,7 +55,7 @@ Type=ext4
 Options=defaults
 EOF
     # create systemd automount unit file
-    cat >/etc/systemd/system/${filename}.automount <<EOF
+    cat <<EOF >"/etc/systemd/system/${filename}.automount"
 [Unit]
 Description=Auto mount $mount_point
 Requires=cloud-init.target
@@ -76,15 +76,15 @@ EOF
 }
 
 trigger_mount_service() {
-    mount_point="$1"
+    local mount_point="$1"
 
-    # e.g. mount_point=/disk/sdb1 -> filename=disk-sdb1.mount
-    filename="${mount_point//\//-}"
+    # e.g. mount_point=/disk/sdb1 -> filename=disk-sdb1
+    local filename="${mount_point//\//-}"
     filename="${filename#-}"
 
     # exec stat once on $mount_point
     # this must exec after cloud-init.target
-    cat >/etc/systemd/system/${filename}.service <<EOF
+    cat <<EOF >"/etc/systemd/system/${filename}.service"
 [Unit]
 Description=trigger mount $mount_point
 After=cloud-final.service
@@ -97,4 +97,57 @@ EOF
 
     systemctl enable --now --no-block "${filename}.service"
     echo "trigger mount $mount_point success"
+}
+
+grow_partition() {
+    local partition="$1"
+    # get device from partition
+    local device=/dev/$(lsblk -o PKNAME -bnr "${partition}")
+
+    # compare device size and partition size
+    local device_size=$(lsblk -o SIZE -bnr "${device}" | head -n 1)
+    local partition_size=$(lsblk -o SIZE -bnr "${partition}")
+    local diff_size=$((device_size - partition_size))
+
+    # if diff_size <= 1GB, do nothing
+    if [ "$diff_size" -le 1073741824 ]; then
+        echo "partition ${partition} will not grow, diff_size=${diff_size}"
+        return
+    fi
+
+    # find the mount point of the partition
+    local mount_point=$(findmnt -n -o TARGET --source "${partition}")
+
+    # some magic
+    printf "fix\n" | parted ---pretend-input-tty "${device}" print
+
+    umount "${partition}"
+    growpart "${device}" 1
+    e2fsck -f "${partition}"
+    resize2fs "${partition}"
+    mount "${partition}" "${mount_point}"
+    echo "grow partition ${partition} success"
+}
+
+grow_partition_service() {
+    local partition="$1"
+    # e.g. partition=/dev/sdb1 -> filename=dev-sdb1-growpart
+    local filename="${partition//\//-}"
+    filename="${filename#-}"
+    filename="${filename}-growpart"
+
+    # create systemd service file
+    cat <<EOF >"/etc/systemd/system/${filename}.service"
+[Unit]
+Description=grow partition $partition
+After=cloud-final.service
+[Service]
+Type=oneshot
+ExecStart=bash -c 'source /opt/scripts-install/helpers/00_mount_data.sh && grow_partition "$partition"'
+[Install]
+WantedBy=cloud-init.target
+EOF
+
+    systemctl enable --now --no-block "${filename}.service"
+    echo "auto grow partition ${partition} success"
 }
