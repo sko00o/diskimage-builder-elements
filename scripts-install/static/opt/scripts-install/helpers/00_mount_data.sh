@@ -101,6 +101,7 @@ EOF
 
 grow_partition() {
     local partition="$1"
+    local mount_point="$2"
     # get device from partition
     local device=/dev/$(lsblk -o PKNAME -bnr "${partition}")
 
@@ -116,7 +117,7 @@ grow_partition() {
     fi
 
     # find the mount point of the partition
-    local mount_point=$(findmnt -n -o TARGET --source "${partition}")
+    # local mount_point=$(findmnt -n -o TARGET --source "${partition}")
 
     umount "${partition}"
     growpart "${device}" 1
