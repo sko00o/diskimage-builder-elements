@@ -118,12 +118,9 @@ grow_partition() {
     # find the mount point of the partition
     local mount_point=$(findmnt -n -o TARGET --source "${partition}")
 
-    # some magic
-    printf "fix\n" | parted ---pretend-input-tty "${device}" print
-
     umount "${partition}"
     growpart "${device}" 1
-    e2fsck -f "${partition}"
+    e2fsck -p -f "${partition}"
     resize2fs "${partition}"
     mount "${partition}" "${mount_point}"
     echo "grow partition ${partition} success"
