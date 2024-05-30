@@ -11,10 +11,10 @@ echo ">> ssh keepalive"
 cat >/etc/cloud/cloud.cfg.d/07-dib-ssh-keepalive.cfg <<EOF
 #cloud-config
 merge_how:
- - name: list
-   settings: [append]
- - name: dict
-   settings: [no_replace, recurse_list]
+  - name: list
+    settings: [append]
+  - name: dict
+    settings: [no_replace, recurse_list]
 bootcmd:
   - sed -i 's/#ClientAliveInterval .*/ClientAliveInterval 60/' /etc/ssh/sshd_config
   - sed -i 's/#ClientAliveCountMax .*/ClientAliveCountMax 10/' /etc/ssh/sshd_config
