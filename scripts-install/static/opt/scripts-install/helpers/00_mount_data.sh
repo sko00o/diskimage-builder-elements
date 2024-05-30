@@ -92,7 +92,7 @@ After=cloud-final.service
 [Service]
 Type=oneshot
 ExecStartPre=-bash -c 'source /opt/scripts-install/helpers/00_mount_data.sh && grow_partition "$partition"'
-ExecStart=stat "${mount_point}"
+ExecStart=bash -c 'ls "${mount_point}" | head -1'
 [Install]
 WantedBy=cloud-init.target
 EOF
