@@ -91,7 +91,8 @@ Description=grow partition "$partition" and trigger mount "$mount_point"
 After=cloud-final.service
 [Service]
 Type=oneshot
-ExecStart=bash -c 'source /opt/scripts-install/helpers/00_mount_data.sh && grow_partition "$partition" "$mount_point"'
+ExecStartPre=-bash -c 'source /opt/scripts-install/helpers/00_mount_data.sh && grow_partition "$partition"'
+ExecStart=stat "${mount_point}"
 [Install]
 WantedBy=cloud-init.target
 EOF
@@ -103,7 +104,6 @@ EOF
 
 grow_partition() {
     local partition="$1"
-    local mount_point="$2"
 
     # get device from partition
     local device=/dev/$(lsblk -o PKNAME -bnr "${partition}")
@@ -116,23 +116,14 @@ grow_partition() {
     # if diff_size <= 1GB, do nothing
     if [ "$diff_size" -le 1073741824 ]; then
         echo "partition ${partition} will not grow, diff_size=${diff_size}"
-
-        # trigger auto mount
-        stat "${mount_point}"
         return
     fi
 
-    # find the mount point of the partition
-    # local mount_point=$(findmnt -n -o TARGET --source "${partition}")
-
-    umount "${partition}"
+    umount "${partition}" &>/dev/null
     growpart "${device}" 1
     e2fsck -p -f "${partition}"
     resize2fs "${partition}"
     echo "grow partition ${partition} success"
-
-    # trigger auto mount
-    stat "${mount_point}"
 }
 
 # grow_partition_service() {
