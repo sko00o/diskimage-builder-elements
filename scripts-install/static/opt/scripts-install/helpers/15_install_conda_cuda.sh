@@ -5,7 +5,7 @@ CUDNN_CU11_VERSION=${CUDNN_CU11_VERSION:-"8.6.0.163"}
 
 conda_install_cuda() {
     ## Install CUDA
-    conda install -y -c conda-forge cudatoolkit=${CUDATOOLKIT_VERSION}
+    conda install -y cudatoolkit=${CUDATOOLKIT_VERSION}
 }
 
 pip_install_cudnn() {
