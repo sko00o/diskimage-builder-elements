@@ -41,10 +41,8 @@ setup_docker_mirror() {
   "mtu": 1450,
   "registry-mirrors": [
     "https://mirror.iscas.ac.cn",
-    "https://mirror.ccs.tencentyun.com",
     "https://docker.nju.edu.cn",
-    "http://hub-mirror.c.163.com",
-    "https://docker.mirrors.ustc.edu.cn"
+    "https://dockerproxy.com"
   ]
 }
 EOF
