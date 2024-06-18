@@ -16,35 +16,37 @@ upload() {
         --public $@
 }
 
-image-linux() {
-    name="$1"
-    os_distro="${2:-ubuntu}"
-    os_version="${3:-22.04}"
-    hw_disk_bus="${4:-scsi}"
+image-general() {
+    local name="${1}"
+    local os_type="${2}"
+    local os_admin_user="${3}"
+    local os_distro="${4}"
+    local os_version="${5}"
+    local hw_disk_bus="${6}"
 
-    upload_options="\
+    local upload_options="\
         --property architecture=x86_64 \
         --property hw_disk_bus='${hw_disk_bus}' \
         --property hw_scsi_model=virtio-scsi \
         --property hw_vif_multiqueue_enabled=true \
         --property hw_qemu_guest_agent=yes \
         --property os_require_quiesce=yes \
-        --property os_type=linux \
-        --property os_admin_user=root \
+        --property os_type='${os_type}' \
+        --property os_admin_user='${os_admin_user}' \
         --property os_distro='${os_distro}' \
         --property os_version='${os_version}'"
 
-    id_file="${name}.id.txt"
+    local id_file="${name}.id.txt"
     if [ -f "${id_file}" ]; then
         upload_options="${upload_options} --id '$(cat ${id_file})'"
     fi
 
-    desc_file="${name}.desc.txt"
+    local desc_file="${name}.desc.txt"
     if [ -f "${desc_file}" ]; then
         upload_options="${upload_options} --property description='$(cat ${desc_file})'"
     fi
 
-    img_file="${name}.qcow2"
+    local img_file="${name}.qcow2"
     if [ -f "${img_file}" ]; then
         upload_options="${upload_options} --disk-format qcow2"
     else
@@ -57,11 +59,31 @@ image-linux() {
     upload ${upload_options} --file "${img_file}" "${name}"
 }
 
+image-linux() {
+    local name="$1"
+    local os_distro="${2:-ubuntu}"
+    local os_version="${3:-22.04}"
+    local hw_disk_bus="${4:-scsi}"
+
+    image-general "${name}" "linux" "root" "${os_distro}" "${os_version}" "${hw_disk_bus}"
+}
+
 image-ubuntu() {
     image-linux "$1" "ubuntu" "$2" "$3"
 }
 
 image-centos() {
-    os_version="${2:-7}"
+    local os_version="${2:-7}"
     image-linux "$1" "centos" "${os_version}" "$3"
+}
+
+image-windows() {
+    local name="$1"
+    local os_distro="${2:-Windows Server}"
+    # ref: https://en.wikipedia.org/wiki/List_of_Microsoft_Windows_versions#Server_versions
+    # e.g. Windows Server 2019 version number is 1809
+    local os_version="${3:-1809}"
+    local hw_disk_bus="${4:-virtio}"
+
+    image-general "${name}" "windows" "Administrator" "${os_distro}" "${os_version}" "${hw_disk_bus}"
 }
