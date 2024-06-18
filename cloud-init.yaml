@@ -12,5 +12,6 @@ packages:
   - debootstrap
   - qemu-utils
   - rclone
+  - libc6-dev
 runcmd:
   - pip3 install diskimage-builder
