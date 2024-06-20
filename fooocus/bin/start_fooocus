@@ -96,7 +96,7 @@ load_venv() {
 }
 
 cd "${APP_DIR}" && load_venv &&
-    python3 entry_with_update.py \
+    python3 launch.py \
         --listen \
         --port "${APP_PORT}" \
         --cache-path "${APP_CACHE}" \
