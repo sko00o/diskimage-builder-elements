@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-# set http proxy 
-. network-turbo && proxy_set
-# load login profile
-. /etc/profile
-
 APP_NAME="sd_webui"
 APP_DIR=${SD_WEBUI_DIR:-"/root/stable-diffusion-webui"}
 APP_PORT=${SD_WEBUI_PORT:-"10000"}
@@ -123,6 +118,9 @@ load_venv() {
         printf "python venv already activate or run without venv: ${VIRTUAL_ENV}"
     fi
 }
+
+# set http proxy without prompt
+. network-turbo && echo "" | proxy_set
 
 cd "${APP_DIR}" && load_venv &&
     ./webui.sh -f \
