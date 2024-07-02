@@ -1,24 +1,158 @@
-#!/bin/bash
-set -euo pipefail
+#!/usr/bin/env python3
+import os
+import subprocess
+import urllib.request
+import argparse
+import configparser
 
-AK=$1
-SK=$2
-ENDPOINT=$3
-BUCKET=$4
 
-# check connection to s3 endpoint
-if ! curl -s "$ENDPOINT" >/dev/null; then
-  echo "mount failed: can not connect to $ENDPOINT"
-  exit 1
-fi
+class RcloneS3:
+    def __init__(self, ak, sk, endpoint, bucket,
+                 mount_path='/root/private',
+                 config_file='/root/.config/rclone/rclone.conf',
+                 read_only=False):
+        self.ak = ak
+        self.sk = sk
+        self.endpoint = endpoint
+        self.bucket = bucket
+        self.legacy_prefix = "mount-private@"
+        self.service_name = "mount-private"
+        self.mount_path = mount_path
+        self.config_file = config_file
+        self.read_only = read_only
 
-# clean up any mount-private@bucket-xxxx.service
-for service in $(systemctl list-units --full --no-legend --no-pager --type=service --all --plain | grep mount-private@ | awk '{print $1}'); do
-  echo "cleaning up $service"
-  systemctl stop "$service"
-  systemctl disable "$service"
-  rm -f "/etc/systemd/system/$service"
-done
+    def setup(self):
+        if not self.can_connect_endpoint():
+            exit(1)
+        self.systemd_cleanup()
+        self.update_config()
+        self.setup_systemd_service()
+        self.start_systemd_service()
 
-source /opt/scripts-install/helpers/50_setup_s3_bucket.sh
-private_bucket_clout_init "$AK" "$SK" "$ENDPOINT" "$BUCKET"
+    def can_connect_endpoint(self) -> bool:
+        """send a request to endpoint url
+        """
+        try:
+            with urllib.request.urlopen(self.endpoint, timeout=5) as response:
+                code = response.getcode()
+                if 200 <= code < 300:
+                    return True
+        except Exception as e:
+            print(f"Error connect to {self.endpoint}: {e}")
+        return False
+
+    def systemd_cleanup(self):
+        """cleanup any mount-private@bucket-xxx.service
+        """
+        for service in self._list_systemd_services():
+            try:
+                subprocess.check_output(['systemctl', 'stop', service])
+                print(f"Stopped service: {service}")
+                subprocess.check_output(['systemctl', 'disable', service])
+                print(f"Disabled service: {service}")
+
+                # delete service file
+                service_file = f"/etc/systemd/system/{service}"
+                if os.path.exists(service_file):
+                    os.remove(service_file)
+                    print(f"Removed service file: {service_file}")
+            except subprocess.CalledProcessError as e:
+                print(f"Error processing service {service}: {e}")
+
+    def _list_systemd_services(self) -> list:
+        services = []
+        output = subprocess.check_output([
+            "systemctl", "list-units",
+            "--type=service",
+            "--no-pager",
+            "--all",
+            "--full",
+            "--no-legend",
+            "--plain",
+        ])
+        for line in output.decode().splitlines():
+            if line.startswith(self.legacy_prefix):
+                service_name = line.split()[0]
+                services.append(service_name)
+        return services
+
+    def setup_systemd_service(self):
+        service_file = f"/etc/systemd/system/{self.service_name}.service"
+
+        options = ""
+        if self.read_only:
+            options += "--read-only"
+
+        service_content = rf"""
+        [Unit]
+        Description=rclone: Remote FUSE filesystem for private data
+        Documentation=man:rclone(1)
+        After=network-online.target
+        Wants=network-online.target
+        
+        [Service]
+        Type=notify
+        User=root
+        Group=root
+        ExecStartPre=-/bin/bash -c '/bin/mkdir -p "{self.mount_path}" && \
+          ! /bin/mountpoint -q "{self.mount_path}" || \
+          /bin/umount --force "{self.mount_path}"'
+        ExecStart= \
+          /usr/bin/rclone mount \
+            --config=/root/.config/rclone/rclone.conf \
+            --allow-other \
+            --s3-directory-markers \
+            --devname="private" {options}\
+            private-data: "{self.mount_path}"
+        ExecStop=/bin/fusermount -u "{self.mount_path}"
+        
+        [Install]
+        WantedBy=default.target
+        """
+        with open(service_file, "w") as file:
+            file.write(service_content)
+        subprocess.check_output(['systemctl', 'daemon-reload'])
+        print(f"Setup systemd service {self.service_name}")
+
+    def start_systemd_service(self):
+        service_name = self.service_name
+        result = subprocess.run(["systemctl", "is-active", "--quiet", service_name], check=False,
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if result.returncode != 0:
+            subprocess.check_output(["systemctl", "enable", "--now", "--no-block", service_name])
+        else:
+            subprocess.check_output(["systemctl", "restart", service_name])
+
+    def update_config(self):
+        config = configparser.ConfigParser()
+        with open(self.config_file, "r") as file:
+            config.read_file(file)
+        cfg_name = f"cfg-{self.bucket}"
+        config[cfg_name] = {
+            "type": "s3",
+            "env_auth": "false",
+            "provider": "Other",
+            "access_key_id": self.ak,
+            "secret_access_key": self.sk,
+            "endpoint": self.endpoint,
+        }
+        config["private-data"] = {
+            "type": "alias",
+            "remote": cfg_name + ":" + self.bucket,
+        }
+        with open(self.config_file, 'w') as file:
+            config.write(file)
+        print(f"Updated rclone configuration: {self.config_file} [{cfg_name}]")
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("ak", help="s3 access key id")
+    parser.add_argument("sk", help="s3 secret key")
+    parser.add_argument("endpoint", help="s3 endpoint url")
+    parser.add_argument("bucket", help="s3 bucket")
+    parser.add_argument("--read-only", action="store_true", default=False, help="mount as readonly")
+    args = parser.parse_args()
+
+    s3 = RcloneS3(args.ak, args.sk, args.endpoint, args.bucket, read_only=args.read_only)
+    s3.setup()
