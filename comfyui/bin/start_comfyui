@@ -106,7 +106,7 @@ load_venv() {
 }
 
 # set http proxy without prompt
-. network-turbo && echo "" | proxy_set
+. network-turbo && proxy_set <<< ""
 
 cd "${APP_DIR}" && load_venv &&
     python3 main.py \
