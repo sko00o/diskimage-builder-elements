@@ -132,6 +132,7 @@ class RcloneS3:
             "type": "s3",
             "env_auth": "false",
             "provider": "Other",
+            "acl": "private",
             "access_key_id": self.ak,
             "secret_access_key": self.sk,
             "endpoint": self.endpoint,
