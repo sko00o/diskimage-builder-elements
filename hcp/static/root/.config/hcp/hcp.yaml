@@ -1,0 +1,4 @@
+remotes:
+  - name: private-data
+    bucket: ""
+    mountpoint: /root/private
