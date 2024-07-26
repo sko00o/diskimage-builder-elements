@@ -7,3 +7,4 @@ scripts-install
 setup-timezone
 setup-motd
 remove-unattended-upgrades
+hcp
