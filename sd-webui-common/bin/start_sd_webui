@@ -15,7 +15,7 @@ data_version="$(basename "$(readlink "${APP_DATA_TAR}")")"
 APP_INIT_START="${APP_DATA_DIR}/${data_version}.init-start"
 APP_INIT_DONE="${APP_DATA_DIR}/${data_version}.init-done"
 
-CACHE=${APP_DIR}/.cache
+CACHE=${APP_DATA_DIR}/.cache
 CLIP_CACHE=${CACHE}/clip
 export XDG_CACHE_HOME=${CACHE}
 export HF_HOME=${CACHE}/huggingface
@@ -81,6 +81,9 @@ if [ -L "${APP_VENV_DIR}" ]; then
             rclone sync --progress \
                 "${APP_PUBLIC_DATA}/models/controlnet/" \
                 "${APP_DATA_DIR}/models/ControlNet/"
+            rclone sync --progress \
+                "${APP_PUBLIC_DATA}/models/sams/" \
+                "${APP_DATA_DIR}/models/sam/"
         fi
 
         # set a empty file to indicate init complete
