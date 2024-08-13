@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+
+import argparse
+import yaml
+
+cfg_path = "/root/.config/hcp/hcp.yaml"
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("name", help="rclone config section name")
+    parser.add_argument("bucket", help="remote bucket name")
+    parser.add_argument("mountpoint", help="absolute path on local disk")
+    args = parser.parse_args()
+
+    config = None
+    with open(cfg_path, "r") as file:
+        config = yaml.safe_load(file)
+
+    items = config["remotes"]
+    if isinstance(items, list):
+        new_config = []
+        for c in items:
+            if c["name"] == args.name:
+                continue
+            new_config.append(c)
+
+        new_config.append(
+            {
+                "name": args.name,
+                "bucket": args.bucket,
+                "mountpoint": args.mountpoint,
+            }
+        )
+        config["remotes"] = new_config
+
+    with open(cfg_path, "w") as file:
+        yaml.dump(config, file)
+    print(f"Updated hcp configuration")

@@ -37,6 +37,11 @@ install_cudnn() {
         libcudnn8-dev=$CUDNN_VERSION-1+cuda${cuda_version}
 }
 
+add_path() {
+    echo 'PATH="$PATH:/usr/local/cuda/bin"' >/etc/profile.d/099_cuda.sh
+    chmod +x /etc/profile.d/099_cuda.sh
+}
+
 # all in one
 install_all() {
     install_cuda_driver
@@ -46,6 +51,8 @@ install_all() {
     echo "CUDA toolkit ${CUDA_VERSION} installed"
     install_cudnn
     echo "cuDNN ${CUDNN_VERSION} installed"
+    add_path
+    echo "add cuda bin to PATH"
 }
 
 install_all
