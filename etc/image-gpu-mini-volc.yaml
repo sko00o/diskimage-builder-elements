@@ -5,6 +5,7 @@
     - ubuntu
     - hc-image-base
     - cloud-init-datasource-volcengine
+    - volcengine-reset-authentication
     # webapp
     - jupyterlab
     # mount

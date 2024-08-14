@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -eu
+set -o pipefail
+
+echo ">> install volcengine reset-authentication"
+
+wget -O "$VOLC_RA_FILE" "$VOLC_RA_REPO"
+sudo dpkg -i "$VOLC_RA_FILE"
+
+# Clean up
+rm "$VOLC_RA_FILE"
