@@ -9,7 +9,7 @@ set -o pipefail
 echo ">> setup config openstack datasource"
 
 if [ -d /etc/cloud/cloud.cfg.d ]; then
-  cat >/etc/cloud/cloud.cfg.d/99-datasource-openstack.cfg <<EOF
+  cat >/etc/cloud/cloud.cfg.d/92-datasource-openstack.cfg <<EOF
 datasource:
   OpenStack:
     metadata_urls: ["http://169.254.169.254"]
