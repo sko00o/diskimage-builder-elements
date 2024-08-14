@@ -1,0 +1,24 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+  set -x
+fi
+set -eu
+set -o pipefail
+
+echo ">> setup config openstack datasource for volcengine"
+
+# ref: https://www.volcengine.com/docs/6627/96125#_5-cloud-init%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE
+if [ -d /etc/cloud/cloud.cfg.d ]; then
+  cat >/etc/cloud/cloud.cfg.d/99-datasource-openstack-volc.cfg <<EOF
+datasource_list: [ConfigDrive, OpenStack]
+
+datasource:
+  OpenStack:
+    metadata_urls: ["http://169.254.169.254","http://100.96.0.96"]
+    max_wait: -1
+    timeout: 5
+    retries: 5
+    apply_network_config: True
+EOF
+fi
