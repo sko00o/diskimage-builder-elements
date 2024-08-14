@@ -7,7 +7,7 @@ APP_PORT=${FOOOCUS_PORT:-"10000"}
 APP_DATA_TAR=${FOOOCUS_DATA_TAR:-"/root/${APP_NAME}_data.tar"}
 APP_DATA_VOLUME=${FOOOCUS_DATA_VOLUME:-"/root/data"}
 APP_VENV_DIR=${FOOOCUS_VENV_DIR:-"${APP_DIR}/venv"}
-APP_PUBLIC_DATA=${FOOOCUS_PUBLIC_DATA:-"public-data:public/${APP_NAME}/data"}
+APP_PUBLIC_DATA=${FOOOCUS_PUBLIC_DATA:-"public-data:public/sd_data"}
 
 APP_DATA_DIR="${APP_DATA_VOLUME}/${APP_NAME}"
 data_version="$(basename "$(readlink "${APP_DATA_TAR}")")"
@@ -55,7 +55,7 @@ if [ -L "${APP_VENV_DIR}" ]; then
         if rclone lsd "${APP_PUBLIC_DATA}" &>/dev/null; then
             echo "Syncing public data: from ${APP_PUBLIC_DATA}/ to ${APP_DATA_DIR}/"
             rclone sync --progress \
-                "${APP_PUBLIC_DATA}/models/" \
+                "${APP_PUBLIC_DATA}/fo_models/" \
                 "${APP_DATA_DIR}/models/"
         fi
 
@@ -98,5 +98,7 @@ cd "${APP_DIR}" && load_venv &&
         --listen \
         --port "${APP_PORT}" \
         --cache-path "${APP_CACHE}" \
+        --external-working-path "${APP_DATA_DIR}" \
+        --output-path "${APP_DATA_DIR}/outputs"\
         --always-gpu \
         $@
