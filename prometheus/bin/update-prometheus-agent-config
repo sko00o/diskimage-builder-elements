@@ -2,7 +2,6 @@
 
 import argparse
 import yaml
-import os
 import subprocess
 
 cfg_path = "/etc/prometheus/prometheus.yml"
@@ -10,9 +9,41 @@ default_url = "http://prometheus.service.yoga:9094/api/v1/write"
 
 service_list = [
     "node_exporter.service",
-    "dcgm-exporter.service",
-    "prometheus-agent.service"
+    "prometheus-agent.service",
 ]
+
+
+def check_nvidia_gpu():
+    try:
+        subprocess.run(
+            ["nvidia-smi"],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+
+if check_nvidia_gpu():
+    service_list.insert(0, "dcgm-exporter.service")
+
+
+def start_systemd_service(service_name):
+    result = subprocess.run(
+        ["systemctl", "is-active", "--quiet", service_name],
+        check=False,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    if result.returncode != 0:
+        subprocess.check_output(
+            ["systemctl", "enable", "--now", "--no-block", service_name]
+        )
+    else:
+        subprocess.check_output(["systemctl", "restart", service_name])
+
 
 def get_instance_id():
     # get cloud-init command output
@@ -60,7 +91,4 @@ if __name__ == "__main__":
     print(f"Updated Prometheus configuration: {cfg_path}")
 
     for service_name in service_list:
-        if os.system(f"systemctl is-active --quiet {service_name}") != 0:
-            os.system(f"systemctl enable --now {service_name}")
-        else:
-            os.system(f"systemctl restart {service_name}")
+        start_systemd_service(service_name)

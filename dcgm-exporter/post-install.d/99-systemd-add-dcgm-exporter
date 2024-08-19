@@ -5,4 +5,4 @@ if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
 fi
 set -euo pipefail
 
-systemctl enable dcgm-exporter.service
+# systemctl enable dcgm-exporter.service
