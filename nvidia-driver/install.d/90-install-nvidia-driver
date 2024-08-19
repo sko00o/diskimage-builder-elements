@@ -10,6 +10,9 @@ install_nvidia_driver() {
     sudo apt-get -y install --no-install-recommends \
         nvidia-driver-${major_version}=${NVIDIA_DRIVER_VERSION}-0ubuntu1 \
         nvidia-modprobe=${NVIDIA_DRIVER_VERSION}-0ubuntu1
+
+    # don't enable nvidia-persistenced.service on default
+    sudo systemctl disable nvidia-persistenced
 }
 
 freeze_nvidia_driver() {

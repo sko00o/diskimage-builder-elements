@@ -11,4 +11,4 @@ else
     sudo apt-get -y install datacenter-gpu-manager
 fi
 
-sudo systemctl enable nvidia-dcgm
+# sudo systemctl enable nvidia-dcgm

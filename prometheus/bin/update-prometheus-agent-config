@@ -9,7 +9,6 @@ default_url = "http://prometheus.service.yoga:9094/api/v1/write"
 
 service_list = [
     "node_exporter.service",
-    "prometheus-agent.service",
 ]
 
 
@@ -27,7 +26,12 @@ def check_nvidia_gpu():
 
 
 if check_nvidia_gpu():
-    service_list.insert(0, "dcgm-exporter.service")
+    service_list.append("nvidia-persistenced.service")
+    service_list.append("nvidia-dcgm.service")
+    service_list.append("dcgm-exporter.service")
+
+
+service_list.append("prometheus-agent.service")
 
 
 def start_systemd_service(service_name):
