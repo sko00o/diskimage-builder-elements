@@ -1,9 +1,9 @@
 #!/bin/bash
 # set -euo pipefail
 
-device="/dev/sdb"
-partition="/dev/sdb1"
-mount_point="/root/data"
+device=${DATA_DEVICE:-"/dev/sdb"}
+partition=${DATA_PARTITION:-"${device%/}1"}
+mount_point=${DATA_MOUNT_POINT:-"/root/data"}
 
 # Wait for the data volume to be attached
 while [ ! -b "${device}" ]; do
