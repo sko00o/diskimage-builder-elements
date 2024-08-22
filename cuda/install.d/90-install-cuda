@@ -31,10 +31,18 @@ install_cuda_toolkit() {
 }
 
 install_cudnn() {
-    cuda_version=$(version_short $CUDA_VERSION)
-    sudo apt-get -y install \
-        libcudnn8=$CUDNN_VERSION-1+cuda${cuda_version} \
-        libcudnn8-dev=$CUDNN_VERSION-1+cuda${cuda_version}
+    major_cudnn_version=${CUDNN_VERSION%%.*}
+    if [[ $major_cudnn_version -eq 8 ]]; then
+        cuda_version=$(version_short $CUDA_VERSION)
+        sudo apt-get -y install \
+            libcudnn8=$CUDNN_VERSION-1+cuda${cuda_version} \
+            libcudnn8-dev=$CUDNN_VERSION-1+cuda${cuda_version}
+    elif [[ $major_cudnn_version -eq 9 ]]; then
+        major_cuda_version=${CUDA_VERSION%%.*}
+        sudo apt-get -y install \
+            libcudnn9-cuda-${major_cuda_version}=$CUDNN_VERSION-1 \
+            libcudnn9-dev-cuda-${major_cuda_version}=$CUDNN_VERSION-1
+    fi
 }
 
 add_path() {
