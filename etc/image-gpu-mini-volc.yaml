@@ -3,9 +3,7 @@
     # base
     - vm
     - ubuntu
-    - hc-image-base
-    - cloud-init-datasource-volcengine
-    - volcengine-reset-authentication
+    - image-base-volc
     # webapp
     - jupyterlab
     # mount

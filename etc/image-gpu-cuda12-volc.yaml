@@ -1,9 +1,9 @@
-- imagename: app-palworld
+- imagename: image-gpu-cuda12-volc
   elements:
     # base
     - vm
     - ubuntu
-    - image-base-hc
+    - image-base-volc
     # webapp
     - jupyterlab
     # mount
@@ -11,8 +11,9 @@
     # monitor
     - node-exporter
     - prometheus
-    # apps
-    - palworld
+    # gpu
+    - dcgm-exporter
+    - cuda
   debug-trace: 0
   no-tmpfs: true
   environment:
@@ -22,6 +23,11 @@
     DIB_MINICONDA_RELEASE: py310_23.11.0-2
     DIB_TIMEZONE: Asia/Shanghai
     DIB_MOTD_BIG_MSG: HOLDCLOUD
+    DIB_DCGM_VERSION: "3.3.0"
+    DIB_DCGM_EXPORTER_VERSION: "3.3.0-3.2.0"
     DIB_PROMETHEUS_VERSION: "2.49.1"
     DIB_NODE_EXPORTER_VER: "1.7.0"
     DIB_JUPYTERLAB_VER: "4.1.2"
+    DIB_NVIDIA_DRIVER_VERSION: "535.183.06"
+    DIB_CUDATOOLKIT_VERSION: "12.2.2"
+    DIB_CUDNN_VERSION: "8.9.7.29"
