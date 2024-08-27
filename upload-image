@@ -81,8 +81,8 @@ image-windows() {
     local name="$1"
     local os_distro="${2:-Windows Server}"
     # ref: https://en.wikipedia.org/wiki/List_of_Microsoft_Windows_versions#Server_versions
-    # e.g. Windows Server 2019 version number is 1809
-    local os_version="${3:-1809}"
+    # e.g. Windows Server 2022 version number is 21H2
+    local os_version="${3:-"21H2"}"
     local hw_disk_bus="${4:-virtio}"
 
     image-general "${name}" "windows" "Administrator" "${os_distro}" "${os_version}" "${hw_disk_bus}"
