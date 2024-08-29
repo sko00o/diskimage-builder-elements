@@ -17,3 +17,9 @@ if [ -n "${COMFYUI_DATA_LINK_FILE}" ] && [ "${COMFYUI_DATA_LINK_FILE}" != "-" ];
     echo ">> link a COMFYUI data file on HOST"
     ln -s "${COMFYUI_DATA_LINK_FILE}" "${COMFYUI_DATA_TAR}"
 fi
+
+echo ">> install cudnn9"
+sudo apt-get -y install \
+    libcudnn9-cuda-12 \
+    libcudnn9-dev-cuda-12 \
+    ffmpeg
