@@ -56,24 +56,28 @@ if [ ! -f "${APP_INIT_DONE}" ]; then
             echo "Done"
     fi
 
-    # sync models from public data
     if rclone lsd "${APP_PUBLIC_DATA}" &>/dev/null; then
         echo "Syncing public data: from ${APP_PUBLIC_DATA}/ to ${APP_DATA_DIR}/"
+
+        # sync user data
+        mkdir -p "${APP_DATA_DIR}/output"
+        rclone copy --progress \
+            "${APP_PUBLIC_DATA}/extra_model_paths.yaml" \
+            "${APP_DATA_DIR}/"
+        rclone sync --progress \
+            "${APP_PUBLIC_DATA}/user/" \
+            "${APP_DATA_DIR}/user/"
+
+        # sync models from public data
         rclone sync --progress \
             "${APP_PUBLIC_DATA}/models/embeddings/" \
             "${APP_DATA_DIR}/models/embeddings/"
-        rclone sync --progress \
-            "${APP_PUBLIC_DATA}/models/checkpoints/" \
-            "${APP_DATA_DIR}/models/checkpoints/"
         rclone sync --progress \
             "${APP_PUBLIC_DATA}/models/vae/" \
             "${APP_DATA_DIR}/models/vae/"
         rclone sync --progress \
             "${APP_PUBLIC_DATA}/models/vae_approx/" \
             "${APP_DATA_DIR}/models/vae_approx/"
-        rclone sync --progress \
-            "${APP_PUBLIC_DATA}/models/controlnet/" \
-            "${APP_DATA_DIR}/models/controlnet/"
         rclone sync --progress \
             "${APP_PUBLIC_DATA}/models/sams/" \
             "${APP_DATA_DIR}/models/sams/"
@@ -84,8 +88,17 @@ if [ ! -f "${APP_INIT_DONE}" ]; then
             "${APP_PUBLIC_DATA}/models/ipadapter/" \
             "${APP_DATA_DIR}/models/ipadapter/"
         rclone sync --progress \
+            "${APP_PUBLIC_DATA}/models/ultralytics/" \
+            "${APP_DATA_DIR}/models/ultralytics/"
+        rclone sync --progress \
             "${APP_PUBLIC_DATA}/models/loras/" \
             "${APP_DATA_DIR}/models/loras/"
+        rclone sync --progress \
+            "${APP_PUBLIC_DATA}/models/controlnet/" \
+            "${APP_DATA_DIR}/models/controlnet/"
+        rclone sync --progress \
+            "${APP_PUBLIC_DATA}/models/checkpoints/" \
+            "${APP_DATA_DIR}/models/checkpoints/"
     fi
 
     # set a empty file to indicate init complete
