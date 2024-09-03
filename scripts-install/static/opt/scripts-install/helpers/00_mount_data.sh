@@ -125,28 +125,3 @@ grow_partition() {
     resize2fs "${partition}"
     echo "grow partition ${partition} success"
 }
-
-# grow_partition_service() {
-#     local partition="$1"
-#     local mount_point="$2"
-
-#     # e.g. partition=/dev/sdb1 -> filename=dev-sdb1-growpart
-#     local filename="${partition//\//-}"
-#     filename="${filename#-}"
-#     filename="${filename}-growpart"
-
-#     # create systemd service file
-#     cat <<EOF >"/etc/systemd/system/${filename}.service"
-# [Unit]
-# Description=grow partition $partition
-# After=cloud-final.service
-# [Service]
-# Type=oneshot
-# ExecStart=bash -c 'source /opt/scripts-install/helpers/00_mount_data.sh && grow_partition "$partition" "$mount_point"'
-# [Install]
-# WantedBy=cloud-init.target
-# EOF
-
-#     systemctl enable --now --no-block "${filename}.service"
-#     echo "auto grow partition ${partition} success"
-# }
