@@ -14,7 +14,7 @@ ExecStart= \
     --config=/root/.config/rclone/rclone.conf \
     --read-only \
     --allow-other \
-    --devname="%i" \
+    --devname="public" \
     public-data:%i /root/public
 ExecStop=/bin/fusermount -u /root/public
 
