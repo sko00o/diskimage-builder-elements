@@ -20,15 +20,15 @@ if __name__ == "__main__":
     if isinstance(items, list):
         new_config = []
         for c in items:
-            if c["name"] == args.name:
+            if c["mountpoint"] == args.mountpoint:
                 continue
             new_config.append(c)
 
         new_config.append(
             {
+                "mountpoint": args.mountpoint,
                 "name": args.name,
                 "bucket": args.bucket,
-                "mountpoint": args.mountpoint,
             }
         )
         config["remotes"] = new_config

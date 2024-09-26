@@ -11,6 +11,7 @@ cp -av ../health-check/static/* static/
 # cp -av ../systemd-rvc-webui/static/* static/
 
 cp -av ../health-check/bin/* static/usr/local/bin/
+cp -av ../hcp/bin/* static/usr/local/bin/
 # cp -av ../systemd-jupyterlab/bin/* static/usr/local/bin/
 # cp -av ../prometheus/bin/* static/usr/local/bin/
 # cp -av ../open-webui/bin/* static/usr/local/bin/
