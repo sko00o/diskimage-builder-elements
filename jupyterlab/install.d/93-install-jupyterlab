@@ -17,4 +17,11 @@ else
 fi
 
 JP_PATH=$(conda run which jupyter)
-ln -s $JP_PATH /usr/local/bin/jupyter
+
+# generate start scripts
+cat <<EOF >/usr/local/bin/start_jupyter_lab
+#!/bin/bash
+${JP_PATH} lab --allow-root --config /root/.jupyter/jupyter_lab_config.py
+EOF
+
+chmod +x /usr/local/bin/start_jupyter_lab

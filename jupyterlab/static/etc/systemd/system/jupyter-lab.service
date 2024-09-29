@@ -5,7 +5,7 @@ Description=Jupyter Lab
 Environment="SHELL=/bin/bash"
 Type=simple
 PIDFile=/run/jupyter-lab.pid
-ExecStart=/usr/local/bin/jupyter lab --allow-root --config /root/.jupyter/jupyter_lab_config.py
+ExecStart=/usr/local/bin/start_jupyter_lab
 User=root
 WorkingDirectory=/root/
 Restart=always
