@@ -4,7 +4,7 @@ import os
 import subprocess
 
 backup_source = "/root/data"
-backup_destination = "private-data:/backup"
+backup_destination = "root-private:/backup"
 
 # Define prompts in both languages
 prompts = {
