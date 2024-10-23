@@ -1,4 +1,4 @@
-- imagename: image-gpu-mini
+- imagename: image-gpu-mini-cm
   elements:
     # base
     - vm

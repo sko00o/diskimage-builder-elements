@@ -1,4 +1,4 @@
-- imagename: image-gpu-pytorch
+- imagename: image-gpu-pytorch-cm
   elements:
     # base
     - vm

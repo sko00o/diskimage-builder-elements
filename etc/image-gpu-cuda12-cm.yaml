@@ -1,4 +1,4 @@
-- imagename: image-gpu-cuda12
+- imagename: image-gpu-cuda12-cm
   elements:
     # base
     - vm
