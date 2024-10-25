@@ -3,7 +3,7 @@
     # base
     - vm
     - ubuntu
-    - image-base-hc
+    - image-base-cm
     # webapp
     - jupyterlab
     # mount
