@@ -18,6 +18,6 @@ systemctl stop qemu-guest-agent
 
 echo ">> install qemu-guest-agent-cm"
 QEMU_GA_CM_DIR=$(ls -l /tmp/ | grep "qemu-guest-agent" | awk '{print $9}')
-mv /usr/bin/qemu-ga /usr/bin/qemu-ga.bak
-mv ${QEMU_GA_CM_DIR}/ubuntu/x86/64bit/qemu-ga /usr/bin/qemu-ga
-chmod a+x /usr/bin/qemu-ga
+mv /usr/sbin/qemu-ga /usr/sbin/qemu-ga.bak
+mv ${QEMU_GA_CM_DIR}/ubuntu/x86/64bit/qemu-ga /usr/sbin/qemu-ga
+chmod a+x /usr/sbin/qemu-ga
