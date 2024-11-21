@@ -1,4 +1,4 @@
-- imagename: image-gpu-cuda12-volc
+- imagename: image-gpu-focal-cuda12-volc
   elements:
     # base
     - vm
