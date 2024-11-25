@@ -1,9 +1,9 @@
-- imagename: image-gpu-focal-cuda12-volc
+- imagename: image-gpu-mini
   elements:
     # base
     - vm
     - ubuntu
-    - image-base-volc
+    - image-base-hc
     # webapp
     - jupyterlab
     # mount
@@ -13,7 +13,7 @@
     - prometheus
     # gpu
     - dcgm-exporter
-    - cuda
+    - nvidia-driver
   debug-trace: 0
   no-tmpfs: true
   environment:
@@ -28,6 +28,4 @@
     DIB_PROMETHEUS_VERSION: "2.49.1"
     DIB_NODE_EXPORTER_VER: "1.7.0"
     DIB_JUPYTERLAB_VER: "4.1.2"
-    DIB_NVIDIA_DRIVER_VERSION: "555.42.06"
-    DIB_CUDATOOLKIT_VERSION: "12.5.1"
-    DIB_CUDNN_VERSION: "9.3.0.75"
+    DIB_NVIDIA_DRIVER_VERSION: "550.127.08"
