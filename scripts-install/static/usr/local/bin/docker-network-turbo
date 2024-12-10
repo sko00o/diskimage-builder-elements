@@ -1,0 +1,79 @@
+#!/bin/bash
+
+LOCAL_IP=$(ip ro show default | grep -o "src [^ ]*" | awk '{print $2}')
+PROXY_IP=$(echo $https_proxy | grep -o "/[^:]*" | cut -c 3-)
+PROXY_PORT=55082
+PROXY_TYPE=http-connect
+PROXY_DNS=5353
+
+if [ "$PROXY_IP" = "" ]; then
+    echo "没有发现 HTTPS_PROXY 变量, 请执行 \`source network-turbo && proxy_set\`"
+    return 0
+fi
+
+PROXY_REAL_IP=$(dig $PROXY_IP +short @8.8.8.8 | tr -d '
+')
+if [ "$PROXY_REAL_IP" != "" ]; then
+    PROXY_IP=$PROXY_REAL_IP
+fi
+
+nc -z $PROXY_IP $PROXY_PORT && nc -uz $PROXY_IP $PROXY_DNS || {
+    echo "连接 http/https 代理[$PROXY_IP:$PROXY_PORT] or dns 代理[$PROXY_IP:$PROXY_DNS] 失败!"
+    return 0
+}
+
+function docker_restart_notify() {
+    if [ -t 0 ]; then
+        echo -n "该操作会重启 DOCKER，正在运行的容器会被关闭，整个过程大约 1 分钟，确认执行么？(y/n)"
+        read -r answer
+        if [ "$answer" != "y" ]; then
+            echo "不执行任何操作，退出"
+            return 1
+        fi
+    fi
+}
+
+function docker_proxy_set() {
+    docker_restart_notify || return 0
+    # update dockerd proxy config
+    mkdir -p /etc/systemd/system/docker.service.d/
+    cat << EOF > /etc/systemd/system/docker.service.d/proxy.conf
+[Service]
+Environment="HTTP_PROXY=$http_proxy"
+Environment="HTTPS_PROXY=$https_proxy"
+Environment="NO_PROXY=$no_proxy"
+EOF
+    systemctl daemon-reload && systemctl restart docker
+
+    container_proxy_set
+}
+
+function container_proxy_set() {
+    docker inspect $(curl https://collection.b0.upaiyun.com/huixingyun/hx-redsocks.imageId) > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        curl https://collection.b0.upaiyun.com/huixingyun/hx-redsocks.tar.gz | docker load
+    fi
+    # recreate hx-resocks to up
+    docker rm -f hx-redsocks || return 0
+    docker run --rm --name=hx-redsocks -d --net=host --cap-add=NET_ADMIN \
+        huixingyun/hx-redsocks:latest up $LOCAL_IP $PROXY_IP $PROXY_PORT $PROXY_TYPE $PROXY_DNS
+}
+
+function docker_proxy_unset() {
+    docker_restart_notify || return 0
+    rm -rf "/etc/systemd/system/docker.service.d/proxy.conf"
+    systemctl daemon-reload && systemctl restart docker
+
+    container_proxy_unset
+}
+
+function container_proxy_unset() {
+    docker inspect $(curl https://collection.b0.upaiyun.com/huixingyun/hx-redsocks.imageId) > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        curl https://collection.b0.upaiyun.com/huixingyun/hx-redsocks.tar.gz | docker load
+    fi
+    # recreate hx-resocks to down
+    docker rm -f hx-redsocks || return 0
+    docker run --name=hx-redsocks -d --net=host --cap-add=NET_ADMIN \
+        huixingyun/hx-redsocks:latest down
+}
