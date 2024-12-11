@@ -8,9 +8,8 @@ set -o nounset
 set -o pipefail
 
 # Install Nvidia Container Toolkit
-VERSION_STRING="${DIB_NVIDIA_CTK_VERSION}"
+VERSION_STRING="${DIB_NVIDIA_CTK_VERSION}-1"
 
-sudo apt-get install -y nvidia-container-toolkit=$VERSION_STRING \
-	nvidia-container-toolkit
+sudo apt-get install -y nvidia-container-toolkit=$VERSION_STRING
 
 nvidia-ctk runtime configure --runtime=docker

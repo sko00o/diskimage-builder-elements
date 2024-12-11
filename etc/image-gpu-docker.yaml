@@ -14,6 +14,8 @@
     # gpu
     - dcgm-exporter
     - nvidia-driver
+    # docker
+    - docker-ce
     - nvidia-ctk
   debug-trace: 0
   no-tmpfs: true
@@ -30,4 +32,5 @@
     DIB_NODE_EXPORTER_VER: "1.7.0"
     DIB_JUPYTERLAB_VER: "4.1.2"
     DIB_NVIDIA_DRIVER_VERSION: "555.42.06"
-    DIB_NVIDIA_CTK_VERSION: "1.16.2-1"
+    DIB_DOCKER_VERSION: "24.0.0"
+    DIB_NVIDIA_CTK_VERSION: "1.17.3"
