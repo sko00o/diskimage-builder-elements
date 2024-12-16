@@ -11,4 +11,5 @@ set -o pipefail
 chmod -x /etc/update-motd.d/*
 
 # Remove motd-new.service
+systemctl disable motd-news.service
 rm /lib/systemd/system/motd-news.service

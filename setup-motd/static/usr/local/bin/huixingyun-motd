@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+
+export LC_ALL=en_US.utf8
+
+#color
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+RED='\033[0;31m'
+CYAN='\033[0;36m'
+YELLOW='\033[1;33m'
+GRAY='\033[1;37m'
+NC='\033[0m'
+
+function show_system_info() {
+    if [ -f /etc/redhat-release ]; then
+        os_version="$(cat /etc/redhat-release) $(uname -i)"
+    elif [ -f /etc/lsb-release ]; then
+        os_version="$(lsb_release -d | cut -f2) $(uname -i)"
+    else
+        os_version="Unknown OS $(uname -i)"
+    fi
+    up=$(uptime | sed -r 's@.*up (.*)([0-9.*] user.*)load average: (.*)@\1\tLOAD:\t\3@g')
+    printf "\t${GREEN}%-15s${NC} ${CYAN}%-31s${NC}\n" "OS" "$os_version"
+    printf "\t${GREEN}%-15s${NC} ${CYAN}%-31s${NC}\n" "Hostname" "$(hostname)"
+    printf "\t${GREEN}%-15s${NC} ${CYAN}%-31s${NC}\n" "Uptime" "$up"
+    echo -e "------------------------------------------------------------------------------------------"
+}
+
+function show_cpu() {
+    cpu_model=$(sed -n '/model name/s: \{1,\}: :gp' /proc/cpuinfo | sort -u |
+        awk -F: '{print $2}' | sed -E 's/\(R\)//g; s/\(TM\)//g; s/CPU//g; s/@ //g' | xargs)
+    cpu_freq=$(awk '/cpu MHz/{freq=$4} END{printf "%.1fGHz", freq/1000}' /proc/cpuinfo)
+    cpu_cores=$(grep -c ^processor /proc/cpuinfo)
+    cpu_info="${cpu_model} (${cpu_cores}) @ ${cpu_freq}"
+    printf "\t${GREEN}%-15s${NC} ${CYAN}%-31s${NC}\n" "CPU" "$cpu_info"
+    echo -e "------------------------------------------------------------------------------------------"
+}
+
+function show_gpu() {
+    if command -v nvidia-smi &>/dev/null; then
+        gpu_names=$(nvidia-smi --query-gpu=name --format=csv,noheader)
+        gpu_info=$(echo "$gpu_names" | sort | uniq -c | awk '{$1=$1;name=substr($0,index($0,$2));printf "%s [x%d]", name, $1}' | tr '\n' ',' | sed 's/,$//')
+        if [ -n "$gpu_info" ]; then
+            printf "\t${GREEN}%-15s${NC} ${CYAN}%s${NC}\n" "GPU List" "$gpu_info"
+        fi
+    else
+        gpu_list=$(lspci | grep -i "VGA\|Display" | sed 's/.*controller: //g' | cut -d' ' -f1-3 | tr '\n' ',' | sed 's/,$//')
+        printf "\t${GREEN}%-15s${NC} ${CYAN}%s${NC}\n" "GPU List" "$gpu_list"
+    fi
+    echo -e "------------------------------------------------------------------------------------------"
+}
+
+function show_ram() {
+    if command -v lsmem &>/dev/null; then
+        ram=$(lsmem | grep "Total online" | awk '{print $4}')
+    else
+        ram=$(awk '/MemTotal/{printf("%.2f GB", $2/1024/1000)}' /proc/meminfo)
+    fi
+    printf "\t${GREEN}%-15s${NC} ${CYAN}%-31s${NC}\n" "Total RAM" "$ram"
+    echo -e "------------------------------------------------------------------------------------------"
+}
+
+function show_disk() {
+    # Check if nvme command exists and there are NVMe devices
+    nvme_enable=false
+    if command -v nvme &>/dev/null; then
+        nvme list | grep -iq nvme && nvme_enable=true
+    fi
+
+    if [ "${nvme_enable}" = "true" ]; then
+        header_format="%-15s %-30s %-18s %-8s %-8s\n"
+        echo -e "\t${GRAY}$(printf "$header_format" "DiskPath" "Model" "SN" "Used" "Size")${NC}"
+
+        nvme list -o json | jq -r '.Devices[] | [.DevicePath, .ModelNumber, .SerialNumber, .UsedBytes, .PhysicalSize, .SectorSize] | @tsv' | while IFS=$'\t' read -r device model serial used size sector; do
+            used_tb=$(awk "BEGIN {printf \"%.2f\", $used/1000000000000}")
+            size_tb=$(awk "BEGIN {printf \"%.2f\", $size/1000000000000}")
+
+            printf "\t${GREEN}%-16s${NC}" "$device"
+            printf "${RED}%-31s${NC}" "$model"
+            printf "%-19s" "$serial"
+            printf "${CYAN}%-9s${NC}" "${used_tb}TB"
+            printf "${RED}%-9s\n${NC}" "${size_tb}TB"
+        done
+    else
+        header_format="%-15s %-16s %-16s %-10s %-8s\n"
+        echo -e "\t${GREEN}$(printf "$header_format" "DiskPath" "Size" "Free" "Used" "Mount")${NC}"
+        df -h | awk '/sd/{printf("\t%-16s%-17s%-17s%-11s%-9s\n", $1, $2, $4, $5, $NF)}'
+    fi
+    echo -e "------------------------------------------------------------------------------------------"
+}
+
+if command -v neofetch &>/dev/null; then
+    neofetch
+else
+    show_system_info
+    show_cpu
+    show_gpu
+    show_ram
+    show_disk
+fi
+
+cat <<EOF
+目录提示
+====================================================================================================
+|  /              |  系统盘，随镜像一起保存。系统盘较小，请优先使用数据盘。
+|  /root/data     |  数据盘，不会保存进镜像。重装系统不影响数据盘。
+|  /root/public   |  公共盘，只读共享目录。包含常用数据集和模型文件。
+|  /root/private  |  网盘，需执行挂载脚本。可以多实例共享，不受实例开关机和保存镜像的影响。
+
+脚本提示
+====================================================================================================
+| 开启学术加速（默认开启） | source network-turbo && proxy_set
+| 关闭学术加速             | source network-turbo && proxy_unset
+| 开启 docker 容器学术加速 | source docker-network-turbo && docker_proxy_set
+| 关闭 docker 容器学术加速 | source docker-network-turbo && docker_proxy_unset
+
+更多文档说明请访问： https://help.huixingyun.com/
+EOF
