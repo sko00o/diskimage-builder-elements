@@ -1,4 +1,4 @@
-- imagename: app-comfyui
+- imagename: app-qinglong
   elements:
     # base
     - vm
@@ -17,6 +17,7 @@
     # app
     - comfyui
     - systemd-comfyui
+    - qinglong-trainer
     - filebrowser
   debug-trace: 0
   no-tmpfs: true
@@ -35,4 +36,6 @@
     DIB_NVIDIA_DRIVER_VERSION: "555.42.06"
     DIB_COMFYUI_FILE: "/root/public/apps/ComfyUI/comfyui_20241216.tar"
     DIB_COMFYUI_DATA_LINK_FILE: "-"
+    DIB_QINGLONG_FILE: "/root/public/apps/qinglong/qinglong_trainer_26.tar"
+    DIB_QINGLONG_DATA_LINK_FILE: "-"
     DIB_FILEBROWSER_ROOT: "/root"

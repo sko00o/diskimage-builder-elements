@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -o errexit
+set -o nounset
+set -o pipefail
+
+# ref: https://docs.astral.sh/uv/getting-started/installation/
+
+# if UV_VERSION is -, then install the latest version
+if [ "$UV_VERSION" = "-" ]; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+else
+    curl -LsSf https://astral.sh/uv/${UV_VERSION}/install.sh | sh
+fi
