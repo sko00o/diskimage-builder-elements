@@ -9,9 +9,4 @@ echo ">> Install ${QINGLONG_APP_NAME}"
 
 TAR_FILE=/tmp/$(basename ${QINGLONG_FILE})
 tar -xvf ${TAR_FILE} -C /root/
-
-# if QINGLONG_DATA_LINK_FILE is not "-"
-if [ -n "${QINGLONG_DATA_LINK_FILE}" ] && [ "${QINGLONG_DATA_LINK_FILE}" != "-" ]; then
-    echo ">> link a COMFYUI data file on HOST"
-    ln -s "${QINGLONG_DATA_LINK_FILE}" "${QINGLONG_DATA_TAR}"
-fi
+rm -rf ${TAR_FILE}

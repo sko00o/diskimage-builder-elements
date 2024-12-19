@@ -11,6 +11,7 @@ if [ -n "${QINGLONG_FILE}" ]; then
     cp "${QINGLONG_FILE}" "${TMP_MOUNT_PATH}/tmp/$(basename ${QINGLONG_FILE})"
 else
     echo "ERROR: QINGLONG_FILE is not set."
+    exit 1
 fi
 
 # if QINGLONG_DATA_FILE is not "-", then copy the file to the image
