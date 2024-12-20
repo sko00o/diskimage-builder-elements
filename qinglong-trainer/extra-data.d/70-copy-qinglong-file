@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -euo pipefail
+
+echo ">> Copy ${QINGLONG_APP_NAME} source file from HOST"
+
+if [ -n "${QINGLONG_FILE}" ]; then
+    cp "${QINGLONG_FILE}" "${TMP_MOUNT_PATH}/tmp/$(basename ${QINGLONG_FILE})"
+else
+    echo "ERROR: QINGLONG_FILE is not set."
+    exit 1
+fi
+
+# if QINGLONG_DATA_FILE is not "-", then copy the file to the image
+if [ -n "${QINGLONG_DATA_FILE}" ] && [ "${QINGLONG_DATA_FILE}" != "-" ]; then
+    echo ">> Copy QINGLONG data file from HOST"
+    cp "${QINGLONG_DATA_FILE}" "${TMP_MOUNT_PATH}/${QINGLONG_DATA_TAR}"
+fi

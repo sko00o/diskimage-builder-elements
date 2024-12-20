@@ -9,6 +9,7 @@ echo ">> Install ${COMFYUI_APP_NAME}"
 
 TAR_FILE=/tmp/$(basename ${COMFYUI_FILE})
 tar -xvf ${TAR_FILE} -C /root/
+rm -rf ${TAR_FILE}
 
 ln -s "/usr/local/bin/${COMFYUI_START_SCRIPT}" "/root/${COMFYUI_START_SCRIPT}"
 

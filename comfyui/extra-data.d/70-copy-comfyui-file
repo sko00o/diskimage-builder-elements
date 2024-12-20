@@ -11,6 +11,7 @@ if [ -n "${COMFYUI_FILE}" ]; then
     cp "${COMFYUI_FILE}" "${TMP_MOUNT_PATH}/tmp/$(basename ${COMFYUI_FILE})"
 else
     echo "ERROR: COMFYUI_FILE is not set."
+    exit 1
 fi
 
 # if COMFYUI_DATA_FILE is not "-", then copy the file to the image

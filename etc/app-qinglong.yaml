@@ -1,4 +1,4 @@
-- imagename: app-comfyui
+- imagename: app-qinglong
   elements:
     # base
     - vm
@@ -17,6 +17,7 @@
     # app
     - comfyui
     - systemd-comfyui
+    - qinglong-trainer
     - filebrowser
   debug-trace: 0
   no-tmpfs: true
@@ -26,7 +27,6 @@
     DIB_OFFLINE: "true"
     DIB_MINICONDA_RELEASE: py310_23.11.0-2
     DIB_TIMEZONE: Asia/Shanghai
-    DIB_MOTD_BIG_MSG: HOLDCLOUD
     DIB_DCGM_VERSION: "3.3.0"
     DIB_DCGM_EXPORTER_VERSION: "3.3.0-3.2.0"
     DIB_PROMETHEUS_VERSION: "2.49.1"
@@ -34,5 +34,5 @@
     DIB_JUPYTERLAB_VER: "4.1.2"
     DIB_NVIDIA_DRIVER_VERSION: "555.42.06"
     DIB_COMFYUI_FILE: "/root/public/apps/ComfyUI/comfyui_20241216.tar"
-    DIB_COMFYUI_DATA_LINK_FILE: "-"
+    DIB_QINGLONG_FILE: "/root/public/apps/qinglong/qinglong_trainer_26.tar"
     DIB_FILEBROWSER_ROOT: "/root"
